@@ -1,6 +1,6 @@
 # XR Tour
 
-This repository contains a "starter" project for web application development in JavaScript. This includes the following components, from front-end to back-end:
+This repository contains the code for XR Tour, a platform and content management system for creating mobile web-based walking tours.
 
 - React 18.2.0
 - React Router 6.10.0
@@ -36,8 +36,8 @@ This repository contains a "starter" project for web application development in 
    like this, the server is running:
 
    ```
-   server_1       | 4:13:08 AM webpack.1 |  You can now view xrtour in the browser.
-   server_1       | 4:13:08 AM webpack.1 |    Local:            http://localhost:3000
+   xrtour-server-1       | 4:01:54 PM client.1 |  You can now view xrtour-client in the browser.
+   xrtour-server-1       | 4:01:54 PM client.1 |    Local:            http://localhost:3000
    ```
 
 5. Now you should be able to open the web app in your browser at: http://localhost:3000/
@@ -285,7 +285,7 @@ This repository contains a "starter" project for web application development in 
 
 ## License
 
-XR Tour
+XR Tour  
 Copyright (C) 2023 CHSA
 
 This program is free software: you can redistribute it and/or modify
