@@ -10,7 +10,7 @@ describe('/api/users', () => {
   let testSession;
 
   beforeEach(async () => {
-    await helper.loadFixtures(['users', 'teams']);
+    await helper.loadFixtures(['users', 'teams', 'memberships']);
     testSession = session(app);
   });
 
@@ -39,7 +39,25 @@ describe('/api/users', () => {
           lastName: 'User',
           picture: null,
           pictureUrl: null,
-          Memberships: [],
+          Memberships: [
+            {
+              Team: {
+                id: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+                link: 'regularuser',
+                name: "Regular's Personal Team",
+                variants: [
+                  {
+                    code: 'en-us',
+                    displayName: 'English',
+                    name: 'English (US)',
+                  },
+                ],
+              },
+              TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+              UserId: 'b9d53b71-faac-4ead-bbb6-745412b79bbf',
+              role: 'OWNER',
+            },
+          ],
         });
       });
     });
