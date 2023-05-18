@@ -39,10 +39,22 @@ describe('/api/teams', () => {
         .expect(StatusCodes.CREATED);
 
       assert(response.body?.id);
+      assert.deepStrictEqual(response.body?.Memberships?.length, 1);
+      assert.deepStrictEqual(response.body.Memberships[0], {
+        TeamId: response.body.id,
+        UserId: 'b9d53b71-faac-4ead-bbb6-745412b79bbf',
+        role: 'OWNER',
+      });
+
       const record = await models.Team.findByPk(response.body.id);
       assert(record);
       assert.deepStrictEqual(record.name, 'New Team');
       assert.deepStrictEqual(record.link, 'newteam');
+
+      const memberships = await record.getMemberships();
+      assert.deepStrictEqual(memberships.length, 1);
+      assert.deepStrictEqual(memberships[0].UserId, 'b9d53b71-faac-4ead-bbb6-745412b79bbf');
+      assert.deepStrictEqual(memberships[0].role, 'OWNER');
     });
 
     it('validates the presence of the Team name', async () => {

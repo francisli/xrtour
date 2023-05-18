@@ -24,7 +24,10 @@ router.get('/', interceptors.requireAdmin, async (req, res) => {
 
 router.get('/me', async (req, res) => {
   if (req.user) {
-    req.user.Memberships = await req.user.getMemberships({ include: 'Team' });
+    req.user.Memberships = await req.user.getMemberships({
+      include: 'Team',
+      order: [['Team', 'name', 'ASC']],
+    });
     res.json(req.user.toJSON());
   } else {
     res.status(StatusCodes.NO_CONTENT).end();

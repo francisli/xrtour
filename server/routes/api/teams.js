@@ -23,6 +23,15 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
   try {
     await models.sequelize.transaction(async (transaction) => {
       await record.save({ transaction });
+      const membership = await models.Membership.create(
+        {
+          TeamId: record.id,
+          UserId: req.user.id,
+          role: 'OWNER',
+        },
+        { transaction }
+      );
+      record.Memberships = [membership];
     });
   } catch (error) {
     if (error.name === 'SequelizeValidationError') {

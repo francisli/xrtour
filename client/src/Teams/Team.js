@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { StatusCodes } from 'http-status-codes';
 
+import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
 import FormGroup from '../Components/FormGroup';
+import UnexpectedError from '../UnexpectedError';
+import ValidationError from '../ValidationError';
 
 function Team() {
-  const { user } = useAuthContext();
+  const navigate = useNavigate();
+  const { user, setUser } = useAuthContext();
   const { teamId } = useParams();
 
   const isEditing = !!teamId;
@@ -13,7 +18,7 @@ function Team() {
 
   const [team, setTeam] = useState({
     name: isFirstTeam ? `${user.firstName}'s Personal Team` : '',
-    link: '',
+    link: isFirstTeam ? `${user.firstName}${user.lastName}`.toLocaleLowerCase() : '',
   });
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
@@ -24,8 +29,41 @@ function Team() {
     setTeam(newTeam);
   }
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      let response;
+      if (team.id) {
+        response = await Api.teams.update(team.id, team);
+      } else {
+        response = await Api.teams.create(team);
+      }
+      const Team = { ...response.data };
+      const { Memberships } = Team;
+      const [Membership] = Memberships;
+      delete Team.Memberships;
+      Membership.Team = Team;
+      const index = user.Memberships.findIndex((m) => m.id === Membership.id);
+      if (index >= 0) {
+        user.Memberships[index] = Membership;
+      } else {
+        user.Memberships.push(Membership);
+      }
+      user.Memberships.sort((m1, m2) => m1.Team?.name?.localeCompare(m2.Team?.name));
+      setUser({ ...user });
+      navigate('/');
+    } catch (error) {
+      console.log(error);
+      if (error.response?.status === StatusCodes.UNPROCESSABLE_ENTITY) {
+        setError(new ValidationError(error.response.data));
+      } else {
+        setError(new UnexpectedError());
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
