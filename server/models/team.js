@@ -14,6 +14,16 @@ module.exports = (sequelize, DataTypes) => {
       }
       return json;
     }
+
+    async getMembership(user, options) {
+      const memberships = await this.getMemberships({
+        where: {
+          UserId: user.id,
+        },
+        transaction: options?.transaction,
+      });
+      return memberships.length ? memberships[0] : null;
+    }
   }
 
   Team.init(
