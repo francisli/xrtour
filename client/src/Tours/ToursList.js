@@ -1,24 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useAuthContext } from '../AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 import Api from '../Api';
 
 import TourCard from './TourCard';
 
 function ToursList() {
-  const { user, membership, setMembership } = useAuthContext();
-  const navigate = useNavigate();
+  const { membership } = useAuthContext();
 
   const [tours, setTours] = useState();
-
-  useEffect(() => {
-    if (user?.Memberships?.length === 0) {
-      navigate('/teams/new');
-    } else if (!membership) {
-      setMembership(user?.Memberships?.[0]);
-    }
-  }, [user, membership, setMembership, navigate]);
 
   useEffect(() => {
     if (!membership) return;
