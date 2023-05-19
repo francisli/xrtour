@@ -51,6 +51,84 @@ describe('/api/tours', () => {
       assert.deepStrictEqual(record.name, 'New Tour');
       assert.deepStrictEqual(record.link, 'newtour');
     });
+
+    it('validates the presence of the Tour name', async () => {
+      const response = await testSession
+        .post('/api/tours')
+        .set('Accept', 'application/json')
+        .send({
+          TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+          link: 'newtour',
+          names: {},
+          descriptions: { 'en-us': 'New Tour description' },
+          variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
+          visibility: 'PRIVATE',
+        })
+        .expect(StatusCodes.UNPROCESSABLE_ENTITY);
+
+      assert.deepStrictEqual(response.body, {
+        errors: [
+          {
+            message: 'Name cannot be blank',
+            path: 'name',
+            value: '',
+          },
+        ],
+        status: 422,
+      });
+    });
+
+    it('validates the uniqueness of the Tour link', async () => {
+      const response = await testSession
+        .post('/api/tours')
+        .set('Accept', 'application/json')
+        .send({
+          TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+          link: 'tour2',
+          names: { 'en-us': 'New Tour' },
+          descriptions: { 'en-us': 'New Tour description' },
+          variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
+          visibility: 'PRIVATE',
+        })
+        .expect(StatusCodes.UNPROCESSABLE_ENTITY);
+
+      assert.deepStrictEqual(response.body, {
+        errors: [
+          {
+            message: 'Link already taken',
+            path: 'link',
+            value: 'tour2',
+          },
+        ],
+        status: 422,
+      });
+    });
+
+    it('validates the format of the Team link', async () => {
+      const response = await testSession
+        .post('/api/tours')
+        .set('Accept', 'application/json')
+        .send({
+          TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+          link: 'invalid link',
+          names: { 'en-us': 'New Tour' },
+          descriptions: { 'en-us': 'New Tour description' },
+          variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
+          visibility: 'PRIVATE',
+        })
+        .expect(StatusCodes.UNPROCESSABLE_ENTITY);
+
+      assert.deepStrictEqual(response.body, {
+        errors: [
+          {
+            message: 'Letters, numbers, and hyphen only',
+            path: 'link',
+            value: 'invalid link',
+          },
+        ],
+        status: 422,
+      });
+    });
   });
 
   describe('GET /:id', () => {

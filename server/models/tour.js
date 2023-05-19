@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { Model } = require('sequelize');
+const { Model, Op } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Tour extends Model {
@@ -15,8 +15,42 @@ module.exports = (sequelize, DataTypes) => {
 
   Tour.init(
     {
-      link: DataTypes.CITEXT,
-      name: DataTypes.STRING,
+      link: {
+        type: DataTypes.CITEXT,
+        validate: {
+          notEmpty: {
+            msg: 'Link cannot be blank',
+          },
+          async isUnique(value) {
+            if (this.changed('link')) {
+              const record = await Tour.findOne({
+                where: {
+                  id: {
+                    [Op.ne]: this.id,
+                  },
+                  TeamId: this.TeamId,
+                  link: value,
+                },
+              });
+              if (record) {
+                throw new Error('Link already taken');
+              }
+            }
+          },
+          is: {
+            args: [/^[A-Za-z0-9-]+$/],
+            msg: 'Letters, numbers, and hyphen only',
+          },
+        },
+      },
+      name: {
+        type: DataTypes.STRING,
+        validate: {
+          notEmpty: {
+            msg: 'Name cannot be blank',
+          },
+        },
+      },
       names: DataTypes.JSONB,
       descriptions: DataTypes.JSONB,
       variants: DataTypes.JSONB,
@@ -30,7 +64,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Tour.beforeValidate((record) => {
     const [variant] = record.variants;
-    record.name = record.names[variant.code];
+    record.name = record.names[variant.code] ?? '';
   });
 
   return Tour;
