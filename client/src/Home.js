@@ -1,11 +1,11 @@
 import { useAuthContext } from './AuthContext';
-import ToursList from './Tours/ToursList';
+import TeamsList from './Teams/TeamsList';
 
 function Home() {
   const { user } = useAuthContext();
 
   return user ? (
-    <ToursList />
+    <TeamsList />
   ) : (
     <main className="container">
       <h1>Home</h1>
