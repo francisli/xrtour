@@ -30,13 +30,13 @@ function TourForm() {
 
   useEffect(() => {
     if (membership) {
-      setVariant(membership?.Team?.variants?.[0]);
+      setVariant(membership.Team.variants[0]);
       setTour({
-        TeamId: membership?.TeamId,
+        TeamId: membership.TeamId,
         link: '',
-        names: membership?.Team?.variants ? { [membership.Team.variants[0]]: '' } : {},
-        descriptions: membership?.Team?.variants ? { [membership.Team.variants[0]]: '' } : {},
-        variants: membership?.Team?.variants ? [membership.Team.variants[0]] : [],
+        names: { [membership.Team.variants[0].code]: '' },
+        descriptions: { [membership.Team.variants[0].code]: '' },
+        variants: [membership.Team.variants[0]],
         visibility: 'PRIVATE',
       });
     }
@@ -64,7 +64,7 @@ function TourForm() {
       } else {
         response = await Api.tours.create(tour);
       }
-      navigate(`/tours/${response.data.id}`);
+      navigate(`/teams/${membership.TeamId}/tours/${response.data.id}`);
     } catch (error) {
       if (error.response?.status === StatusCodes.UNPROCESSABLE_ENTITY) {
         setError(new ValidationError(error.response.data));
