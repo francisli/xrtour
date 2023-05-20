@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 
-function FormGroup({ id, type = 'text', name, label, helpText, placeholder, record, value, error, onChange }) {
+function FormGroup({ id, type = 'text', name, label, helpText, placeholder, plaintext, record, value, error, onChange }) {
   return (
     <div className="mb-3">
       <label className="form-label" htmlFor={id ?? name}>
@@ -8,7 +8,11 @@ function FormGroup({ id, type = 'text', name, label, helpText, placeholder, reco
       </label>
       {type === 'textarea' && (
         <textarea
-          className={classNames('form-control', { 'is-invalid': error?.errorsFor?.(name) })}
+          className={classNames({
+            'form-control': !plaintext,
+            'form-control-plaintext': plaintext,
+            'is-invalid': error?.errorsFor?.(name),
+          })}
           id={id ?? name}
           name={name}
           placeholder={placeholder}
@@ -19,7 +23,11 @@ function FormGroup({ id, type = 'text', name, label, helpText, placeholder, reco
       {type !== 'textarea' && (
         <input
           type={type}
-          className={classNames('form-control', { 'is-invalid': error?.errorsFor?.(name) })}
+          className={classNames({
+            'form-control': !plaintext,
+            'form-control-plaintext': plaintext,
+            'is-invalid': error?.errorsFor?.(name),
+          })}
           id={id ?? name}
           name={name}
           placeholder={placeholder}
