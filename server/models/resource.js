@@ -5,10 +5,14 @@ module.exports = (sequelize, DataTypes) => {
   class Resource extends Model {
     static associate(models) {
       Resource.belongsTo(models.Team);
+      Resource.hasMany(models.File);
     }
 
     toJSON() {
       const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'variants']);
+      if (this.Files) {
+        json.Files = this.Files.map((f) => f.toJSON());
+      }
       return json;
     }
   }

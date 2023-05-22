@@ -36,7 +36,21 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
   }
   let record = models.Resource.build(_.pick(req.body, ['TeamId', 'name', 'type', 'variants']));
   try {
-    await record.save();
+    await models.sequelize.transaction(async (transaction) => {
+      await record.save({ transaction });
+      if (req.body.Files) {
+        const files = req.body.Files.map((f) =>
+          models.File.create(
+            {
+              ..._.pick(f, ['variant', 'externalURL', 'key']),
+              ResourceId: record.id,
+            },
+            { transaction }
+          )
+        );
+        await Promise.all(files);
+      }
+    });
   } catch (error) {
     if (error.name === 'SequelizeValidationError') {
       res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
@@ -54,7 +68,7 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
 });
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {
-  const record = await models.Resource.findByPk(req.params.id, { include: 'Team' });
+  const record = await models.Resource.findByPk(req.params.id, { include: ['Team', 'Files'] });
   if (record) {
     const membership = await record.Team.getMembership(req.user);
     if (!membership) {

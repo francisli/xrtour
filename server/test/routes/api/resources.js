@@ -10,13 +10,21 @@ describe('/api/resources', () => {
   let testSession;
 
   beforeEach(async () => {
-    await helper.loadFixtures(['users', 'teams', 'memberships', 'resources']);
+    await helper.loadUploads([
+      ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
+      ['00-04.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
+    ]);
+    await helper.loadFixtures(['users', 'teams', 'memberships', 'resources', 'files']);
     testSession = session(app);
     await testSession
       .post('/api/auth/login')
       .set('Accept', 'application/json')
       .send({ email: 'regular.user@test.com', password: 'abcd1234' })
       .expect(StatusCodes.OK);
+  });
+
+  afterEach(async () => {
+    await helper.cleanAssets();
   });
 
   describe('GET /', () => {
@@ -39,7 +47,19 @@ describe('/api/resources', () => {
         type: 'LINK',
         variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
       };
-      const response = await testSession.post('/api/resources').set('Accept', 'application/json').send(data).expect(StatusCodes.CREATED);
+      const response = await testSession
+        .post('/api/resources')
+        .set('Accept', 'application/json')
+        .send({
+          ...data,
+          Files: [
+            {
+              variant: 'en-us',
+              externalURL: 'https://test.com',
+            },
+          ],
+        })
+        .expect(StatusCodes.CREATED);
 
       assert(response.body?.id);
       assert.deepStrictEqual(response.body, { ...data, id: response.body.id });
@@ -48,6 +68,12 @@ describe('/api/resources', () => {
       assert(record);
       assert.deepStrictEqual(record.name, 'New Resource');
       assert.deepStrictEqual(record.type, 'LINK');
+
+      const files = await record.getFiles();
+      assert.deepStrictEqual(files.length, 1);
+      assert.deepStrictEqual(files[0].variant, 'en-us');
+      assert.deepStrictEqual(files[0].externalURL, 'https://test.com');
+      assert.deepStrictEqual(files[0].URL, 'https://test.com');
     });
 
     it('validates the presence of the Resource name', async () => {
@@ -113,6 +139,17 @@ describe('/api/resources', () => {
         name: 'Resource 2',
         type: 'AUDIO',
         variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
+        Files: [
+          {
+            ResourceId: '6ebacda9-8d33-4c3e-beb5-18dffb119046',
+            URL: '/api/assets/files/84b62056-05a4-4751-953f-7854ac46bc0f/key/d2e150be-b277-4f68-96c7-22a477e0022f.m4a',
+            externalURL: null,
+            id: '84b62056-05a4-4751-953f-7854ac46bc0f',
+            key: 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a',
+            keyURL: '/api/assets/files/84b62056-05a4-4751-953f-7854ac46bc0f/key/d2e150be-b277-4f68-96c7-22a477e0022f.m4a',
+            variant: 'en-us',
+          },
+        ],
       });
     });
   });

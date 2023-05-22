@@ -89,7 +89,7 @@ function UserForm() {
                     id="picture"
                     name="picture"
                     value={user.picture}
-                    valueUrl={user.pictureUrl}
+                    valueUrl={user.pictureURL}
                     onChange={onChange}
                     onUploading={setUploading}>
                     <div className="card-body">
