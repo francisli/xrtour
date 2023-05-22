@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import classNames from 'classnames';
 
 import Api from '../Api';
@@ -48,9 +48,9 @@ function Tour() {
                 <FormGroup plaintext name="name" label="Name" value={tour.names[variant.code]} />
                 <FormGroup plaintext name="description" label="Description" value={tour.descriptions[variant.code]} />
                 <div className="mb-3">
-                  <button type="button" className="btn btn-primary">
+                  <Link className="btn btn-primary" to="edit">
                     Edit
-                  </button>
+                  </Link>
                 </div>
               </form>
               <h2>Assets</h2>

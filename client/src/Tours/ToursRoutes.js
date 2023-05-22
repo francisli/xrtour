@@ -26,6 +26,7 @@ function ToursRoutes() {
   return (
     <Routes>
       <Route path="new" element={<TourForm />} />
+      <Route path=":TourId/edit" element={<TourForm />} />
       <Route path=":TourId" element={<Tour />} />
       <Route path="" element={<ToursList />} />
     </Routes>

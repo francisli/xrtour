@@ -29,7 +29,7 @@ function TourForm() {
   const [error, setError] = useState();
 
   useEffect(() => {
-    if (membership) {
+    if (membership && !TourId) {
       setVariant(membership.Team.variants[0]);
       setTour({
         TeamId: membership.TeamId,
@@ -40,7 +40,13 @@ function TourForm() {
         visibility: 'PRIVATE',
       });
     }
-  }, [membership]);
+    if (TourId) {
+      Api.tours.get(TourId).then((response) => {
+        setVariant(response.data.variants[0]);
+        setTour(response.data);
+      });
+    }
+  }, [membership, TourId]);
 
   function onChange(event) {
     const newTour = { ...tour };
@@ -86,46 +92,48 @@ function TourForm() {
                 {isNew && 'New Tour'}
                 {!isNew && 'Edit Tour'}
               </h2>
-              <form onSubmit={onSubmit}>
-                {error && error.message && <div className="alert alert-danger">{error.message}</div>}
-                <fieldset disabled={isLoading}>
-                  <FormGroup
-                    name="link"
-                    label="Link name"
-                    helpText="Letters, numbers, and hypen only, to be used in URLs."
-                    onChange={onChange}
-                    record={tour}
-                    error={error}
-                  />
-                  <ul className="nav nav-tabs mb-3">
-                    {tour.variants.map((v) => (
-                      <li key={v.code} className="nav-item">
-                        <a
-                          onClick={() => setVariant(v)}
-                          className={classNames('nav-link', { active: v === variant })}
-                          aria-current="page"
-                          href={`#${v.code}`}>
-                          {v.name}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <FormGroup name="name" label="Name" onChange={onChange} record={tour.names[variant?.code]} error={error} />
-                  <FormGroup
-                    type="textarea"
-                    name="description"
-                    label="Description"
-                    onChange={onChange}
-                    record={tour.names[variant?.code]}
-                    error={error}
-                  />
-                  <div className="mb-3 d-grid">
-                    <button className="btn btn-primary" type="submit">
-                      Submit
-                    </button>
-                  </div>
-                </fieldset>
-              </form>
+              {variant && tour && (
+                <form onSubmit={onSubmit}>
+                  {error && error.message && <div className="alert alert-danger">{error.message}</div>}
+                  <fieldset disabled={isLoading}>
+                    <FormGroup
+                      name="link"
+                      label="Link name"
+                      helpText="Letters, numbers, and hypen only, to be used in URLs."
+                      onChange={onChange}
+                      record={tour}
+                      error={error}
+                    />
+                    <ul className="nav nav-tabs mb-3">
+                      {tour.variants.map((v) => (
+                        <li key={v.code} className="nav-item">
+                          <a
+                            onClick={() => setVariant(v)}
+                            className={classNames('nav-link', { active: v === variant })}
+                            aria-current="page"
+                            href={`#${v.code}`}>
+                            {v.name}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                    <FormGroup name="name" label="Name" onChange={onChange} value={tour.names[variant?.code]} error={error} />
+                    <FormGroup
+                      type="textarea"
+                      name="description"
+                      label="Description"
+                      onChange={onChange}
+                      value={tour.descriptions[variant?.code]}
+                      error={error}
+                    />
+                    <div className="mb-3 d-grid">
+                      <button className="btn btn-primary" type="submit">
+                        Submit
+                      </button>
+                    </div>
+                  </fieldset>
+                </form>
+              )}
             </div>
           </div>
         </div>

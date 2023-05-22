@@ -16,9 +16,8 @@ function FormGroup({ id, type = 'text', name, label, helpText, placeholder, plai
           id={id ?? name}
           name={name}
           placeholder={placeholder}
-          onChange={onChange}>
-          {record ? record[name] : value}
-        </textarea>
+          onChange={onChange}
+          value={record ? record[name] : value}></textarea>
       )}
       {type !== 'textarea' && (
         <input
