@@ -84,58 +84,54 @@ function TourForm() {
 
   return (
     <main className="container">
-      <div className="row justify-content-center">
-        <div className="col col-sm-10 col-md-8 col-lg-6 col-xl-4">
-          <div className="card">
-            <div className="card-body">
-              <h2 className="card-title">
-                {isNew && 'New Tour'}
-                {!isNew && 'Edit Tour'}
-              </h2>
-              {variant && tour && (
-                <form onSubmit={onSubmit}>
-                  {error && error.message && <div className="alert alert-danger">{error.message}</div>}
-                  <fieldset disabled={isLoading}>
-                    <FormGroup
-                      name="link"
-                      label="Link name"
-                      helpText="Letters, numbers, and hypen only, to be used in URLs."
-                      onChange={onChange}
-                      record={tour}
-                      error={error}
-                    />
-                    <ul className="nav nav-tabs mb-3">
-                      {tour.variants.map((v) => (
-                        <li key={v.code} className="nav-item">
-                          <a
-                            onClick={() => setVariant(v)}
-                            className={classNames('nav-link', { active: v === variant })}
-                            aria-current="page"
-                            href={`#${v.code}`}>
-                            {v.name}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                    <FormGroup name="name" label="Name" onChange={onChange} value={tour.names[variant?.code]} error={error} />
-                    <FormGroup
-                      type="textarea"
-                      name="description"
-                      label="Description"
-                      onChange={onChange}
-                      value={tour.descriptions[variant?.code]}
-                      error={error}
-                    />
-                    <div className="mb-3 d-grid">
-                      <button className="btn btn-primary" type="submit">
-                        Submit
-                      </button>
-                    </div>
-                  </fieldset>
-                </form>
-              )}
-            </div>
-          </div>
+      <div className="row">
+        <div className="col-md-6">
+          <h1 className="mb-3">
+            {isNew && 'New Tour'}
+            {!isNew && 'Edit Tour'}
+          </h1>
+          {variant && tour && (
+            <form onSubmit={onSubmit}>
+              {error && error.message && <div className="alert alert-danger">{error.message}</div>}
+              <fieldset disabled={isLoading}>
+                <FormGroup
+                  name="link"
+                  label="Link name"
+                  helpText="Letters, numbers, and hypen only, to be used in URLs."
+                  onChange={onChange}
+                  record={tour}
+                  error={error}
+                />
+                <ul className="nav nav-tabs mb-3">
+                  {tour.variants.map((v) => (
+                    <li key={v.code} className="nav-item">
+                      <a
+                        onClick={() => setVariant(v)}
+                        className={classNames('nav-link', { active: v === variant })}
+                        aria-current="page"
+                        href={`#${v.code}`}>
+                        {v.name}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <FormGroup name="name" label="Name" onChange={onChange} value={tour.names[variant?.code]} error={error} />
+                <FormGroup
+                  type="textarea"
+                  name="description"
+                  label="Description"
+                  onChange={onChange}
+                  value={tour.descriptions[variant?.code]}
+                  error={error}
+                />
+                <div className="mb-3">
+                  <button className="btn btn-primary" type="submit">
+                    Submit
+                  </button>
+                </div>
+              </fieldset>
+            </form>
+          )}
         </div>
       </div>
     </main>
