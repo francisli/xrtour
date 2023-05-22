@@ -1,5 +1,6 @@
 const assert = require('assert');
 const { StatusCodes } = require('http-status-codes');
+const path = require('path');
 const session = require('supertest-session');
 
 const helper = require('../../helper');
@@ -47,6 +48,12 @@ describe('/api/files', () => {
         keyURL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/b45136f4-54e4-45cd-8851-efc9d733a573.png',
         URL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/b45136f4-54e4-45cd-8851-efc9d733a573.png',
       });
+      await helper.sleep(100);
+      assert(
+        await helper.assetPathExists(
+          path.join('files', 'ed2f158a-e44e-432d-971e-e5da1a2e33b4', 'key', 'b45136f4-54e4-45cd-8851-efc9d733a573.png')
+        )
+      );
     });
   });
 });
