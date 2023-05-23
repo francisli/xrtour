@@ -1,6 +1,7 @@
 const express = require('express');
 const { StatusCodes } = require('http-status-codes');
 const _ = require('lodash');
+const { Op } = require('sequelize');
 
 const helpers = require('../helpers');
 const models = require('../../models');
@@ -9,7 +10,7 @@ const interceptors = require('../interceptors');
 const router = express.Router();
 
 router.get('/', interceptors.requireLogin, async (req, res) => {
-  const { page = '1', TeamId } = req.query;
+  const { page = '1', TeamId, type, search } = req.query;
   const team = await models.Team.findByPk(TeamId);
   const membership = await team.getMembership(req.user);
   if (!membership) {
@@ -21,6 +22,14 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
     order: [['name', 'ASC']],
     where: { TeamId },
   };
+  if (type) {
+    options.where.type = type;
+  }
+  if (search && search.trim() !== '') {
+    options.where.name = {
+      [Op.iLike]: `%${search.trim()}%`,
+    };
+  }
   const { records, pages, total } = await models.Resource.paginate(options);
   helpers.setPaginationHeaders(req, res, options.page, pages, total);
   res.json(records.map((record) => record.toJSON()));

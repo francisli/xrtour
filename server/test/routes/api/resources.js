@@ -33,9 +33,33 @@ describe('/api/resources', () => {
         .get('/api/resources?TeamId=1a93d46d-89bf-463b-ab23-8f22f5777907')
         .set('Accept', 'application/json')
         .expect(StatusCodes.OK);
-      assert(response.body.length, 2);
+      assert.deepStrictEqual(response.body.length, 2);
       assert.deepStrictEqual(response.body[0].name, 'Resource 1');
       assert.deepStrictEqual(response.body[1].name, 'Resource 2');
+    });
+
+    it('returns a list of Resources of a specified type for a specified Team', async () => {
+      const response = await testSession
+        .get('/api/resources?TeamId=1a93d46d-89bf-463b-ab23-8f22f5777907&type=AUDIO')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.OK);
+      assert.deepStrictEqual(response.body.length, 1);
+      assert.deepStrictEqual(response.body[0].name, 'Resource 2');
+    });
+
+    it('returns a list of Resources of a specified type for a specified Team filtered by search query', async () => {
+      let response = await testSession
+        .get('/api/resources?TeamId=1a93d46d-89bf-463b-ab23-8f22f5777907&type=AUDIO&search=none')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.OK);
+      assert.deepStrictEqual(response.body.length, 0);
+
+      response = await testSession
+        .get('/api/resources?TeamId=1a93d46d-89bf-463b-ab23-8f22f5777907&type=AUDIO&search=2')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.OK);
+      assert.deepStrictEqual(response.body.length, 1);
+      assert.deepStrictEqual(response.body[0].name, 'Resource 2');
     });
   });
 

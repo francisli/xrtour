@@ -36,6 +36,7 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+    await queryInterface.addIndex('Files', ['ResourceId', 'variant'], { unique: true });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Files');

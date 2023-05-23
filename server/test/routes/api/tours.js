@@ -25,7 +25,7 @@ describe('/api/tours', () => {
         .get('/api/tours?TeamId=1a93d46d-89bf-463b-ab23-8f22f5777907')
         .set('Accept', 'application/json')
         .expect(StatusCodes.OK);
-      assert(response.body.length, 2);
+      assert.deepStrictEqual(response.body.length, 2);
       assert.deepStrictEqual(response.body[0].link, 'tour1');
       assert.deepStrictEqual(response.body[1].link, 'tour2');
     });
