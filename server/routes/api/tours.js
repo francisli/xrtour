@@ -54,12 +54,22 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
 });
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {
-  const record = await models.Tour.findByPk(req.params.id, { include: 'Team' });
+  const record = await models.Tour.findByPk(req.params.id, {
+    include: ['Team', { model: models.TourResource, include: { model: models.Resource, include: 'Files' } }],
+  });
   if (record) {
     const membership = await record.Team.getMembership(req.user);
     if (!membership) {
       res.status(StatusCodes.UNAUTHORIZED).end();
     } else {
+      // sort resources by start and name
+      record.TourResources.sort((r1, r2) => {
+        let result = r1.start.localeCompare(r2.start);
+        if (result === 0) {
+          result = r1.Resource.name.localeCompare(r2.Resource.name);
+        }
+        return result;
+      });
       res.json(record.toJSON());
     }
   } else {
