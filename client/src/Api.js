@@ -105,6 +105,16 @@ const Api = {
     update(id, data) {
       return instance.patch(`/api/tours/${id}`, data);
     },
+    resources(id) {
+      return {
+        index() {
+          return instance.get(`/api/tours/${id}/resources`);
+        },
+        create(data) {
+          return instance.post(`/api/tours/${id}/resources`, data);
+        },
+      };
+    },
   },
   users: {
     index() {

@@ -52,7 +52,10 @@ describe('/api/tours', () => {
       const response = await testSession.post('/api/tours').set('Accept', 'application/json').send(data).expect(StatusCodes.CREATED);
 
       assert(response.body?.id);
-      assert.deepStrictEqual(response.body, { ...data, id: response.body.id });
+      assert.deepStrictEqual(response.body, {
+        ...data,
+        id: response.body.id,
+      });
 
       const record = await models.Tour.findByPk(response.body.id);
       assert(record);
@@ -231,6 +234,19 @@ describe('/api/tours', () => {
         ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
         start: '',
         end: '',
+        Resource: {
+          TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+          id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
+          name: 'Resource 1',
+          type: 'IMAGE',
+          variants: [
+            {
+              code: 'en-us',
+              displayName: 'English',
+              name: 'English (US)',
+            },
+          ],
+        },
       });
     });
   });

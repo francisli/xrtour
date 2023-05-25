@@ -15,11 +15,21 @@ function Tour() {
 
   useEffect(() => {
     let isCancelled = false;
-    Api.tours.get(TourId).then((response) => {
-      if (isCancelled) return;
-      setTour(response.data);
-      setVariant(response.data.variants[0]);
-    });
+    Api.tours
+      .get(TourId)
+      .then((response) => {
+        if (isCancelled) return;
+        setTour(response.data);
+        setVariant(response.data.variants[0]);
+        return Promise.all([Api.tours.resources(TourId).index()]);
+      })
+      .then((result) => {
+        if (result) {
+          const [resourcesResponse] = result;
+          if (isCancelled) return;
+          setResources(resourcesResponse.data);
+        }
+      });
     return () => (isCancelled = true);
   }, [TourId]);
 
@@ -29,7 +39,21 @@ function Tour() {
     setShowingResourcesModal(false);
   }
 
-  function onSelectResource(resource) {
+  async function onSelectResource(resource) {
+    const response = await Api.tours.resources(TourId).create({
+      ResourceId: resource.id,
+      start: '',
+      end: '',
+    });
+    const newResources = [...resources, response.data];
+    newResources.sort((r1, r2) => {
+      let result = r1.start.localeCompare(r2.start);
+      if (result === 0) {
+        result = r1.Resource.name.localeCompare(r2.Resource.name);
+      }
+      return result;
+    });
+    setResources(newResources);
     setShowingResourcesModal(false);
   }
 
@@ -70,6 +94,19 @@ function Tour() {
                       </td>
                     </tr>
                   )}
+                  {resources?.length === 0 && (
+                    <tr>
+                      <td colSpan="4">No assets yet.</td>
+                    </tr>
+                  )}
+                  {resources?.map((r, i) => (
+                    <tr key={r.id}>
+                      <td>{i + 1}</td>
+                      <td>{r?.Resource.type}</td>
+                      <td>{r?.Resource.name}</td>
+                      <td></td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
               <div className="mb-3">

@@ -94,6 +94,7 @@ router.post('/:id/resources', interceptors.requireLogin, async (req, res) => {
           TourId: req.params.id,
           ..._.pick(req.body, ['ResourceId', 'start', 'end']),
         });
+        newRecord.Resource = resource;
         res.status(StatusCodes.CREATED).json(newRecord.toJSON());
       } catch (error) {
         if (error.name === 'SequelizeValidationError') {
