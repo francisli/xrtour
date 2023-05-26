@@ -6,12 +6,16 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Tour.belongsTo(models.Team);
       Tour.hasMany(models.TourResource);
+      Tour.hasMany(models.TourStop);
     }
 
     toJSON() {
       const json = _.pick(this.get(), ['id', 'TeamId', 'link', 'names', 'descriptions', 'variants', 'visibility']);
       if (this.TourResources) {
         json.TourResources = this.TourResources.map((tr) => tr.toJSON());
+      }
+      if (this.TourStops) {
+        json.TourStops = this.TourStops.map((ts) => ts.toJSON());
       }
       return json;
     }
