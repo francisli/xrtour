@@ -9,6 +9,7 @@ import VariantTabs from '../Components/VariantTabs';
 import StopsModal from '../Stops/StopsModal';
 import { useStaticContext } from '../StaticContext';
 import ResourcesTable from '../Resources/ResourcesTable';
+import StopsTable from '../Stops/StopsTable';
 
 function Tour() {
   const staticContext = useStaticContext();
@@ -117,37 +118,7 @@ function Tour() {
                   </button>
                 </div>
                 <h2>Stops</h2>
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Name</th>
-                      <th>Address</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {!stops && (
-                      <tr>
-                        <td colSpan="4">
-                          <div className="spinner-border"></div>
-                        </td>
-                      </tr>
-                    )}
-                    {stops?.length === 0 && (
-                      <tr>
-                        <td colSpan="4">No stops yet.</td>
-                      </tr>
-                    )}
-                    {stops?.map((ts, i) => (
-                      <tr key={ts.id} onClick={() => onClickStop(ts)} className="clickable">
-                        <td>{i + 1}</td>
-                        <td>{ts.Stop.names[ts.Stop.variants[0].code]}</td>
-                        <td>{ts.Stop.address}</td>
-                        <td></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <StopsTable stops={stops} onClickStop={onClickStop} />
                 <div className="mb-3">
                   <button onClick={() => setShowingStopsModal(true)} type="button" className="btn btn-primary">
                     Add Stop
