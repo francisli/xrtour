@@ -81,6 +81,20 @@ const Api = {
       return instance.patch(`/api/resources/${id}`, data);
     },
   },
+  stops: {
+    index(TeamId, search) {
+      return instance.get(`/api/stops`, { params: { TeamId, search } });
+    },
+    create(data) {
+      return instance.post('/api/stops', data);
+    },
+    get(id) {
+      return instance.get(`/api/stops/${id}`);
+    },
+    update(id, data) {
+      return instance.patch(`/api/stops/${id}`, data);
+    },
+  },
   teams: {
     create(data) {
       return instance.post('/api/teams', data);

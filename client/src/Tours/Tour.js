@@ -5,6 +5,7 @@ import Api from '../Api';
 import FormGroup from '../Components/FormGroup';
 import ResourcesModal from '../Resources/ResourcesModal';
 import VariantTabs from '../Components/VariantTabs';
+import StopsModal from '../Stops/StopsModal';
 
 function Tour() {
   const { TourId } = useParams();
@@ -55,6 +56,16 @@ function Tour() {
     });
     setResources(newResources);
     setShowingResourcesModal(false);
+  }
+
+  const [isShowingStopsModal, setShowingStopsModal] = useState(false);
+
+  function onHideStopsModal() {
+    setShowingStopsModal(false);
+  }
+
+  async function onSelectStop(stop) {
+    setShowingStopsModal(false);
   }
 
   return (
@@ -134,7 +145,7 @@ function Tour() {
                 </tbody>
               </table>
               <div className="mb-3">
-                <button type="button" className="btn btn-primary">
+                <button onClick={() => setShowingStopsModal(true)} type="button" className="btn btn-primary">
                   Add Stop
                 </button>
               </div>
@@ -143,6 +154,7 @@ function Tour() {
         </>
       )}
       <ResourcesModal isShowing={isShowingResourcesModal} onHide={onHideResourcesModal} onSelect={onSelectResource} />
+      <StopsModal isShowing={isShowingStopsModal} onHide={onHideStopsModal} onSelect={onSelectStop} />
     </main>
   );
 }
