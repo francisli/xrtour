@@ -82,7 +82,7 @@ router.get('/:id', interceptors.requireLogin, async (req, res) => {
         transaction,
       });
       if (tour && tourStop) {
-        membership = await tour.Team.getMembership(req.user, {transaction});
+        membership = await tour.Team.getMembership(req.user, { transaction });
       }
     });
     if (tour && tourStop) {
@@ -122,7 +122,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
         transaction,
       });
       if (record && updatedRecord) {
-        membership = await record.Team.getMembership(req.user, {transaction});
+        membership = await record.Team.getMembership(req.user, { transaction });
         if (membership && membership.isEditor) {
           await updatedRecord.update(_.pick(req.body, ['position']));
         } else {
@@ -167,7 +167,7 @@ router.delete('/:id', interceptors.requireLogin, async (req, res) => {
         transaction,
       });
       if (record && updatedRecord) {
-        membership = await record.Team.getMembership(req.user, {transaction});
+        membership = await record.Team.getMembership(req.user, { transaction });
         if (membership && membership.isEditor) {
           await updatedRecord.destroy();
         } else {
