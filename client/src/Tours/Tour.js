@@ -8,6 +8,7 @@ import ResourcesModal from '../Resources/ResourcesModal';
 import VariantTabs from '../Components/VariantTabs';
 import StopsModal from '../Stops/StopsModal';
 import { useStaticContext } from '../StaticContext';
+import ResourcesTable from '../Resources/ResourcesTable';
 
 function Tour() {
   const staticContext = useStaticContext();
@@ -109,38 +110,7 @@ function Tour() {
                   </div>
                 </form>
                 <h2>Assets</h2>
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Type</th>
-                      <th>Name</th>
-                      <th>Timeline</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {!resources && (
-                      <tr>
-                        <td colSpan="4">
-                          <div className="spinner-border"></div>
-                        </td>
-                      </tr>
-                    )}
-                    {resources?.length === 0 && (
-                      <tr>
-                        <td colSpan="4">No assets yet.</td>
-                      </tr>
-                    )}
-                    {resources?.map((r, i) => (
-                      <tr key={r.id}>
-                        <td>{i + 1}</td>
-                        <td>{r?.Resource.type}</td>
-                        <td>{r?.Resource.name}</td>
-                        <td></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <ResourcesTable resources={resources} />
                 <div className="mb-3">
                   <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
                     Add Asset
