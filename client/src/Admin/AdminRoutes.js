@@ -6,7 +6,6 @@ function AdminRoutes() {
   return (
     <Routes>
       <Route path="users/*" element={<AdminUsersRoutes />} />
-      <Route path="" element={<Navigate to="users" />} />
     </Routes>
   );
 }
