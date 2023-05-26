@@ -129,6 +129,16 @@ const Api = {
         },
       };
     },
+    stops(id) {
+      return {
+        index() {
+          return instance.get(`/api/tours/${id}/stops`);
+        },
+        create(data) {
+          return instance.post(`/api/tours/${id}/stops`, data);
+        },
+      };
+    },
   },
   users: {
     index() {

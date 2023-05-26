@@ -22,13 +22,14 @@ function Tour() {
         if (isCancelled) return;
         setTour(response.data);
         setVariant(response.data.variants[0]);
-        return Promise.all([Api.tours.resources(TourId).index()]);
+        return Promise.all([Api.tours.resources(TourId).index(), Api.tours.stops(TourId).index()]);
       })
       .then((result) => {
         if (result) {
-          const [resourcesResponse] = result;
+          const [resourcesResponse, stopsResponse] = result;
           if (isCancelled) return;
           setResources(resourcesResponse.data);
+          setStops(stopsResponse.data);
         }
       });
     return () => (isCancelled = true);
@@ -65,6 +66,12 @@ function Tour() {
   }
 
   async function onSelectStop(stop) {
+    const response = await Api.tours.stops(TourId).create({
+      StopId: stop.id,
+      position: stops.reduce((max, current) => Math.max(max, current), 0) + 1,
+    });
+    const newStops = [...stops, response.data];
+    setStops(newStops);
     setShowingStopsModal(false);
   }
 
@@ -142,6 +149,19 @@ function Tour() {
                       </td>
                     </tr>
                   )}
+                  {stops?.length === 0 && (
+                    <tr>
+                      <td colSpan="4">No stops yet.</td>
+                    </tr>
+                  )}
+                  {stops?.map((ts, i) => (
+                    <tr key={ts.id}>
+                      <td>{i + 1}</td>
+                      <td>{ts.Stop.names[ts.Stop.variants[0].code]}</td>
+                      <td>{ts.Stop.address}</td>
+                      <td></td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
               <div className="mb-3">
