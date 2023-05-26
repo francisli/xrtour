@@ -31,7 +31,7 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate }) {
       setVariant(membership.Team.variants[0]);
     }
     if (StopId) {
-      Api.resources.get(StopId).then((response) => {
+      Api.stops.get(StopId).then((response) => {
         if (isCancelled) return;
         setStop(response.data);
         setVariant(response.data.variants[0]);

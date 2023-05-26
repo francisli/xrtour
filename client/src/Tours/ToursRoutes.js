@@ -7,6 +7,7 @@ import Tour from './Tour';
 import TourForm from './TourForm';
 import TourStop from './TourStop';
 import ToursList from './ToursList';
+import TourStopForm from './TourStopForm';
 
 function ToursRoutes() {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ function ToursRoutes() {
   return (
     <Routes>
       <Route path="new" element={<TourForm />} />
+      <Route path=":TourId/stops/:TourStopId/edit" element={<TourStopForm />} />
       <Route path=":TourId/stops/:TourStopId" element={<TourStop />} />
       <Route path=":TourId/edit" element={<TourForm />} />
       <Route path=":TourId" element={<Tour />} />
