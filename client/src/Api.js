@@ -94,6 +94,16 @@ const Api = {
     update(id, data) {
       return instance.patch(`/api/stops/${id}`, data);
     },
+    resources(StopId) {
+      return {
+        index() {
+          return instance.get(`/api/stops/${StopId}/resources`);
+        },
+        create(data) {
+          return instance.post(`/api/stops/${StopId}/resources`, data);
+        },
+      };
+    },
   },
   teams: {
     create(data) {

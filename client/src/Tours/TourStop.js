@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, Link } from 'react-router-dom';
 
+import Api from '../Api';
 import FormGroup from '../Components/FormGroup';
 import VariantTabs from '../Components/VariantTabs';
+import ResourcesModal from '../Resources/ResourcesModal';
 import { useStaticContext } from '../StaticContext';
-
-import Api from '../Api';
 
 function TourStop() {
   const staticContext = useStaticContext();
@@ -14,6 +14,7 @@ function TourStop() {
 
   const [stop, setStop] = useState();
   const [variant, setVariant] = useState();
+  const [resources, setResources] = useState();
 
   useEffect(() => {
     let isCancelled = false;
@@ -24,9 +25,38 @@ function TourStop() {
         if (isCancelled) return;
         setStop(response.data.Stop);
         setVariant(response.data.Stop.variants[0]);
+        return Api.stops.resources(response.data.StopId).index();
+      })
+      .then((response) => {
+        if (isCancelled) return;
+        setResources(response.data);
       });
     return () => (isCancelled = true);
   }, [TourId, TourStopId]);
+
+  const [isShowingResourcesModal, setShowingResourcesModal] = useState(false);
+
+  function onHideResourcesModal() {
+    setShowingResourcesModal(false);
+  }
+
+  async function onSelectResource(resource) {
+    const response = await Api.stops.resources(stop.id).create({
+      ResourceId: resource.id,
+      start: '',
+      end: '',
+    });
+    const newResources = [...resources, response.data];
+    newResources.sort((r1, r2) => {
+      let result = r1.start.localeCompare(r2.start);
+      if (result === 0) {
+        result = r1.Resource.name.localeCompare(r2.Resource.name);
+      }
+      return result;
+    });
+    setResources(newResources);
+    setShowingResourcesModal(false);
+  }
 
   const title = stop?.names[stop.variants[0].code] ?? '';
 
@@ -56,10 +86,49 @@ function TourStop() {
                     </Link>
                   </div>
                 </form>
+                <h2>Assets</h2>
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Type</th>
+                      <th>Name</th>
+                      <th>Timeline</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {!resources && (
+                      <tr>
+                        <td colSpan="4">
+                          <div className="spinner-border"></div>
+                        </td>
+                      </tr>
+                    )}
+                    {resources?.length === 0 && (
+                      <tr>
+                        <td colSpan="4">No assets yet.</td>
+                      </tr>
+                    )}
+                    {resources?.map((r, i) => (
+                      <tr key={r.id}>
+                        <td>{i + 1}</td>
+                        <td>{r?.Resource.type}</td>
+                        <td>{r?.Resource.name}</td>
+                        <td></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="mb-3">
+                  <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
+                    Add Asset
+                  </button>
+                </div>
               </div>
             </div>
           </>
         )}
+        <ResourcesModal isShowing={isShowingResourcesModal} onHide={onHideResourcesModal} onSelect={onSelectResource} />
       </main>
     </>
   );
