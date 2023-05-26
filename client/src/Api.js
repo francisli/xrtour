@@ -129,13 +129,16 @@ const Api = {
         },
       };
     },
-    stops(id) {
+    stops(TourId) {
       return {
         index() {
-          return instance.get(`/api/tours/${id}/stops`);
+          return instance.get(`/api/tours/${TourId}/stops`);
         },
         create(data) {
-          return instance.post(`/api/tours/${id}/stops`, data);
+          return instance.post(`/api/tours/${TourId}/stops`, data);
+        },
+        get(id) {
+          return instance.get(`/api/tours/${TourId}/stops/${id}`);
         },
       };
     },

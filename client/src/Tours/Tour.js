@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import Api from '../Api';
 import FormGroup from '../Components/FormGroup';
@@ -11,6 +11,7 @@ import { useStaticContext } from '../StaticContext';
 
 function Tour() {
   const staticContext = useStaticContext();
+  const navigate = useNavigate();
   const { TourId } = useParams();
   const [tour, setTour] = useState();
   const [variant, setVariant] = useState();
@@ -76,6 +77,10 @@ function Tour() {
     const newStops = [...stops, response.data];
     setStops(newStops);
     setShowingStopsModal(false);
+  }
+
+  function onClickStop(stop) {
+    navigate(`stops/${stop.id}`);
   }
 
   return (
@@ -164,7 +169,7 @@ function Tour() {
                       </tr>
                     )}
                     {stops?.map((ts, i) => (
-                      <tr key={ts.id}>
+                      <tr key={ts.id} onClick={() => onClickStop(ts)} className="clickable">
                         <td>{i + 1}</td>
                         <td>{ts.Stop.names[ts.Stop.variants[0].code]}</td>
                         <td>{ts.Stop.address}</td>

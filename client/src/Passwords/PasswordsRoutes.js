@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import ForgotPassword from './ForgotPassword';
 import ResetPassword from './ResetPassword';

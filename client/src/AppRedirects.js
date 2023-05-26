@@ -6,6 +6,7 @@ export const AUTH_PROTECTED_PATHS = ['/account/*', '/teams/*'];
 export const REDIRECTS = [
   ['/admin', '/admin/users'],
   ['/passwords', '/passwords/forgot'],
+  ['/teams/:TeamId/tours/:TourId/stops', '/teams/:TeamId/tours/:TourId'],
   ['/teams/:TeamId', '/teams/:TeamId/tours'],
 ];
 

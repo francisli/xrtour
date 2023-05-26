@@ -65,6 +65,47 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
   }
 });
 
+router.get('/:id', interceptors.requireLogin, async (req, res) => {
+  const { id, TourId } = req.params;
+  let tour;
+  let tourStop;
+  let membership;
+  try {
+    await models.sequelize.transaction(async (transaction) => {
+      tour = await models.Tour.findByPk(TourId, {
+        include: 'Team',
+        transaction,
+      });
+      tourStop = await models.TourStop.findOne({
+        include: 'Stop',
+        where: { id, TourId },
+        transaction,
+      });
+      if (tour && tourStop) {
+        membership = await tour.Team.getMembership(req.user, {transaction});
+      }
+    });
+    if (tour && tourStop) {
+      if (!membership) {
+        res.status(StatusCodes.UNAUTHORIZED).end();
+      } else {
+        res.json(tourStop.toJSON());
+      }
+    } else {
+      res.status(StatusCodes.NOT_FOUND).end();
+    }
+  } catch (error) {
+    if (error.name === 'SequelizeValidationError') {
+      res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
+        status: StatusCodes.UNPROCESSABLE_ENTITY,
+        errors: error.errors.map((e) => _.pick(e, ['path', 'message', 'value'])),
+      });
+    } else {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+    }
+  }
+});
+
 router.patch('/:id', interceptors.requireLogin, async (req, res) => {
   const { id, TourId } = req.params;
   let record;
@@ -81,7 +122,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
         transaction,
       });
       if (record && updatedRecord) {
-        membership = await record.Team.getMembership(req.user);
+        membership = await record.Team.getMembership(req.user, {transaction});
         if (membership && membership.isEditor) {
           await updatedRecord.update(_.pick(req.body, ['position']));
         } else {
@@ -126,7 +167,7 @@ router.delete('/:id', interceptors.requireLogin, async (req, res) => {
         transaction,
       });
       if (record && updatedRecord) {
-        membership = await record.Team.getMembership(req.user);
+        membership = await record.Team.getMembership(req.user, {transaction});
         if (membership && membership.isEditor) {
           await updatedRecord.destroy();
         } else {

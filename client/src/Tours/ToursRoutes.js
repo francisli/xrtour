@@ -5,6 +5,7 @@ import { useAuthContext } from '../AuthContext';
 
 import Tour from './Tour';
 import TourForm from './TourForm';
+import TourStop from './TourStop';
 import ToursList from './ToursList';
 
 function ToursRoutes() {
@@ -26,6 +27,7 @@ function ToursRoutes() {
   return (
     <Routes>
       <Route path="new" element={<TourForm />} />
+      <Route path=":TourId/stops/:TourStopId" element={<TourStop />} />
       <Route path=":TourId/edit" element={<TourForm />} />
       <Route path=":TourId" element={<Tour />} />
       <Route path="" element={<ToursList />} />
