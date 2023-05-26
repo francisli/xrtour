@@ -50,6 +50,8 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
   }
 });
 
+router.use('/:StopId/resources', require('./stopResources'));
+
 router.get('/:id', interceptors.requireLogin, async (req, res) => {
   const record = await models.Stop.findByPk(req.params.id, {
     include: ['Team'],

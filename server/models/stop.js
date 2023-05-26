@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
   class Stop extends Model {
     static associate(models) {
       Stop.belongsTo(models.Team);
+      Stop.hasMany(models.StopResource);
       Stop.hasMany(models.TourStop);
     }
 
