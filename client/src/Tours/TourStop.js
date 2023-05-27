@@ -61,6 +61,14 @@ function TourStop() {
     setShowingResourcesModal(false);
   }
 
+  async function onRemoveResource(resource) {
+    await Api.stops.resources(stop.id).remove(resource.id);
+    const newResources = [...resources];
+    const index = newResources.indexOf(resource);
+    newResources.splice(index, 1);
+    setResources(newResources);
+  }
+
   const title = stop?.names[stop.variants[0].code] ?? '';
 
   return (
@@ -90,7 +98,7 @@ function TourStop() {
                   </div>
                 </form>
                 <h2>Assets</h2>
-                <ResourcesTable resources={resources} />
+                <ResourcesTable resources={resources} onRemove={onRemoveResource} />
                 <div className="mb-3">
                   <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
                     Add Asset

@@ -102,6 +102,9 @@ const Api = {
         create(data) {
           return instance.post(`/api/stops/${StopId}/resources`, data);
         },
+        remove(id) {
+          return instance.delete(`/api/stops/${StopId}/resources/${id}`);
+        },
       };
     },
   },
