@@ -102,6 +102,9 @@ const Api = {
         create(data) {
           return instance.post(`/api/stops/${StopId}/resources`, data);
         },
+        update(id, data) {
+          return instance.patch(`/api/stops/${StopId}/resources/${id}`, data);
+        },
         remove(id) {
           return instance.delete(`/api/stops/${StopId}/resources/${id}`);
         },

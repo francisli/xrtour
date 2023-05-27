@@ -19,6 +19,8 @@ function TourStop() {
   const [variant, setVariant] = useState();
   const [resources, setResources] = useState();
 
+  const [position, setPosition] = useState(0);
+
   useEffect(() => {
     let isCancelled = false;
     Api.tours
@@ -59,6 +61,15 @@ function TourStop() {
     setShowingResourcesModal(false);
   }
 
+  function onClickResource(resource) {
+    setPosition(resource.start);
+  }
+
+  async function onChangeResource(resource) {
+    await Api.stops.resources(stop.id).update(resource.id, resource);
+    setResources([...resources]);
+  }
+
   async function onRemoveResource(resource) {
     await Api.stops.resources(stop.id).remove(resource.id);
     const newResources = [...resources];
@@ -96,7 +107,7 @@ function TourStop() {
                   </div>
                 </form>
                 <h2>Assets</h2>
-                <ResourcesTable resources={resources} onRemove={onRemoveResource} />
+                <ResourcesTable resources={resources} onClick={onClickResource} onChange={onChangeResource} onRemove={onRemoveResource} />
                 <div className="mb-3">
                   <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
                     Add Asset
@@ -105,7 +116,7 @@ function TourStop() {
               </div>
               <div className="col-md-4">
                 <PhoneScreen className="mx-auto">
-                  <StopViewer stop={{ ...stop, StopResources: resources }} variant={variant} />
+                  <StopViewer position={position} stop={{ ...stop, StopResources: resources }} variant={variant} />
                 </PhoneScreen>
               </div>
             </div>
