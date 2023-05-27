@@ -5,7 +5,7 @@ import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
 import ResourceCard from './ResourceCard';
 
-function ResourcesList({ onNewAsset, onSelect }) {
+function ResourcesList({ onNew, onSelect, onEdit }) {
   const { membership } = useAuthContext();
 
   const [type, setType] = useState('IMAGE');
@@ -72,7 +72,7 @@ function ResourcesList({ onNewAsset, onSelect }) {
           <input onChange={onSearchChange} value={search} type="search" className="form-control" placeholder="Search..." />
         </div>
         <div className="mb-3">
-          <button onClick={() => onNewAsset(type)} type="button" className="btn btn-primary">
+          <button onClick={() => onNew(type)} type="button" className="btn btn-primary">
             New Asset
           </button>
         </div>
@@ -83,7 +83,7 @@ function ResourcesList({ onNewAsset, onSelect }) {
         {!!resources?.length && (
           <div className="row">
             {resources?.map((r) => (
-              <ResourceCard key={r.id} resource={r} onSelect={onSelect} />
+              <ResourceCard key={r.id} resource={r} onSelect={onSelect} onEdit={onEdit} />
             ))}
           </div>
         )}

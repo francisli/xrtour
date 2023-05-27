@@ -7,6 +7,7 @@ import FormGroup from '../Components/FormGroup';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
+import FileUploader from '../Components/FileUploader';
 import PhotoInput from '../Components/PhotoInput';
 
 function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
@@ -101,15 +102,30 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                 <option value="IMAGE">Image</option>
               </FormGroup>
               <VariantTabs variants={resource.variants} current={variant} setVariant={setVariant} />
-              <FormGroup
-                name="externalURL"
-                label="External URL"
-                onChange={onChange}
-                disabled={variantFile().key}
-                value={variantFile().externalURL}
-                error={error}
-              />
-              {type === 'IMAGE' && (
+              {resource.type === 'AUDIO' && (
+                <div className="mb-3">
+                  <label className="form-label" htmlFor="key">
+                    Upload File
+                  </label>
+                  <FileUploader id="key" name="key" value={resource.key} onChange={onChange} onUploading={setUploading}>
+                    <div className="card-body">
+                      <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
+                    </div>
+                  </FileUploader>
+                  {error?.errorMessagesHTMLFor?.('key')}
+                </div>
+              )}
+              {resource.type === 'AR_LINK' && (
+                <FormGroup
+                  name="externalURL"
+                  label="External URL"
+                  onChange={onChange}
+                  disabled={variantFile().key}
+                  value={variantFile().externalURL}
+                  error={error}
+                />
+              )}
+              {resource.type === 'IMAGE' && (
                 <div className="mb-3">
                   <label className="form-label" htmlFor="key">
                     Upload File
@@ -119,8 +135,8 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                     disabled={variantFile().externalURL}
                     id="key"
                     name="key"
-                    value={resource.key}
-                    valueUrl={resource.keyURL}
+                    value={variantFile().key}
+                    valueUrl={variantFile().keyURL}
                     onChange={onChange}
                     onUploading={setUploading}>
                     <div className="card-body">
