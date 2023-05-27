@@ -4,7 +4,9 @@ function ResourceCard({ resource, onSelect, onEdit }) {
   return (
     <div className="resource-card col-md-4">
       <div className="card">
-        <div className="resource-card__img card-img-top"></div>
+        {resource.type === 'IMAGE' && (
+          <div className="resource-card__img card-img-top" style={{ backgroundImage: `url(${resource.Files[0].URL})` }}></div>
+        )}
         <div className="card-body">
           <h3 className="card-title h6">{resource.name}</h3>
           <div>

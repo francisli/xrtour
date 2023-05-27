@@ -19,6 +19,7 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
   }
   const options = {
     page,
+    include: 'Files',
     order: [['name', 'ASC']],
     where: { TeamId },
   };
