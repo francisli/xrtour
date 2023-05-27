@@ -80,7 +80,7 @@ function ResourcesList({ onNewAsset, onSelect }) {
       <div className="col-md-9">
         {!resources && <div className="spinner-border"></div>}
         {resources?.length === 0 && <p>No assets yet.</p>}
-        {resources?.length && (
+        {!!resources?.length && (
           <div className="row">
             {resources?.map((r) => (
               <ResourceCard key={r.id} resource={r} onSelect={onSelect} />
