@@ -46,12 +46,10 @@ function TourStop() {
   async function onSelectResource(resource) {
     const response = await Api.stops.resources(stop.id).create({
       ResourceId: resource.id,
-      start: '',
-      end: '',
     });
     const newResources = [...resources, response.data];
     newResources.sort((r1, r2) => {
-      let result = r1.start.localeCompare(r2.start);
+      let result = Math.sign(r1.start - r2.start);
       if (result === 0) {
         result = r1.Resource.name.localeCompare(r2.Resource.name);
       }
@@ -107,7 +105,7 @@ function TourStop() {
               </div>
               <div className="col-md-4">
                 <PhoneScreen className="mx-auto">
-                  <StopViewer stop={stop} />
+                  <StopViewer stop={{ ...stop, StopResources: resources }} variant={variant} />
                 </PhoneScreen>
               </div>
             </div>

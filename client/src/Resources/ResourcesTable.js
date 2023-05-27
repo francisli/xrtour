@@ -4,6 +4,7 @@ import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
 import './ResourcesTable.scss';
 import ConfirmModal from '../Components/ConfirmModal';
+import TimeCode from '../Components/TimeCode';
 
 function ResourcesTable({ resources, onRemove }) {
   const [isConfirmRemoveShowing, setConfirmRemoveShowing] = useState(false);
@@ -47,9 +48,11 @@ function ResourcesTable({ resources, onRemove }) {
           {resources?.map((r, i) => (
             <tr key={r.id}>
               <td>{i + 1}</td>
-              <td>{r?.Resource.type}</td>
-              <td>{r?.Resource.name}</td>
-              <td></td>
+              <td>{r.Resource.type}</td>
+              <td>{r.Resource.name}</td>
+              <td>
+                <TimeCode seconds={r.start} /> - {r.end ? <TimeCode seconds={r.end} /> : 'End'}
+              </td>
               <td>
                 <button onClick={() => onClickRemove(r)} className="btn btn-sm btn-outline-danger">
                   <FontAwesomeIcon icon={faTrashCan} />

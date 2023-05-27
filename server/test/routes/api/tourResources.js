@@ -39,8 +39,8 @@ describe('/api/tours/:TourId/resources', () => {
           id: 'a26afd2c-b8bc-41d3-ac56-2ac06377993f',
           TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
           ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
-          end: '',
-          start: '',
+          start: 0,
+          end: null,
           Resource: {
             TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
             id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
@@ -70,8 +70,8 @@ describe('/api/tours/:TourId/resources', () => {
           id: 'c12c53d9-efe7-4682-a36c-034f7a4d8390',
           TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
           ResourceId: '6ebacda9-8d33-4c3e-beb5-18dffb119046',
-          end: '',
-          start: '',
+          start: 0,
+          end: null,
           Resource: {
             TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
             id: '6ebacda9-8d33-4c3e-beb5-18dffb119046',
@@ -108,8 +108,6 @@ describe('/api/tours/:TourId/resources', () => {
         .set('Accept', 'application/json')
         .send({
           ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
-          start: '',
-          end: '',
         })
         .expect(StatusCodes.CREATED);
 
@@ -117,8 +115,8 @@ describe('/api/tours/:TourId/resources', () => {
         id: response.body.id,
         TourId: 'ae61f3e7-7de7-40e2-b9a1-c5ad9ff94806',
         ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
-        start: '',
-        end: '',
+        start: 0,
+        end: null,
         Resource: {
           TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
           id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
@@ -129,6 +127,17 @@ describe('/api/tours/:TourId/resources', () => {
               code: 'en-us',
               displayName: 'English',
               name: 'English (US)',
+            },
+          ],
+          Files: [
+            {
+              ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
+              URL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/cdd8007d-dcaf-4163-b497-92d378679668.png',
+              externalURL: null,
+              id: 'ed2f158a-e44e-432d-971e-e5da1a2e33b4',
+              key: 'cdd8007d-dcaf-4163-b497-92d378679668.png',
+              keyURL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/cdd8007d-dcaf-4163-b497-92d378679668.png',
+              variant: 'en-us',
             },
           ],
         },
@@ -142,8 +151,8 @@ describe('/api/tours/:TourId/resources', () => {
         .patch('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352/resources/a26afd2c-b8bc-41d3-ac56-2ac06377993f')
         .set('Accept', 'application/json')
         .send({
-          start: '00:00',
-          end: '00:30',
+          start: 0,
+          end: 30,
         })
         .expect(StatusCodes.OK);
 
@@ -151,8 +160,32 @@ describe('/api/tours/:TourId/resources', () => {
         id: 'a26afd2c-b8bc-41d3-ac56-2ac06377993f',
         TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
         ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
-        start: '00:00',
-        end: '00:30',
+        start: 0,
+        end: 30,
+        Resource: {
+          Files: [
+            {
+              ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
+              URL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/cdd8007d-dcaf-4163-b497-92d378679668.png',
+              externalURL: null,
+              id: 'ed2f158a-e44e-432d-971e-e5da1a2e33b4',
+              key: 'cdd8007d-dcaf-4163-b497-92d378679668.png',
+              keyURL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/cdd8007d-dcaf-4163-b497-92d378679668.png',
+              variant: 'en-us',
+            },
+          ],
+          TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+          id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
+          name: 'Resource 1',
+          type: 'IMAGE',
+          variants: [
+            {
+              code: 'en-us',
+              displayName: 'English',
+              name: 'English (US)',
+            },
+          ],
+        },
       });
     });
   });

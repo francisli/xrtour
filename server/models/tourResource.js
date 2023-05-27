@@ -19,8 +19,8 @@ module.exports = (sequelize, DataTypes) => {
 
   TourResource.init(
     {
-      start: DataTypes.STRING,
-      end: DataTypes.STRING,
+      start: DataTypes.INTEGER,
+      end: DataTypes.INTEGER,
     },
     {
       sequelize,

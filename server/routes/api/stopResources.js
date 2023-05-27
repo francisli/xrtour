@@ -19,7 +19,7 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
     } else {
       // sort resources by start and name
       record.StopResources.sort((r1, r2) => {
-        let result = r1.start.localeCompare(r2.start);
+        let result = Math.sign(r1.start - r2.start);
         if (result === 0) {
           result = r1.Resource.name.localeCompare(r2.Resource.name);
         }
@@ -38,6 +38,7 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
     include: ['Team'],
   });
   const resource = await models.Resource.findOne({
+    include: 'Files',
     where: {
       id: req.body.ResourceId,
       TeamId: record?.TeamId,
@@ -83,6 +84,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
         transaction,
       });
       updatedRecord = await models.StopResource.findOne({
+        include: { model: models.Resource, include: 'Files' },
         where: { id, StopId },
         transaction,
       });
