@@ -5,6 +5,8 @@ import { useParams, Link } from 'react-router-dom';
 import Api from '../Api';
 import FormGroup from '../Components/FormGroup';
 import VariantTabs from '../Components/VariantTabs';
+import PhoneScreen from '../Components/Viewer/PhoneScreen';
+import StopViewer from '../Components/Viewer/StopViewer';
 import ResourcesModal from '../Resources/ResourcesModal';
 import { useStaticContext } from '../StaticContext';
 import ResourcesTable from '../Resources/ResourcesTable';
@@ -73,7 +75,7 @@ function TourStop() {
         {!!stop && (
           <>
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-8">
                 <h1 className="mb-3">{title}</h1>
                 <form>
                   <FormGroup plaintext name="link" label="Link" record={stop} />
@@ -94,6 +96,11 @@ function TourStop() {
                     Add Asset
                   </button>
                 </div>
+              </div>
+              <div className="col-md-4">
+                <PhoneScreen className="mx-auto">
+                  <StopViewer stop={stop} />
+                </PhoneScreen>
               </div>
             </div>
           </>
