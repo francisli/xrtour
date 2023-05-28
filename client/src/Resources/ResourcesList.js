@@ -5,10 +5,10 @@ import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
 import ResourceCard from './ResourceCard';
 
-function ResourcesList({ onNew, onSelect, onEdit }) {
+function ResourcesList({ onNew, onSelect, onEdit, type: initialType = 'IMAGE' }) {
   const { membership } = useAuthContext();
 
-  const [type, setType] = useState('IMAGE');
+  const [type, setType] = useState(initialType);
   const [search, setSearch] = useState('');
   const [searchDebounced, setSearchDebounced] = useState(search);
   const [resources, setResources] = useState();

@@ -52,7 +52,7 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
         const files = req.body.Files.map((f) =>
           models.File.create(
             {
-              ..._.pick(f, ['variant', 'externalURL', 'key']),
+              ..._.pick(f, ['variant', 'externalURL', 'key', 'originalName', 'duration', 'width', 'height']),
               ResourceId: record.id,
             },
             { transaction }

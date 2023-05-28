@@ -37,7 +37,7 @@ function ResourcesModal({ isShowing, onHide, onSelect }) {
         <Modal.Title>Assets</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {!isEditing && <ResourcesList onNew={onNew} onSelect={onSelect} onEdit={onEdit} />}
+        {!isEditing && <ResourcesList type={type} onNew={onNew} onSelect={onSelect} onEdit={onEdit} />}
         {isEditing && (
           <ResourceForm ResourceId={ResourceId} type={type} onCancel={() => setEditing(false)} onCreate={onCreate} onUpdate={onUpdate} />
         )}

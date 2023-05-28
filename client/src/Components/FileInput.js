@@ -5,9 +5,9 @@ import mime from 'mime/lite';
 
 import Api from '../Api';
 
-import './FileUploader.scss';
+import './FileInput.scss';
 
-function FileUploader({ className, children, id, name, onChange, onUploading, value }) {
+function FileInput({ acceptedFiles = null, className, children, id, name, onChange, onUploading, value, valueURL }) {
   const [files, setFiles] = useState([]);
   const [isUploading, setUploading] = useState(false);
   const fileRef = useRef(null);
@@ -69,7 +69,7 @@ function FileUploader({ className, children, id, name, onChange, onUploading, va
   }
 
   return (
-    <Dropzone id={id} multiple={false} onDrop={onDrop} disabled={(value && value !== '') || files.length > 0}>
+    <Dropzone id={id} acceptedFiles={acceptedFiles} multiple={false} onDrop={onDrop} disabled={(value && value !== '') || files.length > 0}>
       {({ getRootProps, getInputProps }) => (
         <div className={classNames('fileuploader', { 'fileuploader--uploading': isUploading }, className)}>
           <div {...getRootProps()}>
@@ -96,11 +96,6 @@ function FileUploader({ className, children, id, name, onChange, onUploading, va
                 &nbsp;
                 {valueContentType === 'application/pdf' && 'PDF Document'}
                 {valueContentType.startsWith('image/') && `${valueContentType.substring(6).toUpperCase()} Image`}
-                {isUploading && (
-                  <div className="spinner-border fileuploader__spinner" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                )}
               </div>
             )}
             {files.length === 0 && !value && children}
@@ -110,4 +105,4 @@ function FileUploader({ className, children, id, name, onChange, onUploading, va
     </Dropzone>
   );
 }
-export default FileUploader;
+export default FileInput;

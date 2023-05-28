@@ -107,7 +107,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                   <label className="form-label" htmlFor="key">
                     Upload File
                   </label>
-                  <FileUploader id="key" name="key" value={resource.key} onChange={onChange} onUploading={setUploading}>
+                  <FileUploader id="key" name="key" value={variantFile().key} onChange={onChange} onUploading={setUploading}>
                     <div className="card-body">
                       <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
                     </div>

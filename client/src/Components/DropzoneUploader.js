@@ -4,7 +4,18 @@ import { v4 as uuid } from 'uuid';
 
 import Api from '../Api';
 
-function DropzoneUploader({ className, children, disabled, id, maxFiles, multiple, onRemoved, onUploaded, onUploading }) {
+function DropzoneUploader({
+  acceptedFiles = null,
+  className,
+  children,
+  disabled,
+  id,
+  maxFiles = 0,
+  multiple,
+  onRemoved,
+  onUploaded,
+  onUploading,
+}) {
   const [files, setFiles] = useState([]);
   const [rejectedFiles, setRejectedFiles] = useState([]);
   const [statuses, setStatuses] = useState([]);
@@ -89,8 +100,9 @@ function DropzoneUploader({ className, children, disabled, id, maxFiles, multipl
   return (
     <Dropzone
       id={id}
+      acceptedFiles={acceptedFiles}
       multiple={multiple}
-      maxFiles={maxFiles ?? 0}
+      maxFiles={maxFiles}
       onDropAccepted={onDropAccepted}
       onDropRejected={onDropRejected}
       disabled={disabled || files.length > 0}>
