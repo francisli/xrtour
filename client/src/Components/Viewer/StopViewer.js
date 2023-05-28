@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import Scrubber from './Scrubber';
 import './StopViewer.scss';
 
 function StopViewer({ position, stop, variant }) {
@@ -33,6 +34,9 @@ function StopViewer({ position, stop, variant }) {
   return (
     <div className="stop-viewer">
       <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
+      <div className="stop-viewer__controls">
+        <Scrubber position={position} duration={duration} className="stop-viewer__scrubber" />
+      </div>
     </div>
   );
 }
