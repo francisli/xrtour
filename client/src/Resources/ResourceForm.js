@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { useAuthContext } from '../AuthContext';
 import Api from '../Api';
+import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
@@ -27,6 +28,9 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
   const [isUploading, setUploading] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
+
+  const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
+  const [deleteError, setDeleteError] = useState();
 
   useEffect(() => {
     let isCancelled = false;
@@ -102,6 +106,16 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setResource(newResource);
   }
 
+  async function onDelete() {
+    setConfirmDeleteShowing(false);
+    try {
+      await Api.resources.delete(resource.id);
+      onCancel?.();
+    } catch (error) {
+      setDeleteError(error);
+    }
+  }
+
   return (
     <div className="row">
       <div className="col-md-6">
@@ -149,13 +163,18 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                   {error?.errorMessagesHTMLFor?.('key')}
                 </div>
               )}
-              <div className="mb-3">
-                <button className="btn btn-primary" type="submit">
-                  Submit
-                </button>
-                &nbsp;
-                <button onClick={onCancel} className="btn btn-secondary" type="button">
-                  Cancel
+              <div className="d-flex justify-content-between mb-3">
+                <div>
+                  <button className="btn btn-primary" type="submit">
+                    Submit
+                  </button>
+                  &nbsp;
+                  <button onClick={onCancel} className="btn btn-secondary" type="button">
+                    Cancel
+                  </button>
+                </div>
+                <button onClick={() => setConfirmDeleteShowing(true)} className="btn btn-outline-danger" type="button">
+                  Delete
                 </button>
               </div>
             </fieldset>
@@ -163,6 +182,12 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
         )}
       </div>
       <div className="col-md-6">{JSON.stringify(resource)}</div>
+      <ConfirmModal nested isShowing={isConfirmDeleteShowing} onCancel={() => setConfirmDeleteShowing(false)} onOK={() => onDelete()}>
+        Are you sure you wish to delete <b>{resource?.name}</b>?
+      </ConfirmModal>
+      <ConfirmModal nested title="An error has occurred" isShowing={!!deleteError} onOK={() => setDeleteError()}>
+        {deleteError?.response?.data?.message ?? 'An unexpected error has occurred, please try again later or contact support.'}
+      </ConfirmModal>
     </div>
   );
 }

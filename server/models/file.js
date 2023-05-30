@@ -68,5 +68,10 @@ module.exports = (sequelize, DataTypes) => {
     file.handleAssetFile('key', options);
   });
 
+  File.afterDestroy(async (file, options) => {
+    file.key = null;
+    file.handleAssetFile('key', options);
+  });
+
   return File;
 };

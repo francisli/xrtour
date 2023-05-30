@@ -117,4 +117,34 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
   }
 });
 
+router.delete('/:id', interceptors.requireLogin, async (req, res) => {
+  const record = await models.Resource.findByPk(req.params.id, { include: 'Team' });
+  if (record) {
+    const membership = await record.Team.getMembership(req.user);
+    if (!membership) {
+      res.status(StatusCodes.UNAUTHORIZED).end();
+    } else {
+      try {
+        await models.sequelize.transaction(async (transaction) => {
+          const files = await record.getFiles({ transaction });
+          await Promise.all(files.map((f) => f.destroy({ transaction })));
+          await record.destroy({ transaction });
+        });
+        res.status(StatusCodes.OK).end();
+      } catch (error) {
+        if (error.name === 'SequelizeForeignKeyConstraintError') {
+          res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
+            status: StatusCodes.UNPROCESSABLE_ENTITY,
+            message: 'Unable to delete, still being used.',
+          });
+        } else {
+          res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+        }
+      }
+    }
+  } else {
+    res.status(StatusCodes.NOT_FOUND).end();
+  }
+});
+
 module.exports = router;

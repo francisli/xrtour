@@ -80,6 +80,9 @@ const Api = {
     update(id, data) {
       return instance.patch(`/api/resources/${id}`, data);
     },
+    delete(id) {
+      return instance.delete(`/api/resources/${id}`);
+    },
   },
   stops: {
     index(TeamId, search) {

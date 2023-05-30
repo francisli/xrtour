@@ -6,6 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Resource.belongsTo(models.Team);
       Resource.hasMany(models.File);
+      Resource.hasMany(models.TourResource);
+      Resource.hasMany(models.StopResource);
     }
 
     toJSON() {
