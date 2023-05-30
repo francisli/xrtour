@@ -52,11 +52,11 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
       <table className={classNames('resources-table table table-striped', { 'table-hover': !!onClick })}>
         <thead>
           <tr>
-            <th>#</th>
-            <th>Type</th>
-            <th>Name</th>
-            <th>Timeline</th>
-            <th>Actions</th>
+            <th className="resources-table__col-num">#</th>
+            <th className="resources-table__col-type">Type</th>
+            <th className="resources-table__col-name">Name</th>
+            <th className="resources-table__col-timeline">Timeline</th>
+            <th className="resources-table__col-actions">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -98,7 +98,7 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
                     'End'
                   ))}
               </td>
-              <td>
+              <td className="resources-table__col-actions">
                 {isEditing && selectedResource === r && (
                   <>
                     <button onClick={onClickSubmitEdit} className="btn btn-sm btn-outline-success">

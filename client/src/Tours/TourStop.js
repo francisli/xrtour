@@ -97,7 +97,7 @@ function TourStop() {
             <div className="row">
               <div className="col-md-8">
                 <h1 className="mb-3">{title}</h1>
-                <form>
+                <form className="mb-5">
                   <FormGroup plaintext name="link" label="Link" record={stop} />
                   <FormGroup plaintext name="address" label="Address" record={stop} />
                   <VariantTabs variants={stop.variants} current={variant} setVariant={setVariant} />
