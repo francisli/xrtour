@@ -15,12 +15,11 @@ function ResourceCard({ resource, onSelect, onEdit }) {
         )}
         <div className="card-body">
           <h3 className="card-title h6">{resource.name}</h3>
-          <div>
+          <div className="d-flex justify-content-between">
             <button onClick={() => onSelect(resource)} type="button" className="btn btn-sm btn-primary">
               Select
             </button>
-            &nbsp;
-            <button onClick={() => onEdit(resource)} type="button" className="btn btn-sm btn-secondary">
+            <button onClick={() => onEdit(resource)} type="button" className="btn btn-sm btn-outline-secondary">
               Edit
             </button>
           </div>
