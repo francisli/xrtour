@@ -90,7 +90,7 @@ function StopViewer({ position, stop, variant, onTimeUpdate }) {
 
   function onTimeUpdateInternal(event) {
     const { target: audio } = event;
-    if (audio.id === currentTrack.id) {
+    if (audio.id === currentTrack?.id) {
       onTimeUpdate?.(Math.round(audio.currentTime) + currentTrack.start);
     }
   }
@@ -105,11 +105,22 @@ function StopViewer({ position, stop, variant, onTimeUpdate }) {
     }
   }
 
+  function onSeek(newPosition) {
+    if (isPlaying) {
+      for (const audio of Object.values(ref.current)) {
+        audio.pause();
+      }
+      setPlaying(false);
+      setCurrentTrack();
+    }
+    onTimeUpdate?.(newPosition);
+  }
+
   return (
     <div className="stop-viewer">
       <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
       <div className="stop-viewer__controls">
-        <Scrubber position={position} duration={duration} className="stop-viewer__scrubber" />
+        <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber" />
         <button onClick={onPlayPause} type="button" className="btn btn-lg btn-outline-primary">
           {!isPlaying && <FontAwesomeIcon icon={faPlay} />}
           {isPlaying && <FontAwesomeIcon icon={faPause} />}

@@ -9,9 +9,11 @@
   flex-grow: 1;
   height: 0.5rem;
   margin: 0 0.5rem;
+  position: relative;
 }
 
 .scrubber__progress {
   height: 100%;
   background-color: blue;
+  pointer-events: none;
 }
