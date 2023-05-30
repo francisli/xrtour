@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+import classNames from 'classnames';
 
 import Scrubber from './Viewer/Scrubber';
 import './AudioPlayer.scss';
 
-function AudioPlayer({ onCanPlay, onDurationChange, src }) {
+function AudioPlayer({ className, onCanPlay, onDurationChange, src }) {
   const ref = useRef();
   const [isReady, setReady] = useState(false);
   const [isPlaying, setPlaying] = useState(false);
@@ -42,7 +43,7 @@ function AudioPlayer({ onCanPlay, onDurationChange, src }) {
   }
 
   return (
-    <div className="audio-player">
+    <div className={classNames('audio-player', className)}>
       <audio
         ref={ref}
         src={src}
@@ -51,7 +52,7 @@ function AudioPlayer({ onCanPlay, onDurationChange, src }) {
         onEnded={onEndedInternal}
         onTimeUpdate={onTimeUpdateInternal}
       />
-      <button onClick={onPlayPause} disabled={!isReady} className="btn btn-outline-primary me-3">
+      <button type="button" onClick={onPlayPause} disabled={!isReady} className="btn btn-outline-primary me-3">
         {!isPlaying && <FontAwesomeIcon icon={faPlay} />}
         {!!isPlaying && <FontAwesomeIcon icon={faPause} />}
       </button>

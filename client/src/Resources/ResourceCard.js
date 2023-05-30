@@ -3,7 +3,7 @@ import './ResourceCard.scss';
 
 function ResourceCard({ resource, onSelect, onEdit }) {
   return (
-    <div className="resource-card col-md-4">
+    <div className="resource-card col-md-4 mb-3">
       <div className="card">
         {resource.type === 'AUDIO' && (
           <div className="resource-card__audio card-img-top">

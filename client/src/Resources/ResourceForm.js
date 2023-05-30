@@ -7,8 +7,17 @@ import FormGroup from '../Components/FormGroup';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
-import FileUploader from '../Components/FileUploader';
-import PhotoInput from '../Components/PhotoInput';
+import FileInput from '../Components/FileInput';
+
+const ACCEPTED_FILES = {
+  AUDIO: {
+    'audio/*': ['.mp3', '.mp4', '.m4a'],
+  },
+  IMAGE: {
+    'image/*': ['.jpg', '.jpeg', '.png'],
+  },
+};
+Object.freeze(ACCEPTED_FILES);
 
 function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
   const { membership } = useAuthContext();
@@ -41,29 +50,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     return () => (isCancelled = true);
   }, [membership, ResourceId, type]);
 
-  function variantFile() {
-    let file = resource?.Files?.find((f) => f.variant === variant?.code);
-    if (!file) {
-      file = { variant: variant?.code, externalURL: '', key: '' };
-      resource?.Files?.push(file);
-      if (resource) {
-        setResource({ ...resource });
-      }
-    }
-    return file;
-  }
-
-  function onChange(event) {
-    const newResource = { ...resource };
-    const { name, value } = event.target;
-    if (name === 'externalURL' || name === 'key') {
-      variantFile()[name] = value;
-    } else {
-      newResource[name] = value;
-    }
-    setResource(newResource);
-  }
-
   async function onSubmit(event) {
     event.preventDefault();
     setError(null);
@@ -88,6 +74,34 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     }
   }
 
+  let variantFile = resource?.Files?.find((f) => f.variant === variant?.code);
+  if (!variantFile) {
+    variantFile = { variant: variant?.code, externalURL: '', key: '' };
+    resource?.Files?.push(variantFile);
+    if (resource) {
+      setResource({ ...resource });
+    }
+  }
+
+  function onChange(event) {
+    const newResource = { ...resource };
+    const { name, value } = event.target;
+    if (['externalURL', 'key', 'originalName', 'duration', 'width', 'height'].includes(name)) {
+      variantFile[name] = value;
+    } else {
+      newResource[name] = value;
+      if (name === 'type') {
+        newResource.externalURL = null;
+        newResource.key = null;
+        newResource.originalName = null;
+        newResource.duration = null;
+        newResource.width = null;
+        newResource.height = null;
+      }
+    }
+    setResource(newResource);
+  }
+
   return (
     <div className="row">
       <div className="col-md-6">
@@ -96,53 +110,42 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
             {error && error.message && <div className="alert alert-danger">{error.message}</div>}
             <fieldset disabled={isLoading || isUploading}>
               <FormGroup name="name" label="Name" onChange={onChange} record={resource} error={error} />
-              <FormGroup type="select" name="type" label="Type" onChange={onChange} record={resource} error={error}>
-                <option value="AUDIO">Audio</option>
-                <option value="AR_LINK">AR Link</option>
-                <option value="IMAGE">Image</option>
-              </FormGroup>
-              <VariantTabs variants={resource.variants} current={variant} setVariant={setVariant} />
-              {resource.type === 'AUDIO' && (
-                <div className="mb-3">
-                  <label className="form-label" htmlFor="key">
-                    Upload File
-                  </label>
-                  <FileUploader id="key" name="key" value={variantFile().key} onChange={onChange} onUploading={setUploading}>
-                    <div className="card-body">
-                      <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
-                    </div>
-                  </FileUploader>
-                  {error?.errorMessagesHTMLFor?.('key')}
-                </div>
+              {!resource.id && (
+                <FormGroup type="select" name="type" label="Type" onChange={onChange} record={resource} error={error}>
+                  <option value="AUDIO">Audio</option>
+                  <option value="AR_LINK">AR Link</option>
+                  <option value="IMAGE">Image</option>
+                </FormGroup>
               )}
+              <VariantTabs variants={resource.variants} current={variant} setVariant={setVariant} />
               {resource.type === 'AR_LINK' && (
                 <FormGroup
                   name="externalURL"
                   label="External URL"
                   onChange={onChange}
-                  disabled={variantFile().key}
-                  value={variantFile().externalURL}
+                  disabled={variantFile.key}
+                  value={variantFile.externalURL}
                   error={error}
                 />
               )}
-              {resource.type === 'IMAGE' && (
+              {resource.type !== 'AR_LINK' && (
                 <div className="mb-3">
                   <label className="form-label" htmlFor="key">
                     Upload File
                   </label>
-                  <PhotoInput
-                    className="card"
-                    disabled={variantFile().externalURL}
+                  <FileInput
                     id="key"
                     name="key"
-                    value={variantFile().key}
-                    valueUrl={variantFile().keyURL}
+                    accept={ACCEPTED_FILES[resource.type]}
+                    value={variantFile.key}
+                    valueURL={variantFile.keyURL}
                     onChange={onChange}
+                    onChangeMetadata={onChange}
                     onUploading={setUploading}>
                     <div className="card-body">
-                      <div className="card-text">Drag-and-drop a photo file here, or click here to browse and select a file.</div>
+                      <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
                     </div>
-                  </PhotoInput>
+                  </FileInput>
                   {error?.errorMessagesHTMLFor?.('key')}
                 </div>
               )}

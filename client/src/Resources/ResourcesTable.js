@@ -8,7 +8,7 @@ import TimeCode from '../Components/TimeCode';
 
 import './ResourcesTable.scss';
 
-function ResourcesTable({ resources, onClick, onChange, onRemove }) {
+function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
   const [selectedResource, setSelectedResource] = useState();
   const [selectedResourceClone, setSelectedResourceClone] = useState();
   const [isEditing, setEditing] = useState(false);
@@ -84,15 +84,19 @@ function ResourcesTable({ resources, onClick, onChange, onRemove }) {
                   seconds={r.start}
                 />{' '}
                 -{' '}
-                {r.end || (isEditing && selectedResource === r) ? (
-                  <TimeCode
-                    onChange={(newValue) => onChangeTimeCode('end', newValue)}
-                    isEditing={isEditing && selectedResource === r}
-                    seconds={r.end}
-                  />
-                ) : (
-                  'End'
+                {r.Resource.type === 'AUDIO' && (
+                  <TimeCode seconds={r.start + r.Resource.Files.find((f) => f.variant === variant.code).duration} />
                 )}
+                {r.Resource.type !== 'AUDIO' &&
+                  (r.end || (isEditing && selectedResource === r) ? (
+                    <TimeCode
+                      onChange={(newValue) => onChangeTimeCode('end', newValue)}
+                      isEditing={isEditing && selectedResource === r}
+                      seconds={r.end}
+                    />
+                  ) : (
+                    'End'
+                  ))}
               </td>
               <td>
                 {isEditing && selectedResource === r && (

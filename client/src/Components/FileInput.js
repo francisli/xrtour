@@ -1,66 +1,35 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import classNames from 'classnames';
-import Dropzone from 'react-dropzone';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import mime from 'mime/lite';
 
-import Api from '../Api';
-
+import AudioPlayer from './AudioPlayer';
+import DropzoneUploader from './DropzoneUploader';
 import './FileInput.scss';
 
-function FileInput({ acceptedFiles = null, className, children, id, name, onChange, onUploading, value, valueURL }) {
-  const [files, setFiles] = useState([]);
-  const [isUploading, setUploading] = useState(false);
-  const fileRef = useRef(null);
-
-  async function onDrop(acceptedFiles) {
-    fileRef.current = null;
-    setFiles(acceptedFiles);
-    if (acceptedFiles.length === 0) {
-      return;
-    }
-    setUploading(true);
-    if (onUploading) {
-      onUploading(true);
-    }
-    const file = acceptedFiles[0];
-    fileRef.current = file;
-    const blob = {
-      filename: file.name,
-      content_type: file.type || 'application/octet-stream',
-      byte_size: file.size,
-    };
-    let signedId;
-    const response = await Api.assets.create({ blob });
-    if (fileRef.current !== file) {
-      return;
-    }
-    const { url, headers } = response.data.direct_upload;
-    signedId = response.data.signed_id;
-    await Api.assets.upload(url, headers, file);
-    if (fileRef.current !== file) {
-      return;
-    }
-    setUploading(false);
-    if (onUploading) {
-      onUploading(false);
-    }
-    if (onChange) {
-      onChange({ target: { name, value: signedId } });
-    }
+function FileInput({ accept, className, children, id, name, onChange, onChangeMetadata, value, valueURL }) {
+  function onUploaded(status) {
+    onChange?.({ target: { name, value: status.signedId } });
+    onChangeMetadata?.({ target: { name: 'originalName', value: status.file.name } });
   }
 
-  function onRemove() {
-    if (isUploading) {
-      setUploading(false);
-      if (onUploading) {
-        onUploading(false);
-      }
-    }
-    fileRef.current = null;
-    setFiles([]);
-    if (onChange) {
-      onChange({ target: { name, value: '' } });
-    }
+  function onRemoved() {
+    onChange?.({ target: { name, value: null } });
+    onChangeMetadata?.({ target: { name: 'originalName', value: null } });
+    onChangeMetadata?.({ target: { name: 'duration', value: null } });
+    onChangeMetadata?.({ target: { name: 'width', value: null } });
+    onChangeMetadata?.({ target: { name: 'height', value: null } });
+  }
+
+  function onAudioDurationChange(newDuration) {
+    onChangeMetadata?.({ target: { name: 'duration', value: newDuration } });
+  }
+
+  function onImageLoad(event) {
+    const { target: img } = event;
+    onChangeMetadata?.({ target: { name: 'width', value: img.naturalWidth } });
+    onChangeMetadata?.({ target: { name: 'height', value: img.naturalHeight } });
   }
 
   let valueContentType;
@@ -69,40 +38,53 @@ function FileInput({ acceptedFiles = null, className, children, id, name, onChan
   }
 
   return (
-    <Dropzone id={id} acceptedFiles={acceptedFiles} multiple={false} onDrop={onDrop} disabled={(value && value !== '') || files.length > 0}>
-      {({ getRootProps, getInputProps }) => (
-        <div className={classNames('fileuploader', { 'fileuploader--uploading': isUploading }, className)}>
-          <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            {files.length > 0 &&
-              files.map((f) => (
-                <div key={f.name} className="fileuploader__file">
-                  <button className="bg-transparent border-0" onClick={() => onRemove()}>
-                    &times;
-                  </button>
-                  &nbsp;{f.name}
-                  {isUploading && (
-                    <div className="spinner-border fileuploader__spinner" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  )}
+    <DropzoneUploader
+      id={id}
+      className={classNames('file-input', className)}
+      accept={accept}
+      multiple={false}
+      disabled={value && value !== ''}
+      onRemoved={onRemoved}
+      onUploaded={onUploaded}>
+      {({ statuses, onRemove }) => {
+        if (statuses.length > 0) {
+          return statuses.map((s) => (
+            <div key={s.id} className="file-input__file">
+              {s.file.type.startsWith('audio/') && (
+                <AudioPlayer className="me-3 my-1 flex-grow-1" src={s.file.preview} onDurationChange={onAudioDurationChange} />
+              )}
+              {s.file.type.startsWith('image/') && (
+                <img className="img-fluid me-3 my-1 file-input__image" alt={s.file.name} src={s.file.preview} onLoad={onImageLoad} />
+              )}
+              {(s.status === 'pending' || s.status === 'uploading') && (
+                <div className="spinner-border file-input__spinner" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
-              ))}
-            {files.length === 0 && value && (
-              <div className="fileuploader__file">
-                <button className="bg-transparent border-0" onClick={() => onRemove()}>
-                  &times;
+              )}
+              {!(s.status === 'pending' || s.status === 'uploading') && (
+                <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => onRemove(s)}>
+                  <FontAwesomeIcon icon={faTrashCan} />
                 </button>
-                &nbsp;
-                {valueContentType === 'application/pdf' && 'PDF Document'}
-                {valueContentType.startsWith('image/') && `${valueContentType.substring(6).toUpperCase()} Image`}
-              </div>
-            )}
-            {files.length === 0 && !value && children}
-          </div>
-        </div>
-      )}
-    </Dropzone>
+              )}
+            </div>
+          ));
+        } else if (statuses.length === 0 && value) {
+          return (
+            <div className="file-input__file">
+              {valueContentType.startsWith('audio/') && <AudioPlayer className="me-3 my-1 flex-grow-1" src={valueURL} />}
+              {valueContentType.startsWith('image/') && (
+                <img className="img-fluid me-3 my-1 file-input__image" alt={value} src={valueURL} />
+              )}
+              <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => onRemoved()}>
+                <FontAwesomeIcon icon={faTrashCan} />
+              </button>
+            </div>
+          );
+        } else if (statuses.length === 0 && !value && children) {
+          return children;
+        }
+      }}
+    </DropzoneUploader>
   );
 }
 export default FileInput;

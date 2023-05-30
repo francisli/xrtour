@@ -51,9 +51,12 @@ function TourStop() {
     });
     const newResources = [...resources, response.data];
     newResources.sort((r1, r2) => {
-      let result = Math.sign(r1.start - r2.start);
+      let result = r1.Resource.type.localeCompare(r2.Resource.type);
       if (result === 0) {
-        result = r1.Resource.name.localeCompare(r2.Resource.name);
+        result = Math.sign(r1.start - r2.start);
+        if (result === 0) {
+          result = r1.Resource.name.localeCompare(r2.Resource.name);
+        }
       }
       return result;
     });
@@ -107,7 +110,13 @@ function TourStop() {
                   </div>
                 </form>
                 <h2>Assets</h2>
-                <ResourcesTable resources={resources} onClick={onClickResource} onChange={onChangeResource} onRemove={onRemoveResource} />
+                <ResourcesTable
+                  variant={variant}
+                  resources={resources}
+                  onClick={onClickResource}
+                  onChange={onChangeResource}
+                  onRemove={onRemoveResource}
+                />
                 <div className="mb-3">
                   <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
                     Add Asset
