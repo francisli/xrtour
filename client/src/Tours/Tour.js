@@ -31,9 +31,9 @@ function Tour() {
         return Promise.all([Api.tours.resources(TourId).index(), Api.tours.stops(TourId).index()]);
       })
       .then((result) => {
+        if (isCancelled) return;
         if (result) {
           const [resourcesResponse, stopsResponse] = result;
-          if (isCancelled) return;
           setResources(resourcesResponse.data);
           setStops(stopsResponse.data);
         }

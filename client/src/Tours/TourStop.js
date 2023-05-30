@@ -125,7 +125,12 @@ function TourStop() {
               </div>
               <div className="col-md-4">
                 <PhoneScreen className="mx-auto">
-                  <StopViewer position={position} stop={{ ...stop, StopResources: resources }} variant={variant} />
+                  <StopViewer
+                    position={position}
+                    stop={{ ...stop, StopResources: resources }}
+                    variant={variant}
+                    onTimeUpdate={(newPosition) => setPosition(newPosition)}
+                  />
                 </PhoneScreen>
               </div>
             </div>
