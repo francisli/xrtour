@@ -83,6 +83,26 @@ function TourStop() {
     setResources(newResources);
   }
 
+  async function onSaveRecording(blob) {
+    const resource = {
+      TeamId: stop.TeamId,
+      name: stop.names[stop.variants[0].code],
+      type: 'AUDIO',
+      variants: stop.variants,
+      Files: [
+        {
+          variant: variant.code,
+          key: blob.signed_id,
+          originalName: blob.filename,
+          duration: blob.duration,
+        },
+      ],
+    };
+    const response = await Api.resources.create(resource);
+    setRecording(false);
+    return onSelectResource(response.data);
+  }
+
   const title = stop?.names[stop.variants[0].code] ?? '';
 
   return (
@@ -117,7 +137,7 @@ function TourStop() {
                         </button>
                       </>
                     )}
-                    {isRecording && <Recorder onCancel={() => setRecording(false)} />}
+                    {isRecording && <Recorder onSave={onSaveRecording} onCancel={() => setRecording(false)} />}
                   </div>
                 </form>
                 <h2>Assets</h2>

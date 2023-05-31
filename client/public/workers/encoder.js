@@ -2,7 +2,7 @@ import { lamejs } from '/workers/lame.min.js';
 class EncoderProcessor extends AudioWorkletProcessor {
   constructor(options) {
     super();
-    this.encoder = new lamejs.Mp3Encoder(1, 44100, 128);
+    this.encoder = new lamejs.Mp3Encoder(1, options?.processorOptions?.sampleRate ?? 44100, 128);
     this.buffer = [];
     this.port.onmessage = (event) => this.onMessage(event);
   }
