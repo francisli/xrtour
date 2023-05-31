@@ -10,6 +10,7 @@ import StopViewer from '../Components/Viewer/StopViewer';
 import ResourcesModal from '../Resources/ResourcesModal';
 import { useStaticContext } from '../StaticContext';
 import ResourcesTable from '../Resources/ResourcesTable';
+import Recorder from '../Resources/Recorder';
 
 function TourStop() {
   const staticContext = useStaticContext();
@@ -18,6 +19,7 @@ function TourStop() {
   const [stop, setStop] = useState();
   const [variant, setVariant] = useState();
   const [resources, setResources] = useState();
+  const [isRecording, setRecording] = useState(false);
 
   const [position, setPosition] = useState(0);
 
@@ -104,9 +106,18 @@ function TourStop() {
                   <FormGroup plaintext name="name" label="Name" value={stop.names[variant.code]} />
                   <FormGroup plaintext type="textarea" name="description" label="Description" value={stop.descriptions[variant.code]} />
                   <div className="mb-3">
-                    <Link className="btn btn-primary" to="edit">
-                      Edit
-                    </Link>
+                    {!isRecording && (
+                      <>
+                        <Link className="btn btn-primary" to="edit">
+                          Edit
+                        </Link>
+                        &nbsp;
+                        <button onClick={() => setRecording(true)} className="btn btn-outline-danger" type="button">
+                          Record
+                        </button>
+                      </>
+                    )}
+                    {isRecording && <Recorder onCancel={() => setRecording(false)} />}
                   </div>
                 </form>
                 <h2>Assets</h2>
