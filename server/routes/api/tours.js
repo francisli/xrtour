@@ -50,7 +50,6 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
   }
 });
 
-router.use('/:TourId/resources', require('./tourResources'));
 router.use('/:TourId/stops', require('./tourStops'));
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {

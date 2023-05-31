@@ -57,7 +57,6 @@ async function resetDatabase() {
     DELETE FROM "StopResources";
     DELETE FROM "TourStops";
     DELETE FROM "Stops";
-    DELETE FROM "TourResources";
     DELETE FROM "Tours";
     DELETE FROM "Files";
     DELETE FROM "Resources";

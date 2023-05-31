@@ -199,7 +199,7 @@ describe('/api/resources', () => {
     });
 
     it('returns an error if the Resource is still referenced', async () => {
-      await helper.loadFixtures(['tours', 'tourResources']);
+      await helper.loadFixtures(['stops', 'stopResources']);
       const response = await testSession
         .delete('/api/resources/6ebacda9-8d33-4c3e-beb5-18dffb119046')
         .set('Accept', 'application/json')
