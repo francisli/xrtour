@@ -6,7 +6,7 @@ const helper = require('../../helper');
 const app = require('../../../app');
 const models = require('../../../models');
 
-describe('/api/tours', () => {
+describe('/api/stops', () => {
   let testSession;
 
   beforeEach(async () => {

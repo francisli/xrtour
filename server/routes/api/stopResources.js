@@ -10,7 +10,7 @@ const router = express.Router({ mergeParams: true });
 router.get('/', interceptors.requireLogin, async (req, res) => {
   const { StopId } = req.params;
   const record = await models.Stop.findByPk(StopId, {
-    include: ['Team', { model: models.StopResource, include: { model: models.Resource, include: 'Files' } }],
+    include: ['Team', { model: models.StopResource, as: 'Resources', include: { model: models.Resource, include: 'Files' } }],
   });
   if (record) {
     const membership = await record.Team.getMembership(req.user);
@@ -18,7 +18,7 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
       res.status(StatusCodes.UNAUTHORIZED).end();
     } else {
       // sort resources by type, start and name
-      record.StopResources.sort((r1, r2) => {
+      record.Resources.sort((r1, r2) => {
         let result = r1.Resource.type.localeCompare(r2.Resource.type);
         if (result === 0) {
           result = Math.sign(r1.start - r2.start);
@@ -28,7 +28,7 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
         }
         return result;
       });
-      res.json(record.StopResources.map((tr) => tr.toJSON()));
+      res.json(record.Resources.map((tr) => tr.toJSON()));
     }
   } else {
     res.status(StatusCodes.NOT_FOUND).end();

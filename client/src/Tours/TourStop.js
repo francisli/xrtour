@@ -117,7 +117,7 @@ function TourStop() {
         {!!stop && (
           <>
             <div className="row">
-              <div className="col-md-8">
+              <div className="col-md-6">
                 <h1 className="mb-3">{title}</h1>
                 <form className="mb-5">
                   <FormGroup plaintext name="link" label="Link" record={stop} />
@@ -154,11 +154,11 @@ function TourStop() {
                   </button>
                 </div>
               </div>
-              <div className="col-md-4">
+              <div className="col-md-6">
                 <PhoneScreen className="mx-auto">
                   <StopViewer
                     position={position}
-                    stop={{ ...stop, StopResources: resources }}
+                    stop={{ ...stop, Resources: resources }}
                     variant={variant}
                     onTimeUpdate={(newPosition) => setPosition(newPosition)}
                   />

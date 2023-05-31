@@ -36,41 +36,6 @@ describe('/api/tours/:TourId/resources', () => {
 
       assert.deepStrictEqual(response.body, [
         {
-          id: 'a26afd2c-b8bc-41d3-ac56-2ac06377993f',
-          TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
-          ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
-          start: 0,
-          end: null,
-          Resource: {
-            TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
-            id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
-            name: 'Resource 1',
-            type: 'IMAGE',
-            variants: [
-              {
-                code: 'en-us',
-                displayName: 'English',
-                name: 'English (US)',
-              },
-            ],
-            Files: [
-              {
-                id: 'ed2f158a-e44e-432d-971e-e5da1a2e33b4',
-                ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
-                variant: 'en-us',
-                externalURL: null,
-                key: 'cdd8007d-dcaf-4163-b497-92d378679668.png',
-                keyURL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/cdd8007d-dcaf-4163-b497-92d378679668.png',
-                originalName: null,
-                duration: null,
-                width: null,
-                height: null,
-                URL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/cdd8007d-dcaf-4163-b497-92d378679668.png',
-              },
-            ],
-          },
-        },
-        {
           id: 'c12c53d9-efe7-4682-a36c-034f7a4d8390',
           TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
           ResourceId: '6ebacda9-8d33-4c3e-beb5-18dffb119046',
@@ -101,6 +66,41 @@ describe('/api/tours/:TourId/resources', () => {
                 width: null,
                 height: null,
                 URL: '/api/assets/files/84b62056-05a4-4751-953f-7854ac46bc0f/key/d2e150be-b277-4f68-96c7-22a477e0022f.m4a',
+              },
+            ],
+          },
+        },
+        {
+          id: 'a26afd2c-b8bc-41d3-ac56-2ac06377993f',
+          TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
+          ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
+          start: 0,
+          end: null,
+          Resource: {
+            TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+            id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
+            name: 'Resource 1',
+            type: 'IMAGE',
+            variants: [
+              {
+                code: 'en-us',
+                displayName: 'English',
+                name: 'English (US)',
+              },
+            ],
+            Files: [
+              {
+                id: 'ed2f158a-e44e-432d-971e-e5da1a2e33b4',
+                ResourceId: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
+                variant: 'en-us',
+                externalURL: null,
+                key: 'cdd8007d-dcaf-4163-b497-92d378679668.png',
+                keyURL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/cdd8007d-dcaf-4163-b497-92d378679668.png',
+                originalName: null,
+                duration: null,
+                width: null,
+                height: null,
+                URL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/cdd8007d-dcaf-4163-b497-92d378679668.png',
               },
             ],
           },

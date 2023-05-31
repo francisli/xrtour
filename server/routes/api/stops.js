@@ -17,6 +17,7 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
     return;
   }
   const options = {
+    include: { model: models.StopResource, as: 'Resources', include: { model: models.Resource, include: 'Files' } },
     page,
     order: [['name', 'ASC']],
     where: { TeamId },

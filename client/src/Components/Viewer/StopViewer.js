@@ -18,11 +18,11 @@ function StopViewer({ position, stop, variant, onTimeUpdate }) {
   const [isPlaying, setPlaying] = useState(false);
 
   useEffect(() => {
-    if (stop.StopResources) {
+    if (stop.Resources) {
       let newDuration = 0;
       let newImages = [];
       let newTracks = [];
-      for (const sr of stop.StopResources) {
+      for (const sr of stop.Resources) {
         if (Number.isInteger(sr.end)) {
           newDuration = Math.max(newDuration, sr.end);
         } else if (Number.isInteger(sr.start)) {

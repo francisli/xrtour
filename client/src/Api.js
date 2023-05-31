@@ -138,13 +138,19 @@ const Api = {
     update(id, data) {
       return instance.patch(`/api/tours/${id}`, data);
     },
-    resources(id) {
+    resources(TourId) {
       return {
         index() {
-          return instance.get(`/api/tours/${id}/resources`);
+          return instance.get(`/api/tours/${TourId}/resources`);
         },
         create(data) {
-          return instance.post(`/api/tours/${id}/resources`, data);
+          return instance.post(`/api/tours/${TourId}/resources`, data);
+        },
+        update(id, data) {
+          return instance.patch(`/api/tours/${TourId}/resources/${id}`, data);
+        },
+        remove(id) {
+          return instance.delete(`/api/tours/${TourId}/resources/${id}`);
         },
       };
     },
