@@ -7,6 +7,7 @@ import { useStaticContext } from '../StaticContext';
 import FormGroup from '../Components/FormGroup';
 import PhoneScreen from '../Components/Viewer/PhoneScreen';
 import VariantTabs from '../Components/VariantTabs';
+import ResourcesModal from '../Resources/ResourcesModal';
 import StopsModal from '../Stops/StopsModal';
 import StopsTable from '../Stops/StopsTable';
 
@@ -34,6 +35,20 @@ function Tour() {
       });
     return () => (isCancelled = true);
   }, [TourId]);
+
+  const [isShowingResourcesModal, setShowingResourcesModal] = useState(false);
+
+  function onHideResourcesModal() {
+    setShowingResourcesModal(false);
+  }
+
+  async function onSelectResource(resource) {
+    await Api.tours.update(tour.id, { CoverResourceId: resource.id });
+    const newTour = { ...tour };
+    newTour.CoverResource = resource;
+    setTour(newTour);
+    setShowingResourcesModal(false);
+  }
 
   const [isShowingStopsModal, setShowingStopsModal] = useState(false);
 
@@ -80,6 +95,25 @@ function Tour() {
                     </Link>
                   </div>
                 </form>
+                <h2>Cover</h2>
+                <div className="mb-5">
+                  {tour.CoverResource && (
+                    <div className="row">
+                      <div className="col-3">
+                        <img
+                          className="img-thumbnail mb-3"
+                          src={tour.CoverResource.Files.find((f) => f.variant === variant.code)?.URL}
+                          alt="Cover"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
+                      Select Asset
+                    </button>
+                  </div>
+                </div>
                 <h2>Stops</h2>
                 <StopsTable stops={stops} onClickStop={onClickStop} />
                 <div className="mb-5">
@@ -94,6 +128,7 @@ function Tour() {
             </div>
           </>
         )}
+        <ResourcesModal isShowing={isShowingResourcesModal} onHide={onHideResourcesModal} onSelect={onSelectResource} types={['IMAGE']} />
         <StopsModal isShowing={isShowingStopsModal} onHide={onHideStopsModal} onSelect={onSelectStop} />
       </main>
     </>
