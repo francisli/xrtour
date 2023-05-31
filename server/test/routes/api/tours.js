@@ -55,6 +55,8 @@ describe('/api/tours', () => {
       assert.deepStrictEqual(response.body, {
         ...data,
         id: response.body.id,
+        IntroStopId: null,
+        CoverResourceId: null,
       });
 
       const record = await models.Tour.findByPk(response.body.id);
@@ -153,6 +155,8 @@ describe('/api/tours', () => {
       assert.deepStrictEqual(data, {
         id: '495b18a8-ae05-4f44-a06d-c1809add0352',
         TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+        CoverResourceId: null,
+        IntroStopId: null,
         link: 'tour2',
         names: { 'en-us': 'Tour 2' },
         descriptions: { 'en-us': 'Tour 2 description' },

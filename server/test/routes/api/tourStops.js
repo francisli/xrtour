@@ -53,6 +53,7 @@ describe('/api/tours/:TourId/stops', () => {
               'en-us': 'CHSA',
             },
             radius: null,
+            type: 'STOP',
             variants: [
               {
                 code: 'en-us',
@@ -81,6 +82,7 @@ describe('/api/tours/:TourId/stops', () => {
               'en-us': "Kan's Restaurant",
             },
             radius: null,
+            type: 'STOP',
             variants: [
               {
                 code: 'en-us',
@@ -122,6 +124,7 @@ describe('/api/tours/:TourId/stops', () => {
             'en-us':
               "Kan's was the first restaurant in Chinatown to win the Holiday (magazine) Award for fine dining; that award was given to Kan's for 14 consecutive years. Its name was frequently on top ten lists of San Francisco restaurants. World-famous celebrities, movie stars, the rich and the powerful came to Kan's, and their appearances were written up by San Francisco columnist Herb Caen.",
           },
+          type: 'STOP',
           variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
         },
       });

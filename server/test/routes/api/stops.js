@@ -42,6 +42,7 @@ describe('/api/stops', () => {
   describe('POST /', () => {
     it('creates a new Stop', async () => {
       const data = {
+        type: 'STOP',
         TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
         link: 'telephone-exchange',
         address: '743 Washington St, San Francisco, CA 94108',
@@ -73,6 +74,7 @@ describe('/api/stops', () => {
         .post('/api/stops')
         .set('Accept', 'application/json')
         .send({
+          type: 'STOP',
           TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
           link: 'telephone-exchange',
           address: '743 Washington St, San Francisco, CA 94108',
@@ -102,6 +104,7 @@ describe('/api/stops', () => {
         .post('/api/stops')
         .set('Accept', 'application/json')
         .send({
+          type: 'STOP',
           TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
           link: 'chsa',
           address: '743 Washington St, San Francisco, CA 94108',
@@ -131,6 +134,7 @@ describe('/api/stops', () => {
         .post('/api/tours')
         .set('Accept', 'application/json')
         .send({
+          type: 'STOP',
           TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
           link: 'invalid link',
           address: '743 Washington St, San Francisco, CA 94108',
@@ -167,6 +171,7 @@ describe('/api/stops', () => {
       assert.deepStrictEqual(data, {
         id: 'e39b97ad-a5e9-422c-b256-d50fec355285',
         TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+        type: 'STOP',
         link: 'chsa',
         address: '965 Clay St, San Francisco, CA 94108',
         coordinate: null,

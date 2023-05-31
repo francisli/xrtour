@@ -5,11 +5,29 @@ module.exports = (sequelize, DataTypes) => {
   class Tour extends Model {
     static associate(models) {
       Tour.belongsTo(models.Team);
+      Tour.belongsTo(models.Resource, { as: 'CoverResource' });
+      Tour.belongsTo(models.Stop, { as: 'IntroStop' });
       Tour.hasMany(models.TourStop);
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'TeamId', 'link', 'names', 'descriptions', 'variants', 'visibility']);
+      const json = _.pick(this.get(), [
+        'id',
+        'TeamId',
+        'CoverResourceId',
+        'IntroStopId',
+        'link',
+        'names',
+        'descriptions',
+        'variants',
+        'visibility',
+      ]);
+      if (this.CoverResource) {
+        json.CoverResource = this.CoverResource.toJSON();
+      }
+      if (this.IntroStop) {
+        json.IntroStop = this.IntroStop.toJSON();
+      }
       if (this.TourStops) {
         json.TourStops = this.TourStops.map((ts) => ts.toJSON());
       }
