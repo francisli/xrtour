@@ -56,7 +56,7 @@ function StopsTable({ type = 'STOP', stops, onClick, onRemove }) {
             </tr>
           )}
           {stops?.map((s, i) => (
-            <tr key={s.id} onClick={() => onClick(s)} className="clickable">
+            <tr key={s.id} onClick={() => onClick(type, s)} className="clickable">
               <td>{i + 1}</td>
               <td>{s.Stop.names[s.Stop.variants[0].code]}</td>
               <td>{s.Stop.address}</td>

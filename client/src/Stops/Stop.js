@@ -118,8 +118,12 @@ function Stop({ stopId }) {
               <div className="col-md-6">
                 <h1 className="mb-3">{title}</h1>
                 <form className="mb-5">
-                  <FormGroup plaintext name="link" label="Link" record={stop} />
-                  <FormGroup plaintext name="address" label="Address" record={stop} />
+                  {stop.type === 'STOP' && (
+                    <>
+                      <FormGroup plaintext name="link" label="Link" record={stop} />
+                      <FormGroup plaintext name="address" label="Address" record={stop} />
+                    </>
+                  )}
                   <VariantTabs variants={stop.variants} current={variant} setVariant={setVariant} />
                   <FormGroup plaintext name="name" label="Name" value={stop.names[variant.code]} />
                   <FormGroup plaintext type="textarea" name="description" label="Description" value={stop.descriptions[variant.code]} />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import inflection from 'inflection';
 
 import Api from '../Api';
 import { useStaticContext } from '../StaticContext';
@@ -74,8 +75,8 @@ function Tour() {
     setShowingStopsModal(false);
   }
 
-  function onClickStop(stop) {
-    navigate(`stops/${stop.id}`);
+  function onClickStop(type, stop) {
+    navigate(`${inflection.pluralize(type).toLocaleLowerCase()}/${stop.id}`);
   }
 
   async function onRemoveIntro() {
