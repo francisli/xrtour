@@ -35,7 +35,7 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
     res.status(StatusCodes.UNAUTHORIZED).end();
     return;
   }
-  const record = models.Stop.build(_.pick(req.body, ['TeamId', 'link', 'address', 'radius', 'names', 'descriptions', 'variants']));
+  const record = models.Stop.build(_.pick(req.body, ['TeamId', 'type', 'link', 'address', 'radius', 'names', 'descriptions', 'variants']));
   try {
     await record.save();
     res.status(StatusCodes.CREATED).json(record.toJSON());

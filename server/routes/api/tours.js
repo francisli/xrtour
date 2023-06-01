@@ -55,7 +55,15 @@ router.use('/:TourId/stops', require('./tourStops'));
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {
   const record = await models.Tour.findByPk(req.params.id, {
-    include: ['Team', { model: models.Resource, as: 'CoverResource', include: 'Files' }],
+    include: [
+      'Team',
+      { model: models.Resource, as: 'CoverResource', include: 'Files' },
+      {
+        model: models.Stop,
+        as: 'IntroStop',
+        include: { model: models.StopResource, as: 'Resources', include: { model: models.Resource, include: 'Files' } },
+      },
+    ],
   });
   if (record) {
     const membership = await record.Team.getMembership(req.user);

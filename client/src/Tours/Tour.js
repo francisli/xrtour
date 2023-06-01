@@ -50,6 +50,7 @@ function Tour() {
     setShowingResourcesModal(false);
   }
 
+  const [stopType, setStopType] = useState('STOP');
   const [isShowingStopsModal, setShowingStopsModal] = useState(false);
 
   function onHideStopsModal() {
@@ -57,17 +58,39 @@ function Tour() {
   }
 
   async function onSelectStop(stop) {
-    const response = await Api.tours.stops(TourId).create({
-      StopId: stop.id,
-      position: stops.reduce((max, current) => Math.max(max, current), 0) + 1,
-    });
-    const newStops = [...stops, response.data];
-    setStops(newStops);
+    if (stop.type === 'INTRO') {
+      await Api.tours.update(tour.id, { IntroStopId: stop.id });
+      const newTour = { ...tour };
+      newTour.IntroStop = stop;
+      setTour(newTour);
+    } else if (stop.type === 'STOP') {
+      const response = await Api.tours.stops(TourId).create({
+        StopId: stop.id,
+        position: stops.reduce((max, current) => Math.max(max, current), 0) + 1,
+      });
+      const newStops = [...stops, response.data];
+      setStops(newStops);
+    }
     setShowingStopsModal(false);
   }
 
   function onClickStop(stop) {
     navigate(`stops/${stop.id}`);
+  }
+
+  async function onRemoveIntro() {
+    await Api.tours.update(tour.id, { IntroStopId: null });
+    const newTour = { ...tour };
+    newTour.IntroStop = null;
+    setTour(newTour);
+  }
+
+  async function onRemoveStop(stop) {
+    await Api.tours.stops(tour.id).remove(stop.id);
+    const newStops = [...stops];
+    const index = newStops.indexOf(stop);
+    newStops.splice(index, 1);
+    setStops(newStops);
   }
 
   return (
@@ -95,29 +118,53 @@ function Tour() {
                     </Link>
                   </div>
                 </form>
-                <h2>Cover</h2>
-                <div className="mb-5">
-                  {tour.CoverResource && (
-                    <div className="row">
-                      <div className="col-3">
-                        <img
-                          className="img-thumbnail mb-3"
-                          src={tour.CoverResource.Files.find((f) => f.variant === variant.code)?.URL}
-                          alt="Cover"
-                        />
+                <div className="row mb-5">
+                  <div className="col-md-6">
+                    <h2>Cover</h2>
+                    {tour.CoverResource && (
+                      <div className="row">
+                        <div className="col-6">
+                          <img
+                            className="img-thumbnail mb-3"
+                            src={tour.CoverResource.Files.find((f) => f.variant === variant.code)?.URL}
+                            alt="Cover"
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  <div>
+                    )}
                     <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
-                      Select Asset
+                      Select Cover
                     </button>
                   </div>
                 </div>
-                <h2>Stops</h2>
-                <StopsTable stops={stops} onClickStop={onClickStop} />
+                <h2>Intro</h2>
+                <StopsTable
+                  type="INTRO"
+                  stops={tour.IntroStop ? [{ id: tour.IntroStopId, Stop: tour.IntroStop }] : []}
+                  onClick={onClickStop}
+                  onRemove={onRemoveIntro}
+                />
                 <div className="mb-5">
-                  <button onClick={() => setShowingStopsModal(true)} type="button" className="btn btn-primary">
+                  <button
+                    onClick={() => {
+                      setStopType('INTRO');
+                      setShowingStopsModal(true);
+                    }}
+                    type="button"
+                    className="btn btn-primary">
+                    Set Intro
+                  </button>
+                </div>
+                <h2>Stops</h2>
+                <StopsTable stops={stops} onClick={onClickStop} onRemove={onRemoveStop} />
+                <div className="mb-5">
+                  <button
+                    onClick={() => {
+                      setStopType('STOP');
+                      setShowingStopsModal(true);
+                    }}
+                    type="button"
+                    className="btn btn-primary">
                     Add Stop
                   </button>
                 </div>
@@ -129,7 +176,7 @@ function Tour() {
           </>
         )}
         <ResourcesModal isShowing={isShowingResourcesModal} onHide={onHideResourcesModal} onSelect={onSelectResource} types={['IMAGE']} />
-        <StopsModal isShowing={isShowingStopsModal} onHide={onHideStopsModal} onSelect={onSelectStop} />
+        <StopsModal type={stopType} isShowing={isShowingStopsModal} onHide={onHideStopsModal} onSelect={onSelectStop} />
       </main>
     </>
   );
