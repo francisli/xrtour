@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { pluralize } from 'inflection';
+import { useNavigate, useParams } from 'react-router-dom';
+import { capitalize, pluralize } from 'inflection';
 import { StatusCodes } from 'http-status-codes';
 import { v4 as uuid } from 'uuid';
 
@@ -12,15 +13,18 @@ import VariantTabs from '../Components/VariantTabs';
 
 function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type }) {
   const { membership } = useAuthContext();
+  const { StopId: StopIdParam } = useParams();
+  const navigate = useNavigate();
 
-  const [stop, setStop] = useState();
+  const [Stop, setStop] = useState();
   const [variant, setVariant] = useState();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
 
   useEffect(() => {
     let isCancelled = false;
-    if (membership && !StopId) {
+    let id = StopId ?? StopIdParam;
+    if (membership && !id) {
       setStop({
         TeamId: membership.TeamId,
         type,
@@ -33,18 +37,18 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
       });
       setVariant(membership.Team.variants[0]);
     }
-    if (StopId) {
-      Api.stops.get(StopId).then((response) => {
+    if (id) {
+      Api.stops.get(id).then((response) => {
         if (isCancelled) return;
         setStop(response.data);
         setVariant(response.data.variants[0]);
       });
     }
     return () => (isCancelled = true);
-  }, [membership, StopId, type, startingAddress]);
+  }, [membership, StopId, StopIdParam, type, startingAddress]);
 
   function onChange(event) {
-    const newStop = { ...stop };
+    const newStop = { ...Stop };
     const { name, value } = event.target;
     if (name === 'name' || name === 'description') {
       newStop[pluralize(name)][variant?.code] = value;
@@ -60,12 +64,15 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
     setLoading(true);
     try {
       let response;
-      if (StopId) {
-        response = await Api.stops.update(StopId, stop);
-        onUpdate(response.data);
+      if (Stop.id) {
+        response = await Api.stops.update(Stop.id, Stop);
+        onUpdate?.(response.data);
       } else {
-        response = await Api.stops.create(stop);
-        onCreate(response.data);
+        response = await Api.stops.create(Stop);
+        onCreate?.(response.data);
+      }
+      if (StopIdParam) {
+        navigate(-1);
       }
     } catch (error) {
       if (error.response?.status === StatusCodes.UNPROCESSABLE_ENTITY) {
@@ -78,33 +85,41 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
     }
   }
 
-  return (
+  function onCancelInternal() {
+    onCancel?.();
+    if (StopIdParam) {
+      navigate(-1);
+    }
+  }
+
+  const form = (
     <div className="row">
       <div className="col-md-6">
-        {variant && stop && (
+        {!Stop && <div className="spinner-border"></div>}
+        {variant && Stop && (
           <form autoComplete="off" onSubmit={onSubmit}>
             {error && error.message && <div className="alert alert-danger">{error.message}</div>}
             <fieldset disabled={isLoading}>
-              {stop.type === 'STOP' && (
+              {Stop.type === 'STOP' && (
                 <>
-                  <FormGroup name="link" label="Link" onChange={onChange} record={stop} error={error} />
-                  <FormGroup name="address" label="Address" onChange={onChange} record={stop} error={error} />
+                  <FormGroup name="link" label="Link" onChange={onChange} record={Stop} error={error} />
+                  <FormGroup name="address" label="Address" onChange={onChange} record={Stop} error={error} />
                 </>
               )}
-              {stop.type === 'TRANSITION' && (
+              {Stop.type === 'TRANSITION' && (
                 <>
-                  <FormGroup name="address" label="Starting Address" onChange={onChange} record={stop} error={error} />
-                  <FormGroup name="destAddress" label="Destination Address" onChange={onChange} record={stop} error={error} />
+                  <FormGroup name="address" label="Starting Address" onChange={onChange} record={Stop} error={error} />
+                  <FormGroup name="destAddress" label="Destination Address" onChange={onChange} record={Stop} error={error} />
                 </>
               )}
-              <VariantTabs variants={stop.variants} current={variant} setVariant={setVariant} />
-              <FormGroup name="name" label="Name" onChange={onChange} value={stop.names[variant?.code]} error={error} />
+              <VariantTabs variants={Stop.variants} current={variant} setVariant={setVariant} />
+              <FormGroup name="name" label="Name" onChange={onChange} value={Stop.names[variant?.code]} error={error} />
               <FormGroup
                 type="textarea"
                 name="description"
                 label="Description"
                 onChange={onChange}
-                value={stop.descriptions[variant?.code]}
+                value={Stop.descriptions[variant?.code]}
                 error={error}
               />
               <div className="mb-3">
@@ -112,7 +127,7 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
                   Submit
                 </button>
                 &nbsp;
-                <button onClick={onCancel} className="btn btn-secondary" type="button">
+                <button onClick={onCancelInternal} className="btn btn-secondary" type="button">
                   Cancel
                 </button>
               </div>
@@ -120,8 +135,20 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
           </form>
         )}
       </div>
-      <div className="col-md-6">{JSON.stringify(stop)}</div>
+      <div className="col-md-6">{JSON.stringify(Stop)}</div>
     </div>
   );
+  if (StopIdParam) {
+    return (
+      <>
+        <main className="container">
+          <h1 className="mb-3">Edit {Stop ? capitalize(Stop.type) : ''}</h1>
+          {form}
+        </main>
+      </>
+    );
+  } else {
+    return form;
+  }
 }
 export default StopForm;

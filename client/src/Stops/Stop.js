@@ -125,6 +125,12 @@ function Stop({ StopId, children }) {
                       <FormGroup plaintext name="address" label="Address" record={stop} />
                     </>
                   )}
+                  {stop.type === 'TRANSITION' && (
+                    <>
+                      <FormGroup plaintext name="address" label="Starting Address" record={stop} />
+                      <FormGroup plaintext name="destAddress" label="Destination Address" record={stop} />
+                    </>
+                  )}
                   <VariantTabs variants={stop.variants} current={variant} setVariant={setVariant} />
                   <FormGroup plaintext name="name" label="Name" value={stop.names[variant.code]} />
                   <FormGroup plaintext type="textarea" name="description" label="Description" value={stop.descriptions[variant.code]} />

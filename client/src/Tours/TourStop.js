@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import Api from '../Api';
 import Stop from '../Stops/Stop';
@@ -8,6 +8,7 @@ import StopsTable from '../Stops/StopsTable';
 
 function TourStop() {
   const { TourId, TourStopId } = useParams();
+  const navigate = useNavigate();
   const [TourStop, setTourStop] = useState();
   const [isShowingStopsModal, setShowingStopsModal] = useState(false);
 
@@ -32,7 +33,9 @@ function TourStop() {
     await Api.tours.stops(TourId).update(TourStopId, { TransitionStopId: stop.id });
   }
 
-  function onClickTransition(stop) {}
+  function onClickTransition(type, stop) {
+    navigate(`transitions/${stop.id}`);
+  }
 
   async function onRemoveTransition(stop) {
     const newTourStop = { ...TourStop };
