@@ -6,11 +6,11 @@ import inflection from 'inflection';
 import Api from '../Api';
 import { useStaticContext } from '../StaticContext';
 import FormGroup from '../Components/FormGroup';
-import PhoneScreen from '../Components/Viewer/PhoneScreen';
 import VariantTabs from '../Components/VariantTabs';
 import ResourcesModal from '../Resources/ResourcesModal';
 import StopsModal from '../Stops/StopsModal';
 import StopsTable from '../Stops/StopsTable';
+import SharePreview from '../Components/SharePreview';
 
 function Tour() {
   const staticContext = useStaticContext();
@@ -105,9 +105,9 @@ function Tour() {
         {!tour && <div className="spinner-border"></div>}
         {tour && (
           <>
+            <h1 className="mb-3">{tour.names[tour.variants[0].code]}</h1>
             <div className="row">
               <div className="col-md-6">
-                <h1 className="mb-3">{tour.names[tour.variants[0].code]}</h1>
                 <form className="mb-5">
                   <FormGroup plaintext name="link" label="Link" record={tour} />
                   <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
@@ -170,8 +170,8 @@ function Tour() {
                   </button>
                 </div>
               </div>
-              <div className="col-md-6">
-                <PhoneScreen className="mx-auto"></PhoneScreen>
+              <div className="col-md-4 offset-md-1">
+                <SharePreview tour={tour} />
               </div>
             </div>
           </>

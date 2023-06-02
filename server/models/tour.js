@@ -28,6 +28,9 @@ module.exports = (sequelize, DataTypes) => {
       if (this.IntroStop) {
         json.IntroStop = this.IntroStop.toJSON();
       }
+      if (this.Team) {
+        json.Team = this.Team.toJSON();
+      }
       if (this.TourStops) {
         json.TourStops = this.TourStops.map((ts) => ts.toJSON());
       }

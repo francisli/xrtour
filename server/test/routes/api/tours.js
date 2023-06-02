@@ -162,6 +162,18 @@ describe('/api/tours', () => {
         descriptions: { 'en-us': 'Tour 2 description' },
         variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
         visibility: 'PRIVATE',
+        Team: {
+          id: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+          link: 'regularuser',
+          name: "Regular's Personal Team",
+          variants: [
+            {
+              code: 'en-us',
+              displayName: 'English',
+              name: 'English (US)',
+            },
+          ],
+        },
       });
     });
   });
