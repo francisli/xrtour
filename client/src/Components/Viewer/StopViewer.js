@@ -5,7 +5,7 @@ import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 import Scrubber from './Scrubber';
 import './StopViewer.scss';
 
-function StopViewer({ position, stop, variant, onTimeUpdate }) {
+function StopViewer({ position, stop, transition, variant, onTimeUpdate }) {
   const [duration, setDuration] = useState(0);
   const [imageURL, setImageURL] = useState();
 
@@ -35,12 +35,31 @@ function StopViewer({ position, stop, variant, onTimeUpdate }) {
           newImages.push(sr);
         }
       }
+      if (transition?.Resources) {
+        const offset = newDuration;
+        for (const sr of transition.Resources) {
+          if (Number.isInteger(sr.end)) {
+            newDuration = Math.max(newDuration, offset + sr.end);
+          } else if (Number.isInteger(sr.start)) {
+            newDuration = Math.max(newDuration, offset + sr.start);
+          }
+          if (sr.Resource.type === 'AUDIO') {
+            newDuration = Math.max(
+              newDuration,
+              offset + sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0
+            );
+            newTracks.push({ ...sr, start: offset + sr.start });
+          } else if (sr.Resource.type === 'IMAGE') {
+            newImages.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
+          }
+        }
+      }
       setDuration(newDuration);
       setImages(newImages);
       setTracks(newTracks);
       ref.current = {};
     }
-  }, [stop, variant]);
+  }, [stop, transition, variant]);
 
   useEffect(() => {
     if (images && tracks && Number.isInteger(position)) {

@@ -77,7 +77,14 @@ router.get('/:id', interceptors.requireLogin, async (req, res) => {
         transaction,
       });
       tourStop = await models.TourStop.findOne({
-        include: ['Stop', 'TransitionStop'],
+        include: [
+          'Stop',
+          {
+            model: models.Stop,
+            as: 'TransitionStop',
+            include: { model: models.StopResource, as: 'Resources', include: { model: models.Resource, include: 'Files' } },
+          },
+        ],
         where: { id, TourId },
         transaction,
       });

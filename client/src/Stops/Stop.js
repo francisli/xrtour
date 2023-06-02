@@ -12,7 +12,7 @@ import ResourcesModal from '../Resources/ResourcesModal';
 import ResourcesTable from '../Resources/ResourcesTable';
 import { useStaticContext } from '../StaticContext';
 
-function Stop({ StopId, children }) {
+function Stop({ StopId, transition, children }) {
   const staticContext = useStaticContext();
   const { StopId: StopIdParam } = useParams();
   const [stop, setStop] = useState();
@@ -169,6 +169,7 @@ function Stop({ StopId, children }) {
                   <StopViewer
                     position={position}
                     stop={{ ...stop, Resources: resources }}
+                    transition={transition}
                     variant={variant}
                     onTimeUpdate={(newPosition) => setPosition(newPosition)}
                   />

@@ -47,7 +47,7 @@ function TourStop() {
 
   return (
     <>
-      <Stop StopId={TourStop?.StopId}>
+      <Stop StopId={TourStop?.StopId} transition={TourStop?.TransitionStop}>
         <h2>Transition</h2>
         <StopsTable
           type="TRANSITION"
