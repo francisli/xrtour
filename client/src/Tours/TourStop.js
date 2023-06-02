@@ -68,6 +68,7 @@ function TourStop() {
         isShowing={isShowingStopsModal}
         onHide={() => setShowingStopsModal(false)}
         onSelect={onSelectTransition}
+        startingAddress={tourStop?.Stop?.address}
       />
     </>
   );

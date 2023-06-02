@@ -10,7 +10,7 @@ import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
 
-function StopForm({ StopId, onCancel, onCreate, onUpdate, type }) {
+function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type }) {
   const { membership } = useAuthContext();
 
   const [stop, setStop] = useState();
@@ -25,7 +25,8 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, type }) {
         TeamId: membership.TeamId,
         type,
         link: type !== 'STOP' ? uuid() : '',
-        address: '',
+        address: startingAddress ?? '',
+        destAddress: null,
         names: { [membership.Team.variants[0].code]: '' },
         descriptions: { [membership.Team.variants[0].code]: '' },
         variants: [membership.Team.variants[0]],
@@ -40,7 +41,7 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, type }) {
       });
     }
     return () => (isCancelled = true);
-  }, [membership, StopId, type]);
+  }, [membership, StopId, type, startingAddress]);
 
   function onChange(event) {
     const newStop = { ...stop };
@@ -91,7 +92,10 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, type }) {
                 </>
               )}
               {stop.type === 'TRANSITION' && (
-                <FormGroup name="address" label="Destination Address" onChange={onChange} record={stop} error={error} />
+                <>
+                  <FormGroup name="address" label="Starting Address" onChange={onChange} record={stop} error={error} />
+                  <FormGroup name="destAddress" label="Destination Address" onChange={onChange} record={stop} error={error} />
+                </>
               )}
               <VariantTabs variants={stop.variants} current={variant} setVariant={setVariant} />
               <FormGroup name="name" label="Name" onChange={onChange} value={stop.names[variant?.code]} error={error} />
