@@ -32,11 +32,16 @@ function StopViewer({ position, stop, transition, variant, onTimeUpdate }) {
           newDuration = Math.max(newDuration, sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0);
           newTracks.push(sr);
         } else if (sr.Resource.type === 'IMAGE') {
-          newImages.push(sr);
+          newImages.push({ ...sr });
         }
       }
       if (transition?.Resources) {
         const offset = newDuration;
+        for (const ir of newImages) {
+          if (!Number.isInteger(ir.end)) {
+            ir.end = offset;
+          }
+        }
         for (const sr of transition.Resources) {
           if (Number.isInteger(sr.end)) {
             newDuration = Math.max(newDuration, offset + sr.end);
