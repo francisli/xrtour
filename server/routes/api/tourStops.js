@@ -77,7 +77,7 @@ router.get('/:id', interceptors.requireLogin, async (req, res) => {
         transaction,
       });
       tourStop = await models.TourStop.findOne({
-        include: 'Stop',
+        include: ['Stop', 'TransitionStop'],
         where: { id, TourId },
         transaction,
       });
@@ -124,7 +124,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
       if (record && updatedRecord) {
         membership = await record.Team.getMembership(req.user, { transaction });
         if (membership && membership.isEditor) {
-          await updatedRecord.update(_.pick(req.body, ['position']));
+          await updatedRecord.update(_.pick(req.body, ['TransitionStopId', 'position']));
         } else {
           membership = null;
         }

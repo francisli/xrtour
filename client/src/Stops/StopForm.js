@@ -84,11 +84,14 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, type }) {
           <form autoComplete="off" onSubmit={onSubmit}>
             {error && error.message && <div className="alert alert-danger">{error.message}</div>}
             <fieldset disabled={isLoading}>
-              {type === 'STOP' && (
+              {stop.type === 'STOP' && (
                 <>
                   <FormGroup name="link" label="Link" onChange={onChange} record={stop} error={error} />
                   <FormGroup name="address" label="Address" onChange={onChange} record={stop} error={error} />
                 </>
+              )}
+              {stop.type === 'TRANSITION' && (
+                <FormGroup name="address" label="Destination Address" onChange={onChange} record={stop} error={error} />
               )}
               <VariantTabs variants={stop.variants} current={variant} setVariant={setVariant} />
               <FormGroup name="name" label="Name" onChange={onChange} value={stop.names[variant?.code]} error={error} />

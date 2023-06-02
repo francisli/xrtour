@@ -39,6 +39,7 @@ describe('/api/tours/:TourId/stops', () => {
           id: 'c25b67d5-fef6-4b9b-8f54-7ded9d1889b4',
           TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
           StopId: 'e39b97ad-a5e9-422c-b256-d50fec355285',
+          TransitionStopId: null,
           position: 1,
           Stop: {
             TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
@@ -67,6 +68,7 @@ describe('/api/tours/:TourId/stops', () => {
           id: '473abc1e-c5cb-4148-a2e4-c75a1dfcb3e1',
           TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
           StopId: 'bba84716-633e-4593-85a0-9da4010eb99b',
+          TransitionStopId: null,
           position: 2,
           Stop: {
             TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
@@ -111,6 +113,7 @@ describe('/api/tours/:TourId/stops', () => {
         id: response.body.id,
         TourId: 'ae61f3e7-7de7-40e2-b9a1-c5ad9ff94806',
         StopId: 'bba84716-633e-4593-85a0-9da4010eb99b',
+        TransitionStopId: null,
         position: 1,
         Stop: {
           id: 'bba84716-633e-4593-85a0-9da4010eb99b',
@@ -145,6 +148,7 @@ describe('/api/tours/:TourId/stops', () => {
         id: 'c25b67d5-fef6-4b9b-8f54-7ded9d1889b4',
         TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
         StopId: 'e39b97ad-a5e9-422c-b256-d50fec355285',
+        TransitionStopId: null,
         position: 3,
       });
     });

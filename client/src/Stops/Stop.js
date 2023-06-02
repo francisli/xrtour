@@ -12,7 +12,7 @@ import ResourcesModal from '../Resources/ResourcesModal';
 import ResourcesTable from '../Resources/ResourcesTable';
 import { useStaticContext } from '../StaticContext';
 
-function Stop({ stopId }) {
+function Stop({ stopId, children }) {
   const staticContext = useStaticContext();
   const [stop, setStop] = useState();
   const [variant, setVariant] = useState();
@@ -150,11 +150,12 @@ function Stop({ stopId }) {
                   onChange={onChangeResource}
                   onRemove={onRemoveResource}
                 />
-                <div className="mb-3">
+                <div className="mb-5">
                   <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
                     Add Asset
                   </button>
                 </div>
+                {children}
               </div>
               <div className="col-md-6">
                 <PhoneScreen className="mx-auto">
