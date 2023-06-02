@@ -45,6 +45,9 @@ describe('/api/tours/:TourId/stops', () => {
             TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
             address: '965 Clay St, San Francisco, CA 94108',
             coordinate: null,
+            destAddress: null,
+            destCoordinate: null,
+            destRadius: null,
             descriptions: {
               'en-us': 'CHSA is the oldest organization in the country dedicated to the preservation of Chinese American history.',
             },
@@ -74,6 +77,9 @@ describe('/api/tours/:TourId/stops', () => {
             TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
             address: '708 Grant Ave, San Francisco, CA 94108',
             coordinate: null,
+            destAddress: null,
+            destCoordinate: null,
+            destRadius: null,
             descriptions: {
               'en-us':
                 "Kan's was the first restaurant in Chinatown to win the Holiday (magazine) Award for fine dining; that award was given to Kan's for 14 consecutive years. Its name was frequently on top ten lists of San Francisco restaurants. World-famous celebrities, movie stars, the rich and the powerful came to Kan's, and their appearances were written up by San Francisco columnist Herb Caen.",
@@ -122,6 +128,9 @@ describe('/api/tours/:TourId/stops', () => {
           address: '708 Grant Ave, San Francisco, CA 94108',
           coordinate: null,
           radius: null,
+          destAddress: null,
+          destCoordinate: null,
+          destRadius: null,
           names: { 'en-us': "Kan's Restaurant" },
           descriptions: {
             'en-us':

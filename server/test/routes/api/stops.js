@@ -60,6 +60,9 @@ describe('/api/stops', () => {
         id: response.body.id,
         coordinate: null,
         radius: null,
+        destAddress: null,
+        destCoordinate: null,
+        destRadius: null,
       });
 
       const record = await models.Stop.findByPk(response.body.id);
@@ -161,7 +164,7 @@ describe('/api/stops', () => {
   });
 
   describe('GET /:id', () => {
-    it('returns a Tour by id', async () => {
+    it('returns a Stop by id', async () => {
       const response = await testSession
         .get('/api/stops/e39b97ad-a5e9-422c-b256-d50fec355285')
         .set('Accept', 'application/json')
@@ -176,6 +179,9 @@ describe('/api/stops', () => {
         address: '965 Clay St, San Francisco, CA 94108',
         coordinate: null,
         radius: null,
+        destAddress: null,
+        destCoordinate: null,
+        destRadius: null,
         names: { 'en-us': 'CHSA' },
         descriptions: {
           'en-us': 'CHSA is the oldest organization in the country dedicated to the preservation of Chinese American history.',
