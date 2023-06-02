@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
 import Api from '../Api';
@@ -12,22 +12,23 @@ import ResourcesModal from '../Resources/ResourcesModal';
 import ResourcesTable from '../Resources/ResourcesTable';
 import { useStaticContext } from '../StaticContext';
 
-function Stop({ stopId, children }) {
+function Stop({ StopId, children }) {
   const staticContext = useStaticContext();
+  const { StopId: StopIdParam } = useParams();
   const [stop, setStop] = useState();
   const [variant, setVariant] = useState();
   const [resources, setResources] = useState();
 
   useEffect(() => {
     let isCancelled = false;
-    if (stopId) {
+    if (StopId || StopIdParam) {
       Api.stops
-        .get(stopId)
+        .get(StopId ?? StopIdParam)
         .then((response) => {
           if (isCancelled) return;
           setStop(response.data);
           setVariant(response.data.variants[0]);
-          return Api.stops.resources(stopId).index();
+          return Api.stops.resources(StopId ?? StopIdParam).index();
         })
         .then((response) => {
           if (isCancelled) return;
@@ -35,7 +36,7 @@ function Stop({ stopId, children }) {
         });
     }
     return () => (isCancelled = true);
-  }, [stopId]);
+  }, [StopId, StopIdParam]);
 
   const [isRecording, setRecording] = useState(false);
   const [position, setPosition] = useState(0);

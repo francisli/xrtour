@@ -8,7 +8,7 @@ import StopsTable from '../Stops/StopsTable';
 
 function TourStop() {
   const { TourId, TourStopId } = useParams();
-  const [tourStop, setTourStop] = useState();
+  const [TourStop, setTourStop] = useState();
   const [isShowingStopsModal, setShowingStopsModal] = useState(false);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function TourStop() {
 
   async function onSelectTransition(stop) {
     setShowingStopsModal(false);
-    const newTourStop = { ...tourStop };
+    const newTourStop = { ...TourStop };
     newTourStop.TransitionStopId = stop.id;
     newTourStop.TransitionStop = stop;
     setTourStop(newTourStop);
@@ -35,7 +35,7 @@ function TourStop() {
   function onClickTransition(stop) {}
 
   async function onRemoveTransition(stop) {
-    const newTourStop = { ...tourStop };
+    const newTourStop = { ...TourStop };
     newTourStop.TransitionStopId = null;
     delete newTourStop.TransitionStop;
     setTourStop(newTourStop);
@@ -44,11 +44,11 @@ function TourStop() {
 
   return (
     <>
-      <Stop stopId={tourStop?.StopId}>
+      <Stop StopId={TourStop?.StopId}>
         <h2>Transition</h2>
         <StopsTable
           type="TRANSITION"
-          stops={tourStop?.TransitionStop ? [{ id: tourStop.TransitionStopId, Stop: tourStop.TransitionStop }] : []}
+          stops={TourStop?.TransitionStop ? [{ id: TourStop.TransitionStopId, Stop: TourStop.TransitionStop }] : []}
           onClick={onClickTransition}
           onRemove={onRemoveTransition}
         />
@@ -68,7 +68,7 @@ function TourStop() {
         isShowing={isShowingStopsModal}
         onHide={() => setShowingStopsModal(false)}
         onSelect={onSelectTransition}
-        startingAddress={tourStop?.Stop?.address}
+        startingAddress={TourStop?.Stop?.address}
       />
     </>
   );
