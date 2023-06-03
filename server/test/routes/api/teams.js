@@ -144,6 +144,23 @@ describe('/api/teams', () => {
             name: 'English (US)',
           },
         ],
+        Memberships: [
+          {
+            TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+            User: {
+              email: 'regular.user@test.com',
+              firstName: 'Regular',
+              id: 'b9d53b71-faac-4ead-bbb6-745412b79bbf',
+              isAdmin: false,
+              lastName: 'User',
+              picture: null,
+              pictureURL: null,
+            },
+            UserId: 'b9d53b71-faac-4ead-bbb6-745412b79bbf',
+            id: '5a313737-e5ff-48fd-ba6b-b82983a7a7bf',
+            role: 'OWNER',
+          },
+        ],
       });
     });
   });
