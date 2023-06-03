@@ -43,11 +43,22 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
       res.status(StatusCodes.UNAUTHORIZED).end();
     } else {
       try {
-        const newRecord = await models.TourStop.create({
-          TourId,
-          ..._.pick(req.body, ['StopId', 'position']),
+        let newRecord;
+        await models.sequelize.transaction(async (transaction) => {
+          const data = {
+            TourId,
+            ..._.pick(req.body, ['StopId', 'position']),
+          };
+          if (!Number.isInteger(data.position)) {
+            data.position =
+              (await models.TourStop.count({
+                where: { TourId },
+                transaction,
+              })) + 1;
+          }
+          newRecord = await models.TourStop.create(data, { transaction });
+          newRecord.Stop = stop;
         });
-        newRecord.Stop = stop;
         res.status(StatusCodes.CREATED).json(newRecord.toJSON());
       } catch (error) {
         if (error.name === 'SequelizeValidationError') {

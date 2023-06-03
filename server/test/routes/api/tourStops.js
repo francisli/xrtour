@@ -141,6 +141,18 @@ describe('/api/tours/:TourId/stops', () => {
         },
       });
     });
+
+    it('sets position at end if not defined', async () => {
+      const response = await testSession
+        .post('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352/stops')
+        .set('Accept', 'application/json')
+        .send({
+          StopId: 'cd682130-9b7e-4831-b211-bd74330f0e21',
+        })
+        .expect(StatusCodes.CREATED);
+
+      assert.deepStrictEqual(response.body?.position, 3);
+    });
   });
 
   describe('PATCH /:id', () => {
