@@ -33,9 +33,10 @@ describe('/api/stops', () => {
         .get('/api/stops?TeamId=1a93d46d-89bf-463b-ab23-8f22f5777907')
         .set('Accept', 'application/json')
         .expect(StatusCodes.OK);
-      assert.deepStrictEqual(response.body.length, 2);
-      assert.deepStrictEqual(response.body[0].link, 'chsa');
-      assert.deepStrictEqual(response.body[1].link, 'kans-restaurant');
+      assert.deepStrictEqual(response.body.length, 3);
+      assert.deepStrictEqual(response.body[0].link, 'ccba');
+      assert.deepStrictEqual(response.body[1].link, 'chsa');
+      assert.deepStrictEqual(response.body[2].link, 'kans-restaurant');
     });
   });
 
