@@ -123,7 +123,7 @@ function TeamForm() {
                     <span>
                       {m.User?.firstName} {m.User?.lastName} &lt;{m.User?.email}&gt;
                     </span>
-                    <span className="d-flex">
+                    <span className="d-flex" style={{ visibility: m.UserId === user.id ? 'hidden' : 'visible' }}>
                       <select className="form-select me-2" value={m.role} readOnly>
                         <option value="OWNER">Owner</option>
                         <option value="EDITOR">Editor</option>
@@ -135,6 +135,22 @@ function TeamForm() {
                     </span>
                   </li>
                 ))}
+                <li className="list-group-item">
+                  <label htmlFor="email" className="form-label small">
+                    Add a Member by email address:
+                  </label>
+                  <div className="d-flex">
+                    <input type="email" className="form-control flex-grow-1 me-2" placeholder="name@domain.com" />
+                    <select className="form-select w-auto me-2" readOnly>
+                      <option value="OWNER">Owner</option>
+                      <option value="EDITOR">Editor</option>
+                      <option value="VIEWER">Viewer</option>
+                    </select>
+                    <button type="button" className="btn btn-outline-primary">
+                      Add
+                    </button>
+                  </div>
+                </li>
               </ul>
             </div>
           </div>

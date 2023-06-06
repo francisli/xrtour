@@ -3,6 +3,8 @@ import { useAuthContext } from '../AuthContext';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStaticContext } from '../StaticContext';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 function TeamsList() {
   const navigate = useNavigate();
@@ -41,7 +43,7 @@ function TeamsList() {
                 </div>
               ))}
               <Link to="new" className="list-group-item">
-                New Team
+                <FontAwesomeIcon icon={faPlus} /> New Team
               </Link>
             </ul>
           </div>

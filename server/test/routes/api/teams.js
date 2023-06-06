@@ -160,8 +160,43 @@ describe('/api/teams', () => {
             id: '5a313737-e5ff-48fd-ba6b-b82983a7a7bf',
             role: 'OWNER',
           },
+          {
+            TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+            User: {
+              email: 'another.user@test.com',
+              firstName: 'Another',
+              id: '124ea562-938d-44f4-b757-e4906eec2dc3',
+              isAdmin: false,
+              lastName: 'User',
+              picture: null,
+              pictureURL: null,
+            },
+            UserId: '124ea562-938d-44f4-b757-e4906eec2dc3',
+            id: '886304d3-cb45-442f-8914-f7fad8b6781a',
+            role: 'VIEWER',
+          },
         ],
       });
+    });
+  });
+
+  describe('PATCH /:id', () => {
+    it('updates a Team', async () => {
+      const response = await testSession
+        .patch('/api/teams/1a93d46d-89bf-463b-ab23-8f22f5777907')
+        .send({
+          name: 'Updated name',
+          link: 'updated-link',
+        })
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.OK);
+
+      assert.deepStrictEqual(response.body?.name, 'Updated name');
+      assert.deepStrictEqual(response.body?.link, 'updated-link');
+
+      const record = await models.Team.findByPk('1a93d46d-89bf-463b-ab23-8f22f5777907');
+      assert.deepStrictEqual(record.name, 'Updated name');
+      assert.deepStrictEqual(record.link, 'updated-link');
     });
   });
 });
