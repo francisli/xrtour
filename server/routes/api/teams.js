@@ -48,7 +48,7 @@ router.get('/:id', interceptors.requireLogin, async (req, res) => {
   let membership;
   await models.sequelize.transaction(async (transaction) => {
     record = await models.Team.findByPk(req.params.id, {
-      include: { model: models.Membership, include: 'User' },
+      include: { model: models.Membership, include: ['Invite', 'User'] },
       transaction,
     });
     membership = await record.getMembership(req.user, { transaction });

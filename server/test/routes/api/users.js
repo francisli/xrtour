@@ -10,7 +10,7 @@ describe('/api/users', () => {
   let testSession;
 
   beforeEach(async () => {
-    await helper.loadFixtures(['users', 'teams', 'memberships']);
+    await helper.loadFixtures(['users', 'invites', 'teams', 'memberships']);
     testSession = session(app);
   });
 
@@ -56,6 +56,7 @@ describe('/api/users', () => {
               },
               TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
               UserId: 'b9d53b71-faac-4ead-bbb6-745412b79bbf',
+              InviteId: null,
               role: 'OWNER',
             },
           ],

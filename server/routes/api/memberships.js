@@ -14,10 +14,24 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
   if (membership?.isOwner) {
     try {
       const user = await models.User.findOne({ where: { email } });
+      let record;
       if (user) {
-        const record = await models.Membership.create({ TeamId, UserId: user.id, role });
-        res.status(StatusCodes.CREATED).json(record.toJSON());
+        record = await models.Membership.create({ TeamId, UserId: user.id, role });
+        record.User = user;
+      } else {
+        let invite;
+        await models.sequelize.transaction(async (transaction) => {
+          [invite] = await models.Invite.findOrCreate({
+            where: { email, revokedAt: null },
+            defaults: { CreatedByUserId: req.user.id },
+            transaction,
+          });
+          record = await models.Membership.create({ TeamId, InviteId: invite.id, role }, { transaction });
+          record.Invite = invite;
+        });
+        await invite.sendTeamInviteEmail(team);
       }
+      res.status(StatusCodes.CREATED).json(record.toJSON());
     } catch (error) {
       if (error.name === 'SequelizeValidationError') {
         res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
@@ -74,12 +88,15 @@ router.delete('/:id', interceptors.requireLogin, async (req, res) => {
   try {
     await models.sequelize.transaction(async (transaction) => {
       record = await models.Membership.findByPk(req.params.id, {
-        include: ['Team', 'User'],
+        include: ['Team', 'Invite', 'User'],
         transaction,
       });
       membership = await record.Team.getMembership(req.user, { transaction });
       if (membership?.isOwner) {
         await record.destroy({ transaction });
+        if (!record.User && (await record.Invite?.countMemberships({ transaction })) === 0) {
+          await record.Invite.update({ revokedAt: new Date(), RevokedByUserId: req.user.id }, { transaction });
+        }
       }
     });
     if (record) {
