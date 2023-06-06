@@ -86,7 +86,11 @@ function TeamForm() {
     setTeam({ ...team });
   }
 
-  async function onChangeRole(membership, newRole) {}
+  async function onChangeRole(membership, newRole) {
+    await Api.memberships.update(membership.id, { role: newRole });
+    membership.role = newRole;
+    setTeam({ ...team });
+  }
 
   const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
   const [selectedMembership, setSelectedMembership] = useState();
@@ -151,7 +155,7 @@ function TeamForm() {
                         {m.User.firstName} {m.User.lastName} &lt;{m.User.email}&gt;
                       </span>
                     )}
-                    {m.Invite && (
+                    {!m.User && m.Invite && (
                       <span>
                         <b>Invited:</b> {m.Invite.email}
                       </span>

@@ -36,9 +36,11 @@ function TeamsList() {
                         Switch
                       </Link>
                     )}
-                    <Link to={`${m.TeamId}/manage`} className="btn btn-sm btn-secondary">
-                      Manage
-                    </Link>
+                    {m.role !== 'VIEWER' && (
+                      <Link to={`${m.TeamId}/manage`} className="btn btn-sm btn-secondary">
+                        Manage
+                      </Link>
+                    )}
                   </span>
                 </div>
               ))}

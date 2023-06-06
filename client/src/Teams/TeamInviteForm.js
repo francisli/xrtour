@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import Api from '../Api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 function TeamInviteForm({ TeamId, onCreate }) {
   const [data, setData] = useState({
@@ -49,8 +51,8 @@ function TeamInviteForm({ TeamId, onCreate }) {
               <option value="EDITOR">Editor</option>
               <option value="VIEWER">Viewer</option>
             </select>
-            <button type="submit" className="btn btn-outline-primary">
-              Add
+            <button type="submit" className="btn btn-icon btn-outline-primary">
+              <FontAwesomeIcon icon={faPlus} />
             </button>
           </fieldset>
         </form>

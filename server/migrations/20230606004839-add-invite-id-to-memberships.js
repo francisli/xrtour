@@ -14,10 +14,10 @@ module.exports = {
     });
     await queryInterface.removeIndex('Memberships', 'memberships__team_id__user_id');
     await queryInterface.sequelize.query(
-      'CREATE UNIQUE INDEX "memberships__team_id__user_id" ON "Memberships" ("TeamId", "UserId") WHERE "InviteId" IS NULL'
+      'CREATE UNIQUE INDEX "memberships__team_id__user_id" ON "Memberships" ("TeamId", "UserId") WHERE "UserId" IS NOT NULL'
     );
     await queryInterface.sequelize.query(
-      'CREATE UNIQUE INDEX "memberships__team_id__invite_id" ON "Memberships" ("TeamId", "InviteId") WHERE "UserId" IS NULL'
+      'CREATE UNIQUE INDEX "memberships__team_id__invite_id" ON "Memberships" ("TeamId", "InviteId") WHERE "InviteId" IS NOT NULL'
     );
   },
 
