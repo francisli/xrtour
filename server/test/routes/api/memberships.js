@@ -103,7 +103,7 @@ describe('/api/memberships', () => {
       assert.deepStrictEqual(emails.length, 1);
       assert.deepStrictEqual(
         emails[0].subject,
-        `You are invited to join Regular&#39;s Personal Team on ${process.env.REACT_APP_SITE_TITLE}!`
+        `You are invited to join Regular's Personal Team on ${process.env.REACT_APP_SITE_TITLE}!`
       );
       assert.deepStrictEqual(emails[0].to, 'new.user@test.com');
     });
