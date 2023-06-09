@@ -16,8 +16,7 @@ import TeamsRoutes from './Teams/TeamsRoutes';
 import UsersRoutes from './Users/UsersRoutes';
 
 function App() {
-  const { staticContext } = useStaticContext();
-
+  const staticContext = useStaticContext();
   return (
     <AuthContextProvider>
       <Header />
