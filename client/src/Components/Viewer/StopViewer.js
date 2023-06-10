@@ -120,11 +120,9 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
   }
 
   function onEndedInternal(event) {
-    let isEnded = true;
-    for (const audio of Object.values(ref.current)) {
-      isEnded = isEnded && audio.paused;
-    }
-    if (isEnded) {
+    const { id } = event.target;
+    const index = tracks.findIndex((sr) => sr.id === id);
+    if (index >= tracks.length - 1) {
       setPlaying(false);
       onEnded?.();
     }
