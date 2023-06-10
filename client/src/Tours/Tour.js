@@ -123,13 +123,20 @@ function Tour() {
                   <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
                   <FormGroup plaintext name="name" label="Name" value={tour.names[variant.code]} />
                   <FormGroup plaintext name="description" label="Description" value={tour.descriptions[variant.code]} />
-                  {membership.role !== 'VIEWER' && (
-                    <div className="mb-3">
-                      <Link className="btn btn-primary" to="edit">
+                  <div className="mb-3">
+                    {membership.role !== 'VIEWER' && (
+                      <Link className="btn btn-primary me-2" to="edit">
                         Edit
                       </Link>
-                    </div>
-                  )}
+                    )}
+                    <a
+                      className="btn btn-secondary"
+                      href={`/teams/${membership?.TeamId}/tours/${TourId}/preview`}
+                      rel="noreferrer"
+                      target="_blank">
+                      Preview
+                    </a>
+                  </div>
                 </form>
                 <div className="row mb-5">
                   <div className="col-md-6">

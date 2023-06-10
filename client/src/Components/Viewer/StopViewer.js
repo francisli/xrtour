@@ -5,7 +5,7 @@ import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 import Scrubber from './Scrubber';
 import './StopViewer.scss';
 
-function StopViewer({ position, stop, transition, variant, onTimeUpdate }) {
+function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, onTimeUpdate }) {
   const [duration, setDuration] = useState(0);
   const [imageURL, setImageURL] = useState();
 
@@ -15,7 +15,7 @@ function StopViewer({ position, stop, transition, variant, onTimeUpdate }) {
   const ref = useRef({});
 
   const [isReady, setReady] = useState(false);
-  const [isPlaying, setPlaying] = useState(false);
+  const [isPlaying, setPlaying] = useState(autoPlay || false);
 
   useEffect(() => {
     if (stop.Resources) {
@@ -64,7 +64,7 @@ function StopViewer({ position, stop, transition, variant, onTimeUpdate }) {
       setTracks(newTracks);
       ref.current = {};
     }
-  }, [stop, transition, variant]);
+  }, [autoPlay, stop, transition, variant]);
 
   useEffect(() => {
     if (images && tracks && Number.isInteger(position)) {
@@ -126,6 +126,7 @@ function StopViewer({ position, stop, transition, variant, onTimeUpdate }) {
     }
     if (isEnded) {
       setPlaying(false);
+      onEnded?.();
     }
   }
 
@@ -150,8 +151,9 @@ function StopViewer({ position, stop, transition, variant, onTimeUpdate }) {
           {isPlaying && <FontAwesomeIcon icon={faPause} />}
         </button>
       </div>
-      {tracks?.map((sr) => (
+      {tracks?.map((sr, i) => (
         <audio
+          autoPlay={autoPlay && i === 0}
           id={sr.id}
           key={sr.id}
           ref={(el) => el && (ref.current[el.id] = el)}
