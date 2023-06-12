@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
+import QRCode from 'react-qr-code';
 import inflection from 'inflection';
 
 import Api from '../Api';
@@ -104,6 +107,17 @@ function Tour() {
     }
   }
 
+  const previewPopover = (
+    <Popover>
+      <Popover.Body>
+        <QRCode
+          size={244}
+          value={`${window.location.protocol}//${window.location.host}/teams/${membership?.TeamId}/tours/${TourId}/preview`}
+        />
+      </Popover.Body>
+    </Popover>
+  );
+
   return (
     <>
       <Helmet>
@@ -123,13 +137,22 @@ function Tour() {
                   <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
                   <FormGroup plaintext name="name" label="Name" value={tour.names[variant.code]} />
                   <FormGroup plaintext name="description" label="Description" value={tour.descriptions[variant.code]} />
-                  {membership.role !== 'VIEWER' && (
-                    <div className="mb-3">
-                      <Link className="btn btn-primary" to="edit">
+                  <div className="mb-3">
+                    {membership.role !== 'VIEWER' && (
+                      <Link className="btn btn-primary me-2" to="edit">
                         Edit
                       </Link>
-                    </div>
-                  )}
+                    )}
+                    <OverlayTrigger trigger="hover" placement="right" overlay={previewPopover}>
+                      <a
+                        className="btn btn-secondary"
+                        href={`/teams/${membership?.TeamId}/tours/${TourId}/preview`}
+                        rel="noreferrer"
+                        target="_blank">
+                        Preview
+                      </a>
+                    </OverlayTrigger>
+                  </div>
                 </form>
                 <div className="row mb-5">
                   <div className="col-md-6">
