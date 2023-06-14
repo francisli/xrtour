@@ -106,17 +106,15 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
       for (const sr of tracks) {
         const end = sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0;
         if (sr.start <= position && position < end) {
-          if (sr !== currentTrack) {
-            setCurrentTrack(sr);
-          }
           const audio = ref.current[sr.id];
-          if (audio) {
-            if (audio.paused) {
-              audio.currentTime = position - sr.start;
+          if (!isPlaying && audio?.paused) {
+            audio.currentTime = position - sr.start;
+          }
+          if (sr !== currentTrack) {
+            if (isPlaying && !currentTrack?.pauseAtEnd) {
+              audio?.play();
             }
-            if (isPlaying) {
-              audio.play();
-            }
+            setCurrentTrack(sr);
           }
           break;
         }
