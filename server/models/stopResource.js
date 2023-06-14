@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'StopId', 'ResourceId', 'start', 'end']);
+      const json = _.pick(this.get(), ['id', 'StopId', 'ResourceId', 'start', 'end', 'pauseAtEnd']);
       if (this.Resource) {
         json.Resource = this.Resource.toJSON();
       }
@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       start: DataTypes.INTEGER,
       end: DataTypes.INTEGER,
+      pauseAtEnd: DataTypes.BOOLEAN,
     },
     {
       sequelize,

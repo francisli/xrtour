@@ -26,6 +26,11 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
     selectedResource[name] = newValue;
   }
 
+  function onTogglePause(resource, newValue) {
+    resource.pauseAtEnd = newValue;
+    onChange(resource);
+  }
+
   function onClickSubmitEdit() {
     onChange(selectedResource);
     setSelectedResource(undefined);
@@ -57,7 +62,12 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
             <th className="resources-table__col-num">#</th>
             <th className="resources-table__col-type">Type</th>
             <th className="resources-table__col-name">Name</th>
-            <th className="resources-table__col-timeline">Timeline</th>
+            <th className="resources-table__col-timeline">
+              <div className="d-flex justify-content-between">
+                <span>Timeline</span>
+                <span>Pause?</span>
+              </div>
+            </th>
             <th className="resources-table__col-actions">Actions</th>
           </tr>
         </thead>
@@ -80,25 +90,40 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
               <td>{r.Resource.type}</td>
               <td>{r.Resource.name}</td>
               <td>
-                <TimeCode
-                  onChange={(newValue) => onChangeTimeCode('start', newValue)}
-                  isEditing={isEditing && selectedResource === r}
-                  seconds={r.start}
-                />{' '}
-                -{' '}
-                {r.Resource.type === 'AUDIO' && (
-                  <TimeCode seconds={r.start + r.Resource.Files.find((f) => f.variant === variant.code).duration} />
-                )}
-                {r.Resource.type !== 'AUDIO' &&
-                  (r.end || (isEditing && selectedResource === r) ? (
+                <div className="d-flex justify-content-between">
+                  <span>
                     <TimeCode
-                      onChange={(newValue) => onChangeTimeCode('end', newValue)}
+                      onChange={(newValue) => onChangeTimeCode('start', newValue)}
                       isEditing={isEditing && selectedResource === r}
-                      seconds={r.end}
-                    />
-                  ) : (
-                    'End'
-                  ))}
+                      seconds={r.start}
+                    />{' '}
+                    -{' '}
+                    {r.Resource.type === 'AUDIO' && (
+                      <TimeCode seconds={r.start + r.Resource.Files.find((f) => f.variant === variant.code).duration} />
+                    )}
+                    {r.Resource.type !== 'AUDIO' &&
+                      (r.end || (isEditing && selectedResource === r) ? (
+                        <TimeCode
+                          onChange={(newValue) => onChangeTimeCode('end', newValue)}
+                          isEditing={isEditing && selectedResource === r}
+                          seconds={r.end}
+                        />
+                      ) : (
+                        'End'
+                      ))}
+                  </span>
+                  {!(isEditing && selectedResource === r) && (
+                    <span>
+                      <input
+                        onChange={(event) => onTogglePause(r, event.target.checked)}
+                        type="checkbox"
+                        name="pauseAtEnd"
+                        checked={r.pauseAtEnd}
+                        className="form-check-input"
+                      />
+                    </span>
+                  )}
+                </div>
               </td>
               <td className="resources-table__col-actions">
                 {membership.role !== 'VIEWER' && (

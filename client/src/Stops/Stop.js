@@ -118,7 +118,7 @@ function Stop({ StopId, transition, children }) {
         {!!stop && (
           <>
             <div className="row">
-              <div className="col-md-6">
+              <div className="col-md-7">
                 <h1 className="mb-3">{title}</h1>
                 <form className="mb-5">
                   {stop.type === 'STOP' && (
@@ -172,7 +172,7 @@ function Stop({ StopId, transition, children }) {
                 </div>
                 {children}
               </div>
-              <div className="col-md-6">
+              <div className="col-md-5">
                 <PhoneScreen className="mx-auto">
                   <StopViewer
                     position={position}

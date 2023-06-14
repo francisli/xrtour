@@ -146,10 +146,13 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
 
   function onEndedInternal(event) {
     const { id } = event.target;
-    const index = tracks.findIndex((sr) => sr.id === id);
-    if (index >= tracks.length - 1) {
+    const sr = tracks.find((sr) => sr.id === id);
+    const index = tracks.indexOf(sr);
+    if (sr.pauseAtEnd || index >= tracks.length - 1) {
       setPlaying(false);
-      onEnded?.();
+      if (index >= tracks.length - 1) {
+        onEnded?.();
+      }
     }
   }
 
