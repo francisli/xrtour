@@ -13,6 +13,17 @@ import ResourcesTable from '../Resources/ResourcesTable';
 import { useStaticContext } from '../StaticContext';
 import { useAuthContext } from '../AuthContext';
 
+function resourceSortComparator(r1, r2) {
+  let result = r1.Resource.type.localeCompare(r2.Resource.type);
+  if (result === 0) {
+    result = Math.sign(r1.start - r2.start);
+    if (result === 0) {
+      result = r1.Resource.name.localeCompare(r2.Resource.name);
+    }
+  }
+  return result;
+}
+
 function Stop({ StopId, transition, children }) {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
@@ -53,16 +64,7 @@ function Stop({ StopId, transition, children }) {
       ResourceId: resource.id,
     });
     const newResources = [...resources, response.data];
-    newResources.sort((r1, r2) => {
-      let result = r1.Resource.type.localeCompare(r2.Resource.type);
-      if (result === 0) {
-        result = Math.sign(r1.start - r2.start);
-        if (result === 0) {
-          result = r1.Resource.name.localeCompare(r2.Resource.name);
-        }
-      }
-      return result;
-    });
+    newResources.sort(resourceSortComparator);
     setResources(newResources);
     setShowingResourcesModal(false);
   }
@@ -73,7 +75,9 @@ function Stop({ StopId, transition, children }) {
 
   async function onChangeResource(resource) {
     await Api.stops.resources(stop.id).update(resource.id, resource);
-    setResources([...resources]);
+    const newResources = [...resources];
+    newResources.sort(resourceSortComparator);
+    setResources(newResources);
   }
 
   async function onRemoveResource(resource) {
