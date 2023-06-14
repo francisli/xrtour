@@ -15,6 +15,13 @@ function ResourceCard({ resource, onSelect, onEdit }) {
         )}
         <div className="card-body">
           <h3 className="card-title h6">{resource.name}</h3>
+          {resource.type === 'AR_LINK' && (
+            <p>
+              <a target="_blank" href={resource.Files[0].URL}>
+                {resource.Files[0].URL}
+              </a>
+            </p>
+          )}
           <div className="d-flex justify-content-between">
             <button onClick={() => onSelect(resource)} type="button" className="btn btn-sm btn-primary">
               Select
