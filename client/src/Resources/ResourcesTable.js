@@ -112,7 +112,7 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
                         'End'
                       ))}
                   </span>
-                  {!(isEditing && selectedResource === r) && (
+                  {r.Resource.type === 'AUDIO' && !(isEditing && selectedResource === r) && (
                     <span>
                       <input
                         onChange={(event) => onTogglePause(r, event.target.checked)}
