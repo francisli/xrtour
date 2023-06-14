@@ -19,7 +19,7 @@ services:
       - ./data:/data
   server:
     build: .
-    image: francisli/xrtour:1.0.1
+    image: francisli/xrtour:1.0.2
     command: bash -l -c "bin/init; nf --env=/dev/null start -j Procfile.dev"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
