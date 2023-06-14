@@ -54,6 +54,16 @@ router.get('/*', async (req, res, next) => {
         return true;
       });
       if (isRedirected) return;
+      if (req.user) {
+        req.user.Memberships = await req.user.getMemberships({
+          include: 'Team',
+          order: [['Team', 'name', 'ASC']],
+        });
+        if (urlPath === '/') {
+          res.redirect('/teams');
+          return;
+        }
+      }
       const staticContext = { ...defaultStaticContext, authContext: { user: req.user?.toJSON() ?? null } };
       const helmetContext = {};
       const reactApp = ReactDOMServer.renderToString(
