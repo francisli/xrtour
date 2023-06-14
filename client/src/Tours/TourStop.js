@@ -58,7 +58,7 @@ function TourStop() {
           onRemove={onRemoveTransition}
         />
         <div className="mb-5">
-          {membership.role !== 'VIEWER' && (
+          {membership?.role !== 'VIEWER' && (
             <button
               onClick={() => {
                 setShowingStopsModal(true);

@@ -7,11 +7,15 @@ import './StopViewer.scss';
 
 function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, onTimeUpdate }) {
   const [duration, setDuration] = useState(0);
-  const [imageURL, setImageURL] = useState();
 
   const [images, setImages] = useState();
   const [tracks, setTracks] = useState();
+  const [arLinks, setArLinks] = useState();
+
+  const [imageURL, setImageURL] = useState();
+  const [arLinkURL, setArLinkURL] = useState();
   const [currentTrack, setCurrentTrack] = useState();
+
   const ref = useRef({});
 
   const [isReady, setReady] = useState(false);
@@ -22,6 +26,7 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
       let newDuration = 0;
       let newImages = [];
       let newTracks = [];
+      let newArLinks = [];
       for (const sr of stop.Resources) {
         if (Number.isInteger(sr.end)) {
           newDuration = Math.max(newDuration, sr.end);
@@ -33,11 +38,18 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
           newTracks.push(sr);
         } else if (sr.Resource.type === 'IMAGE') {
           newImages.push({ ...sr });
+        } else if (sr.Resource.type === 'AR_LINK') {
+          newArLinks.push({ ...sr });
         }
       }
       if (transition?.Resources) {
         const offset = newDuration;
         for (const ir of newImages) {
+          if (!Number.isInteger(ir.end)) {
+            ir.end = offset;
+          }
+        }
+        for (const ir of newArLinks) {
           if (!Number.isInteger(ir.end)) {
             ir.end = offset;
           }
@@ -56,18 +68,21 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
             newTracks.push({ ...sr, start: offset + sr.start });
           } else if (sr.Resource.type === 'IMAGE') {
             newImages.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
+          } else if (sr.Resource.type === 'AR_LINK') {
+            newArLinks.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
           }
         }
       }
       setDuration(newDuration);
       setImages(newImages);
       setTracks(newTracks);
+      setArLinks(newArLinks);
       ref.current = {};
     }
   }, [autoPlay, stop, transition, variant]);
 
   useEffect(() => {
-    if (images && tracks && Number.isInteger(position)) {
+    if (images && arLinks && tracks && Number.isInteger(position)) {
       let newImageURL;
       for (const sr of images) {
         if (sr.start <= position && (sr.end ?? Number.MAX_SAFE_INTEGER) > position) {
@@ -77,6 +92,16 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
       }
       if (newImageURL !== imageURL) {
         setImageURL(newImageURL);
+      }
+      let newArLinkURL;
+      for (const sr of arLinks) {
+        if (sr.start <= position && (sr.end ?? Number.MAX_SAFE_INTEGER) > position) {
+          newArLinkURL = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
+          break;
+        }
+      }
+      if (newArLinkURL !== arLinkURL) {
+        setArLinkURL(newArLinkURL);
       }
       for (const sr of tracks) {
         const end = sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0;
@@ -97,7 +122,7 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
         }
       }
     }
-  }, [variant, images, imageURL, tracks, currentTrack, isPlaying, position]);
+  }, [variant, images, imageURL, arLinks, arLinkURL, tracks, currentTrack, isPlaying, position]);
 
   function onPlayPause() {
     if (isPlaying) {
@@ -142,6 +167,7 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
   return (
     <div className="stop-viewer">
       <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
+      {arLinkURL && <a target="_blank" href={arLinkURL} className="stop-viewer__ar-link"></a>}
       <div className="stop-viewer__controls">
         <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber" />
         <button onClick={onPlayPause} type="button" className="btn btn-lg btn-outline-primary">
