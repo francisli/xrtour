@@ -35,16 +35,20 @@ function Stop({ StopId, transition, children }) {
   useEffect(() => {
     let isCancelled = false;
     if (StopId || StopIdParam) {
+      let newStop;
       Api.stops
         .get(StopId ?? StopIdParam)
         .then((response) => {
           if (isCancelled) return;
-          setStop(response.data);
+          newStop = response.data;
+          setStop(newStop);
           setVariant(response.data.variants[0]);
           return Api.stops.resources(StopId ?? StopIdParam).index();
         })
         .then((response) => {
           if (isCancelled) return;
+          newStop.Resources = response.data;
+          setStop({ ...newStop });
           setResources(response.data);
         });
     }
@@ -66,6 +70,7 @@ function Stop({ StopId, transition, children }) {
     const newResources = [...resources, response.data];
     newResources.sort(resourceSortComparator);
     setResources(newResources);
+    setStop({ ...stop, Resources: newResources });
     setShowingResourcesModal(false);
   }
 
@@ -78,6 +83,7 @@ function Stop({ StopId, transition, children }) {
     const newResources = [...resources];
     newResources.sort(resourceSortComparator);
     setResources(newResources);
+    setStop({ ...stop, Resources: newResources });
   }
 
   async function onRemoveResource(resource) {
@@ -86,6 +92,7 @@ function Stop({ StopId, transition, children }) {
     const index = newResources.indexOf(resource);
     newResources.splice(index, 1);
     setResources(newResources);
+    setStop({ ...stop, Resources: newResources });
   }
 
   async function onSaveRecording(blob) {
@@ -180,7 +187,7 @@ function Stop({ StopId, transition, children }) {
                 <PhoneScreen className="mx-auto">
                   <StopViewer
                     position={position}
-                    stop={{ ...stop, Resources: resources }}
+                    stop={stop}
                     transition={transition}
                     variant={variant}
                     onTimeUpdate={(newPosition) => setPosition(newPosition)}
