@@ -185,13 +185,15 @@ function Stop({ StopId, transition, children }) {
               </div>
               <div className="col-md-5">
                 <PhoneScreen className="mx-auto">
-                  <StopViewer
-                    position={position}
-                    stop={stop}
-                    transition={transition}
-                    variant={variant}
-                    onTimeUpdate={(newPosition) => setPosition(newPosition)}
-                  />
+                  <PhoneScreen className="position-fixed">
+                    <StopViewer
+                      position={position}
+                      stop={stop}
+                      transition={transition}
+                      variant={variant}
+                      onTimeUpdate={(newPosition) => setPosition(newPosition)}
+                    />
+                  </PhoneScreen>
                 </PhoneScreen>
               </div>
             </div>
