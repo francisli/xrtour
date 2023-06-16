@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faLocationDot, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 
 import Scrubber from './Scrubber';
 import './StopViewer.scss';
+import Toc from './Toc';
 
-function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, onTimeUpdate }) {
+function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, transition, variant, onEnded, onSelect, onTimeUpdate }) {
   const [duration, setDuration] = useState(0);
 
   const [images, setImages] = useState();
@@ -18,8 +19,9 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
 
   const ref = useRef({});
 
-  const [isReady, setReady] = useState(false);
   const [isPlaying, setPlaying] = useState(autoPlay || false);
+  const [isTocOpen, setTocOpen] = useState(false);
+  const [isMapOpen, setMapOpen] = useState(false);
 
   useEffect(() => {
     if (stop.Resources) {
@@ -165,10 +167,33 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
     onTimeUpdate?.(newPosition);
   }
 
+  function onSelectInternal(ts) {
+    setTocOpen(false);
+    if (ts && ts.StopId !== stop?.id) {
+      onSelect?.(ts);
+    } else if (!ts && stop?.id !== tour?.IntroStopId) {
+      onSelect?.(ts);
+    }
+  }
+
   return (
     <div className="stop-viewer">
       <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
-      {arLinkURL && <a target="_blank" href={arLinkURL} className="stop-viewer__ar-link"></a>}
+      {arLinkURL && <a target="_blank" href={arLinkURL} rel="noreferrer" className="stop-viewer__ar-link"></a>}
+      {!!controls && (
+        <div className="stop-viewer__toc">
+          <button onClick={() => setTocOpen(true)} className="btn btn-lg btn-outline-primary">
+            <FontAwesomeIcon icon={faBars} />
+          </button>
+        </div>
+      )}
+      {!!controls && (
+        <div className="stop-viewer__map">
+          <button className="btn btn-lg btn-outline-primary">
+            <FontAwesomeIcon icon={faLocationDot} />
+          </button>
+        </div>
+      )}
       <div className="stop-viewer__controls">
         <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber" />
         <button onClick={onPlayPause} type="button" className="btn btn-lg btn-outline-primary">
@@ -179,6 +204,7 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
       {tracks?.map((sr, i) => (
         <audio
           autoPlay={autoPlay && i === 0}
+          onPlay={() => !isPlaying && setPlaying(true)}
           id={sr.id}
           key={sr.id}
           ref={(el) => el && (ref.current[el.id] = el)}
@@ -187,6 +213,14 @@ function StopViewer({ autoPlay, position, stop, transition, variant, onEnded, on
           onEnded={onEndedInternal}
         />
       ))}
+      <Toc
+        isOpen={isTocOpen}
+        onClose={() => setTocOpen(false)}
+        onSelect={onSelectInternal}
+        tour={tour}
+        tourStops={tourStops}
+        variant={variant}
+      />
     </div>
   );
 }
