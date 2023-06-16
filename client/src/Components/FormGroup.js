@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import classNames from 'classnames';
 
 function FormGroup({
@@ -15,6 +16,16 @@ function FormGroup({
   error,
   onChange,
 }) {
+  const ref = useRef();
+
+  useEffect(() => {
+    if (type === 'textarea' && ref.current) {
+      ref.current.style.height = 'auto';
+      const { scrollHeight } = ref.current;
+      ref.current.style.height = `${scrollHeight + 2}px`;
+    }
+  }, [type, value]);
+
   return (
     <div className="mb-3">
       <label className="form-label" htmlFor={id ?? name}>
@@ -39,6 +50,7 @@ function FormGroup({
       )}
       {type === 'textarea' && (
         <textarea
+          ref={ref}
           className={classNames({
             'form-control': !plaintext,
             'form-control-plaintext': plaintext,
