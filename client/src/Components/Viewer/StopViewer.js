@@ -6,7 +6,7 @@ import Scrubber from './Scrubber';
 import './StopViewer.scss';
 import Toc from './Toc';
 
-function StopViewer({ autoPlay, controls, position, tourStops, stop, transition, variant, onEnded, onSelect, onTimeUpdate }) {
+function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, transition, variant, onEnded, onSelect, onTimeUpdate }) {
   const [duration, setDuration] = useState(0);
 
   const [images, setImages] = useState();
@@ -20,7 +20,6 @@ function StopViewer({ autoPlay, controls, position, tourStops, stop, transition,
   const ref = useRef({});
 
   const [isPlaying, setPlaying] = useState(autoPlay || false);
-
   const [isTocOpen, setTocOpen] = useState(false);
   const [isMapOpen, setMapOpen] = useState(false);
 
@@ -168,6 +167,15 @@ function StopViewer({ autoPlay, controls, position, tourStops, stop, transition,
     onTimeUpdate?.(newPosition);
   }
 
+  function onSelectInternal(ts) {
+    setTocOpen(false);
+    if (ts && ts.StopId !== stop?.id) {
+      onSelect?.(ts);
+    } else if (!ts && stop?.id !== tour?.IntroStopId) {
+      onSelect?.(ts);
+    }
+  }
+
   return (
     <div className="stop-viewer">
       <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
@@ -196,6 +204,7 @@ function StopViewer({ autoPlay, controls, position, tourStops, stop, transition,
       {tracks?.map((sr, i) => (
         <audio
           autoPlay={autoPlay && i === 0}
+          onPlay={() => !isPlaying && setPlaying(true)}
           id={sr.id}
           key={sr.id}
           ref={(el) => el && (ref.current[el.id] = el)}
@@ -204,7 +213,14 @@ function StopViewer({ autoPlay, controls, position, tourStops, stop, transition,
           onEnded={onEndedInternal}
         />
       ))}
-      <Toc isOpen={isTocOpen} onClose={() => setTocOpen(false)} onSelect={onSelect} tourStops={tourStops} variant={variant} />
+      <Toc
+        isOpen={isTocOpen}
+        onClose={() => setTocOpen(false)}
+        onSelect={onSelectInternal}
+        tour={tour}
+        tourStops={tourStops}
+        variant={variant}
+      />
     </div>
   );
 }

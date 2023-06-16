@@ -73,8 +73,12 @@ function TourPreview() {
 
   function onSelect(ts) {
     if (TourStopId) {
-      navigate(ts.id);
-    } else {
+      if (ts) {
+        navigate(`../stops/${ts.id}`);
+      } else {
+        navigate('..');
+      }
+    } else if (ts) {
       navigate(`stops/${ts.id}`);
     }
   }
@@ -85,6 +89,7 @@ function TourPreview() {
         <StopViewer
           autoPlay={true}
           controls={true}
+          tour={Tour}
           tourStops={TourStops}
           stop={TourStop.Stop}
           variant={variant}
@@ -97,6 +102,7 @@ function TourPreview() {
       {variant && !TourStop && Tour?.IntroStop && (
         <StopViewer
           controls={true}
+          tour={Tour}
           tourStops={TourStops}
           stop={Tour.IntroStop}
           variant={variant}
