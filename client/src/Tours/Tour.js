@@ -129,6 +129,16 @@ function Tour() {
         {!tour && <div className="spinner-border"></div>}
         {tour && (
           <>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                  <Link to="/">Home</Link>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                  {tour.names[tour.variants[0].code]}
+                </li>
+              </ol>
+            </nav>
             <h1 className="mb-3">{tour.names[tour.variants[0].code]}</h1>
             <div className="row">
               <div className="col-md-6">

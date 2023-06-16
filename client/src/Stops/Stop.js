@@ -27,10 +27,22 @@ function resourceSortComparator(r1, r2) {
 function Stop({ StopId, transition, children }) {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
-  const { StopId: StopIdParam } = useParams();
+  const { StopId: StopIdParam, TourId } = useParams();
+  const [tour, setTour] = useState();
   const [stop, setStop] = useState();
   const [variant, setVariant] = useState();
   const [resources, setResources] = useState();
+
+  useEffect(() => {
+    let isCancelled = false;
+    if (TourId) {
+      Api.tours.get(TourId).then((response) => {
+        if (isCancelled) return;
+        setTour(response.data);
+      });
+    }
+    return () => (isCancelled = true);
+  }, [TourId]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -130,6 +142,19 @@ function Stop({ StopId, transition, children }) {
           <>
             <div className="row">
               <div className="col-md-7">
+                <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                      <Link to="/">Home</Link>
+                    </li>
+                    <li class="breadcrumb-item">
+                      <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.names[tour?.variants[0].code]}</Link>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                      {title}
+                    </li>
+                  </ol>
+                </nav>
                 <h1 className="mb-3">{title}</h1>
                 <form className="mb-5">
                   {stop.type === 'STOP' && (
