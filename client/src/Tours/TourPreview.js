@@ -71,20 +71,40 @@ function TourPreview() {
     }
   }
 
+  function onSelect(ts) {
+    if (TourStopId) {
+      navigate(ts.id);
+    } else {
+      navigate(`stops/${ts.id}`);
+    }
+  }
+
   return (
     <div className="tour-preview">
       {variant && TourStop && (
         <StopViewer
           autoPlay={true}
+          controls={true}
+          tourStops={TourStops}
           stop={TourStop.Stop}
           variant={variant}
           onEnded={onEnded}
+          onSelect={onSelect}
           position={position}
           onTimeUpdate={setPosition}
         />
       )}
       {variant && !TourStop && Tour?.IntroStop && (
-        <StopViewer stop={Tour.IntroStop} variant={variant} onEnded={onEnded} position={position} onTimeUpdate={setPosition} />
+        <StopViewer
+          controls={true}
+          tourStops={TourStops}
+          stop={Tour.IntroStop}
+          variant={variant}
+          onEnded={onEnded}
+          onSelect={onSelect}
+          position={position}
+          onTimeUpdate={setPosition}
+        />
       )}
     </div>
   );
