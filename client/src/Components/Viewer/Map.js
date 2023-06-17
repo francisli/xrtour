@@ -23,6 +23,16 @@ function Map({ isOpen, onClose, tourStops }) {
         zoom: 16,
       });
       map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+      map.addControl(
+        new mapboxgl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true,
+          },
+          trackUserLocation: true,
+          showUserHeading: true,
+        }),
+        'bottom-right'
+      );
     }
     return () => map?.remove();
   }, [isOpen]);
