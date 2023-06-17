@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faLocationDot, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 
+import Map from './Map';
 import Scrubber from './Scrubber';
-import './StopViewer.scss';
 import Toc from './Toc';
+import './StopViewer.scss';
 
 function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, transition, variant, onEnded, onSelect, onTimeUpdate }) {
   const [duration, setDuration] = useState(0);
@@ -189,7 +190,7 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
       )}
       {!!controls && (
         <div className="stop-viewer__map">
-          <button className="btn btn-lg btn-outline-primary">
+          <button onClick={() => setMapOpen(true)} className="btn btn-lg btn-outline-primary">
             <FontAwesomeIcon icon={faLocationDot} />
           </button>
         </div>
@@ -221,6 +222,7 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
         tourStops={tourStops}
         variant={variant}
       />
+      <Map isOpen={isMapOpen} onClose={() => setMapOpen(false)} />
     </div>
   );
 }

@@ -1,0 +1,22 @@
+.map {
+  background-color: white;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  overflow-y: scroll;
+  transform: translateX(100%);
+}
+
+.map--open {
+  transform: translateX(0);
+  transition: 0.2s;
+}
+
+.map__close {
+  right: 0;
+  padding: 1rem;
+  position: absolute;
+  top: 0;
+}
