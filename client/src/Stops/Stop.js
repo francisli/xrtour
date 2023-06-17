@@ -133,7 +133,7 @@ function Stop({ StopId, transition, children }) {
     <>
       <Helmet>
         <title>
-          {title} - {staticContext.env.REACT_APP_SITE_TITLE}
+          {title} - {staticContext?.env?.SITE_TITLE}
         </title>
       </Helmet>
       <main className="container">

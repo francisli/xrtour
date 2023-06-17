@@ -222,7 +222,7 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
         tourStops={tourStops}
         variant={variant}
       />
-      <Map isOpen={isMapOpen} onClose={() => setMapOpen(false)} />
+      <Map isOpen={isMapOpen} onClose={() => setMapOpen(false)} tourStops={tourStops} />
     </div>
   );
 }

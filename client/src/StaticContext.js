@@ -7,8 +7,9 @@ const defaultValue = {
     user: null,
   },
   env: {
-    REACT_APP_SITE_TITLE: process.env.REACT_APP_SITE_TITLE,
-    REACT_APP_FEATURE_REGISTRATION: process.env.REACT_APP_FEATURE_REGISTRATION,
+    FEATURE_REGISTRATION: process.env.REACT_APP_FEATURE_REGISTRATION,
+    MAPBOX_ACCESS_TOKEN: process.env.REACT_APP_MAPBOX_ACCESS_TOKEN,
+    SITE_TITLE: process.env.REACT_APP_SITE_TITLE,
   },
 };
 

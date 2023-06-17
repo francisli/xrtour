@@ -27,7 +27,7 @@ function ToursList() {
     <>
       <Helmet>
         <title>
-          {membership?.Team?.name ?? ''} - {staticContext.env.REACT_APP_SITE_TITLE}
+          {membership?.Team?.name ?? ''} - {staticContext?.env?.SITE_TITLE}
         </title>
       </Helmet>
       <main className="container">

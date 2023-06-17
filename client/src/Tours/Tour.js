@@ -122,7 +122,7 @@ function Tour() {
     <>
       <Helmet>
         <title>
-          {tour?.names[tour.variants[0].code] ?? ''} - {staticContext.env.REACT_APP_SITE_TITLE}
+          {tour?.names[tour.variants[0].code] ?? ''} - {staticContext?.env?.SITE_TITLE}
         </title>
       </Helmet>
       <main className="container">
