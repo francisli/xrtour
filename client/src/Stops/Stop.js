@@ -143,14 +143,14 @@ function Stop({ StopId, transition, children }) {
             <div className="row">
               <div className="col-md-7">
                 <nav aria-label="breadcrumb">
-                  <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
+                  <ol className="breadcrumb">
+                    <li className="breadcrumb-item">
                       <Link to="/">Home</Link>
                     </li>
-                    <li class="breadcrumb-item">
+                    <li className="breadcrumb-item">
                       <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.names[tour?.variants[0].code]}</Link>
                     </li>
-                    <li class="breadcrumb-item active" aria-current="page">
+                    <li className="breadcrumb-item active" aria-current="page">
                       {title}
                     </li>
                   </ol>

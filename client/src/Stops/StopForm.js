@@ -52,6 +52,10 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
     const { name, value } = event.target;
     if (name === 'name' || name === 'description') {
       newStop[pluralize(name)][variant?.code] = value;
+    } else if (name === 'address' || name === 'destAddress') {
+      const coordinateKey = name.startsWith('dest') ? 'destCoordinate' : 'coordinate';
+      newStop[name] = value?.place_name;
+      newStop[coordinateKey] = value?.geometry;
     } else {
       newStop[name] = value;
     }
@@ -103,7 +107,7 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
               {Stop.type === 'STOP' && (
                 <>
                   <FormGroup name="link" label="Link" onChange={onChange} record={Stop} error={error} />
-                  <FormGroup name="address" label="Address" onChange={onChange} record={Stop} error={error} />
+                  <FormGroup name="address" type="address" label="Address" onChange={onChange} record={Stop} error={error} />
                 </>
               )}
               {Stop.type === 'TRANSITION' && (

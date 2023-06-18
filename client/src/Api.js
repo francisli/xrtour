@@ -56,6 +56,13 @@ const Api = {
       return instance.delete(`/api/invites/${id}`);
     },
   },
+  mapbox: {
+    geocode(query, access_token) {
+      return instance.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`, {
+        params: { access_token, type: 'address' },
+      });
+    },
+  },
   memberships: {
     create(data) {
       return instance.post('/api/memberships', data);
