@@ -33,9 +33,14 @@ function Map({ isOpen, onClose, tourStops }) {
         }),
         'bottom-right'
       );
+      for (const ts of tourStops) {
+        if (ts.Stop?.coordinate) {
+          new mapboxgl.Marker().setLngLat(ts.Stop.coordinate.coordinates).addTo(map);
+        }
+      }
     }
     return () => map?.remove();
-  }, [isOpen]);
+  }, [isOpen, tourStops]);
 
   return (
     <div className={classNames('map', { 'map--open': isOpen })}>
