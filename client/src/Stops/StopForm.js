@@ -112,8 +112,15 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
               )}
               {Stop.type === 'TRANSITION' && (
                 <>
-                  <FormGroup name="address" label="Starting Address" onChange={onChange} record={Stop} error={error} />
-                  <FormGroup name="destAddress" label="Destination Address" onChange={onChange} record={Stop} error={error} />
+                  <FormGroup name="address" type="address" label="Starting Address" onChange={onChange} record={Stop} error={error} />
+                  <FormGroup
+                    name="destAddress"
+                    type="address"
+                    label="Destination Address"
+                    onChange={onChange}
+                    record={Stop}
+                    error={error}
+                  />
                 </>
               )}
               <VariantTabs variants={Stop.variants} current={variant} setVariant={setVariant} />
