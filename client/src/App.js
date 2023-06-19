@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 
+import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.scss';
 
 import { AuthContextProvider } from './AuthContext';
@@ -30,7 +31,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/passwords/*" element={<PasswordsRoutes />} />
                 <Route path="/invites/*" element={<InvitesRoutes />} />
-                {staticContext?.env?.REACT_APP_FEATURE_REGISTRATION === 'true' && <Route path="/register" element={<Register />} />}
+                {staticContext?.env?.FEATURE_REGISTRATION === 'true' && <Route path="/register" element={<Register />} />}
                 <Route path="/teams/*" element={<TeamsRoutes />} />
                 <Route path="/account/*" element={<UsersRoutes />} />
                 <Route path="/admin/*" element={<AdminRoutes />} />

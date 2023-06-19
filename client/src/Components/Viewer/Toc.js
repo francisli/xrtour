@@ -8,11 +8,11 @@ function Toc({ isOpen, onClose, onSelect, tour, tourStops, variant }) {
   return (
     <div className={classNames('toc', { 'toc--open': isOpen })}>
       <div className="toc__close">
-        <button onClick={() => onClose()} className="btn btn-lg btn-outline-primary">
+        <button onClick={() => onClose()} className="btn btn-lg btn-primary btn-round">
           <FontAwesomeIcon icon={faXmark} />
         </button>
       </div>
-      <div className="toc__header h2 text-center">Table of Contents</div>
+      <div className="toc__header h2 text-center">{tour?.names[variant?.code]}</div>
       <div className="toc__list">
         {tour?.IntroStop && (
           <button onClick={() => onSelect?.()} className="toc__item list-group-item">
@@ -20,7 +20,7 @@ function Toc({ isOpen, onClose, onSelect, tour, tourStops, variant }) {
           </button>
         )}
         {tourStops?.map((ts, i) => (
-          <button onClick={() => onSelect?.(ts)} className="toc__item list-group-item">
+          <button key={ts.id} onClick={() => onSelect?.(ts)} className="toc__item list-group-item">
             {i + 1}. {ts.Stop?.names?.[variant?.code]}
           </button>
         ))}

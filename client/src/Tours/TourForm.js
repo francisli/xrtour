@@ -89,7 +89,7 @@ function TourForm() {
     <>
       <Helmet>
         <title>
-          {isNew ? 'New Tour' : 'Edit Tour'} - {staticContext.env.REACT_APP_SITE_TITLE}
+          {isNew ? 'New Tour' : 'Edit Tour'} - {staticContext?.env?.SITE_TITLE}
         </title>
       </Helmet>
       <main className="container">

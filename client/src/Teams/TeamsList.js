@@ -21,7 +21,7 @@ function TeamsList() {
   return (
     <>
       <Helmet>
-        <title>My Teams - {staticContext.env.REACT_APP_SITE_TITLE}</title>
+        <title>My Teams - {staticContext?.env?.SITE_TITLE}</title>
       </Helmet>
       <main className="container">
         <div className="row justify-content-center">

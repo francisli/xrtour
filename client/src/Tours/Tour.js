@@ -122,7 +122,7 @@ function Tour() {
     <>
       <Helmet>
         <title>
-          {tour?.names[tour.variants[0].code] ?? ''} - {staticContext.env.REACT_APP_SITE_TITLE}
+          {tour?.names[tour.variants[0].code] ?? ''} - {staticContext?.env?.SITE_TITLE}
         </title>
       </Helmet>
       <main className="container">
@@ -130,11 +130,11 @@ function Tour() {
         {tour && (
           <>
             <nav aria-label="breadcrumb">
-              <ol class="breadcrumb">
-                <li class="breadcrumb-item">
+              <ol className="breadcrumb">
+                <li className="breadcrumb-item">
                   <Link to="/">Home</Link>
                 </li>
-                <li class="breadcrumb-item active" aria-current="page">
+                <li className="breadcrumb-item active" aria-current="page">
                   {tour.names[tour.variants[0].code]}
                 </li>
               </ol>
@@ -153,7 +153,7 @@ function Tour() {
                         Edit
                       </Link>
                     )}
-                    <OverlayTrigger trigger="hover" placement="right" overlay={previewPopover}>
+                    <OverlayTrigger trigger={['hover', 'focus']} placement="right" overlay={previewPopover}>
                       <a
                         className="btn btn-secondary"
                         href={`/teams/${membership?.TeamId}/tours/${TourId}/preview`}

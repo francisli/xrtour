@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import classNames from 'classnames';
 
+import AddressInput from './AddressInput';
+
 function FormGroup({
   children,
   disabled,
@@ -64,7 +66,8 @@ function FormGroup({
           onChange={onChange}
           value={record ? record[name] : value}></textarea>
       )}
-      {type !== 'textarea' && type !== 'select' && (
+      {type === 'address' && <AddressInput id={id} name={name} record={record} value={value} onChange={onChange} />}
+      {type !== 'address' && type !== 'textarea' && type !== 'select' && (
         <input
           type={type}
           className={classNames({
