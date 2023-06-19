@@ -10,7 +10,7 @@ import { useStaticContext } from '../../StaticContext';
 import './Map.scss';
 import Api from '../../Api';
 
-function Map({ isOpen, onClose, stop, tourStops }) {
+function Map({ isOpen, onClose, stop, tourStops, variant }) {
   const containerRef = useRef();
   const staticContext = useStaticContext();
   mapboxgl.accessToken = staticContext?.env?.MAPBOX_ACCESS_TOKEN;
@@ -33,10 +33,16 @@ function Map({ isOpen, onClose, stop, tourStops }) {
         showUserHeading: true,
       });
       map.addControl(geolocate, 'bottom-right');
+      const padding = { top: 150, right: 50, bottom: 50, left: 50 };
       const coords = [];
       let bounds;
       tourStops?.forEach((ts, i) => {
         if (ts.Stop?.coordinate) {
+          const popup = new mapboxgl.Popup({ closeButton: false, offset: 25 }).setHTML(
+            `<div class="map__popup-title">${i + 1}. ${ts.Stop?.names[variant?.code]}</div><div class="map__popup-body">${
+              ts.Stop?.address
+            }</div>`
+          );
           const { coordinates } = ts.Stop.coordinate;
           const el = document.createElement('div');
           el.className = 'map__marker';
@@ -44,7 +50,10 @@ function Map({ isOpen, onClose, stop, tourStops }) {
             el.className = 'map__marker map__marker--current';
           }
           el.innerHTML = `<span class="map__marker-label">${i + 1}</span>`;
-          new mapboxgl.Marker(el).setLngLat(coordinates).addTo(map);
+          el.addEventListener('click', function () {
+            map.fitBounds(bounds, { padding });
+          });
+          new mapboxgl.Marker(el).setLngLat(coordinates).setPopup(popup).addTo(map);
           if (bounds) {
             bounds.extend(coordinates);
           } else {
@@ -54,13 +63,13 @@ function Map({ isOpen, onClose, stop, tourStops }) {
         }
       });
       if (bounds) {
-        map.fitBounds(bounds, { padding: { top: 100, right: 50, bottom: 50, left: 50 } });
+        map.fitBounds(bounds, { padding });
       }
       geolocate.on('geolocate', (data) => {
         const newBounds = new mapboxgl.LngLatBounds(bounds.getSouthWest(), bounds.getNorthEast());
         const { latitude, longitude } = data.coords;
         newBounds.extend([longitude, latitude]);
-        map.fitBounds(newBounds, { padding: { top: 100, right: 50, bottom: 50, left: 50 } });
+        map.fitBounds(newBounds, { padding });
       });
       // get route path and draw on map
       map.on('load', () => {

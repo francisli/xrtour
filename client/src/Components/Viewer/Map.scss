@@ -1,3 +1,5 @@
+@import '../../Assets/Variables';
+
 .map {
   background-color: white;
   bottom: 0;
@@ -31,9 +33,9 @@
 
 .map__marker {
   align-items: center;
-  background: white;
-  border: 2px solid black;
+  background: $chsa-red;
   border-radius: 1rem;
+  color: white;
   display: flex;
   font-weight: bold;
   font-size: 1rem;
@@ -43,10 +45,20 @@
 }
 
 .map__marker--current {
-  background: yellow;
+  background: $chsa-yellow;
+  color: black;
 }
 
 .map__marker-label {
   position: relative;
   top: -1px;
+}
+
+.map__popup-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.map__popup-body {
+  font-size: 14px;
 }
