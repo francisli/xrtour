@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { isIOS } from 'react-device-detect';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
@@ -39,9 +40,17 @@ function Map({ isOpen, onClose, stop, tourStops, variant }) {
       tourStops?.forEach((ts, i) => {
         if (ts.Stop?.coordinate) {
           const popup = new mapboxgl.Popup({ closeButton: false, offset: 25 }).setHTML(
-            `<div class="map__popup-title">${i + 1}. ${ts.Stop?.names[variant?.code]}</div><div class="map__popup-body">${
+            `<div class="map__popup-title">${i + 1}. ${ts.Stop?.names[variant?.code]}</div><div class="map__popup-body mb-2">${
               ts.Stop?.address
-            }</div>`
+            }</div><div class="map__popup-body"><a class="btn btn-sm btn-primary" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+              ts.Stop?.address
+            )}">Get directions in Google Maps</a></div>${
+              isIOS
+                ? `<div class="map__popup-body mt-2"><a class="btn btn-sm btn-primary" target="_blank" href="http://maps.apple.com/?daddr=${encodeURIComponent(
+                    ts.Stop?.address
+                  )}">Get directions in Apple Maps</a></div>`
+                : ''
+            }`
           );
           const { coordinates } = ts.Stop.coordinate;
           const el = document.createElement('div');
@@ -104,7 +113,7 @@ function Map({ isOpen, onClose, stop, tourStops, variant }) {
       });
     }
     return () => map?.remove();
-  }, [isOpen, stop, tourStops]);
+  }, [isOpen, stop, tourStops, variant]);
 
   return (
     <div className={classNames('map', { 'map--open': isOpen })}>
