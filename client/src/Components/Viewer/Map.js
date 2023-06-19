@@ -10,7 +10,7 @@ import { useStaticContext } from '../../StaticContext';
 import './Map.scss';
 import Api from '../../Api';
 
-function Map({ isOpen, onClose, tourStops }) {
+function Map({ isOpen, onClose, stop, tourStops }) {
   const containerRef = useRef();
   const staticContext = useStaticContext();
   mapboxgl.accessToken = staticContext?.env?.MAPBOX_ACCESS_TOKEN;
@@ -42,6 +42,9 @@ function Map({ isOpen, onClose, tourStops }) {
           const { coordinates } = ts.Stop.coordinate;
           const el = document.createElement('div');
           el.className = 'map__marker';
+          if (ts.Stop.id === stop?.id) {
+            el.className = 'map__marker map__marker--current';
+          }
           el.innerHTML = `<span class="map__marker-label">${i + 1}</span>`;
           new mapboxgl.Marker(el).setLngLat(coordinates).addTo(map);
           if (bounds) {
@@ -87,7 +90,7 @@ function Map({ isOpen, onClose, tourStops }) {
       });
     }
     return () => map?.remove();
-  }, [isOpen, tourStops]);
+  }, [isOpen, stop, tourStops]);
 
   return (
     <div className={classNames('map', { 'map--open': isOpen })}>
