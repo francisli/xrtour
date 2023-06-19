@@ -28,3 +28,21 @@
   right: 0;
   top: 0;
 }
+
+.map__marker {
+  align-items: center;
+  background: white;
+  border: 2px solid black;
+  border-radius: 1rem;
+  display: flex;
+  font-weight: bold;
+  font-size: 1rem;
+  height: 2rem;
+  justify-content: center;
+  width: 2rem;
+}
+
+.map__marker-label {
+  position: relative;
+  top: -1px;
+}

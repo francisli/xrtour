@@ -33,10 +33,23 @@ function Map({ isOpen, onClose, tourStops }) {
         }),
         'bottom-right'
       );
-      for (const ts of tourStops) {
+      let bounds;
+      tourStops?.forEach((ts, i) => {
         if (ts.Stop?.coordinate) {
-          new mapboxgl.Marker().setLngLat(ts.Stop.coordinate.coordinates).addTo(map);
+          const { coordinates } = ts.Stop.coordinate;
+          const el = document.createElement('div');
+          el.className = 'map__marker';
+          el.innerHTML = `<span class="map__marker-label">${i + 1}</span>`;
+          new mapboxgl.Marker(el).setLngLat(coordinates).addTo(map);
+          if (bounds) {
+            bounds.extend(coordinates);
+          } else {
+            bounds = new mapboxgl.LngLatBounds(coordinates, coordinates);
+          }
         }
+      });
+      if (bounds) {
+        map.fitBounds(bounds, { padding: 50 });
       }
     }
     return () => map?.remove();
