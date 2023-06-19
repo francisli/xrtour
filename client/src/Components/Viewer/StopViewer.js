@@ -83,8 +83,8 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
       setArLinks(newArLinks);
       ref.current = {};
 
-      const newIndex = tourStops.findIndex((ts) => ts.StopId === stop.id);
-      setStopIndex(newIndex + 1);
+      const newIndex = tourStops?.findIndex((ts) => ts.StopId === stop.id);
+      setStopIndex(newIndex === undefined ? undefined : newIndex + 1);
     }
   }, [autoPlay, stop, tourStops, transition, variant]);
 
@@ -200,7 +200,7 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
         </div>
       )}
       <div className="stop-viewer__title h5">
-        {stopIndex}. {stop?.names[variant?.code]}
+        {stopIndex ?? '#'}. {stop?.names[variant?.code]}
       </div>
       <div className="stop-viewer__controls">
         <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber mb-2" />

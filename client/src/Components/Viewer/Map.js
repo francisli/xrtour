@@ -25,16 +25,14 @@ function Map({ isOpen, onClose, stop, tourStops }) {
         zoom: 16,
       });
       map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-      map.addControl(
-        new mapboxgl.GeolocateControl({
-          positionOptions: {
-            enableHighAccuracy: true,
-          },
-          trackUserLocation: true,
-          showUserHeading: true,
-        }),
-        'bottom-right'
-      );
+      const geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true,
+        },
+        trackUserLocation: true,
+        showUserHeading: true,
+      });
+      map.addControl(geolocate, 'bottom-right');
       const coords = [];
       let bounds;
       tourStops?.forEach((ts, i) => {
@@ -56,10 +54,17 @@ function Map({ isOpen, onClose, stop, tourStops }) {
         }
       });
       if (bounds) {
-        map.fitBounds(bounds, { padding: 50 });
+        map.fitBounds(bounds, { padding: { top: 100, right: 50, bottom: 50, left: 50 } });
       }
+      geolocate.on('geolocate', (data) => {
+        const newBounds = new mapboxgl.LngLatBounds(bounds.getSouthWest(), bounds.getNorthEast());
+        const { latitude, longitude } = data.coords;
+        newBounds.extend([longitude, latitude]);
+        map.fitBounds(newBounds, { padding: { top: 100, right: 50, bottom: 50, left: 50 } });
+      });
       // get route path and draw on map
       map.on('load', () => {
+        geolocate.trigger();
         map.addSource('route', {
           type: 'geojson',
           data: {
@@ -75,7 +80,7 @@ function Map({ isOpen, onClose, stop, tourStops }) {
             'line-cap': 'round',
           },
           paint: {
-            'line-color': '#cccccc',
+            'line-color': '#ffdd55',
             'line-opacity': 0.5,
             'line-width': 13,
             'line-blur': 0.5,
@@ -96,7 +101,7 @@ function Map({ isOpen, onClose, stop, tourStops }) {
     <div className={classNames('map', { 'map--open': isOpen })}>
       <div ref={containerRef} className="map__container"></div>
       <div className="map__close">
-        <button onClick={() => onClose()} className="btn btn-lg btn-outline-primary">
+        <button onClick={() => onClose()} className="btn btn-lg btn-primary btn-round">
           <FontAwesomeIcon icon={faXmark} />
         </button>
       </div>
