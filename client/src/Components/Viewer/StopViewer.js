@@ -9,6 +9,7 @@ import './StopViewer.scss';
 
 function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, transition, variant, onEnded, onSelect, onTimeUpdate }) {
   const [duration, setDuration] = useState(0);
+  const [stopIndex, setStopIndex] = useState(0);
 
   const [images, setImages] = useState();
   const [tracks, setTracks] = useState();
@@ -81,8 +82,11 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
       setTracks(newTracks);
       setArLinks(newArLinks);
       ref.current = {};
+
+      const newIndex = tourStops.findIndex((ts) => ts.StopId === stop.id);
+      setStopIndex(newIndex + 1);
     }
-  }, [autoPlay, stop, transition, variant]);
+  }, [autoPlay, stop, tourStops, transition, variant]);
 
   useEffect(() => {
     if (images && arLinks && tracks && Number.isInteger(position)) {
@@ -183,21 +187,24 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
       {arLinkURL && <a target="_blank" href={arLinkURL} rel="noreferrer" className="stop-viewer__ar-link"></a>}
       {!!controls && (
         <div className="stop-viewer__toc">
-          <button onClick={() => setTocOpen(true)} className="btn btn-lg btn-outline-primary">
+          <button onClick={() => setTocOpen(true)} className="btn btn-lg btn-primary btn-round">
             <FontAwesomeIcon icon={faBars} />
           </button>
         </div>
       )}
       {!!controls && (
         <div className="stop-viewer__map">
-          <button onClick={() => setMapOpen(true)} className="btn btn-lg btn-outline-primary">
+          <button onClick={() => setMapOpen(true)} className="btn btn-lg btn-primary btn-round">
             <FontAwesomeIcon icon={faLocationDot} />
           </button>
         </div>
       )}
+      <div className="stop-viewer__title h5">
+        {stopIndex}. {stop?.names[variant?.code]}
+      </div>
       <div className="stop-viewer__controls">
-        <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber" />
-        <button onClick={onPlayPause} type="button" className="btn btn-lg btn-outline-primary">
+        <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber mb-2" />
+        <button onClick={onPlayPause} type="button" className="btn btn-lg btn-warning btn-round">
           {!isPlaying && <FontAwesomeIcon icon={faPlay} />}
           {isPlaying && <FontAwesomeIcon icon={faPause} />}
         </button>

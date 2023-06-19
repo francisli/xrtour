@@ -1,3 +1,5 @@
+@import '../../Assets/Variables';
+
 .stop-viewer {
   position: relative;
   width: 100%;
@@ -54,4 +56,16 @@
   left: 0;
   padding: 1rem;
   text-align: center;
+}
+
+.stop-viewer__title {
+  color: white;
+  font-weight: 600;
+  left: 6rem;
+  position: absolute;
+  right: 6rem;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  top: 3rem;
+  transform: translateY(-50%);
 }
