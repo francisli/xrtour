@@ -152,7 +152,7 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
     if (sr.pauseAtEnd || index >= tracks.length - 1) {
       setPlaying(false);
       if (index >= tracks.length - 1) {
-        onEnded?.();
+        onEnded?.(!sr.pauseAtEnd);
       }
     }
   }

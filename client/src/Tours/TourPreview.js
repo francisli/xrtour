@@ -17,6 +17,7 @@ function TourPreview() {
   const [TourStop, setTourStop] = useState();
   const [position, setPosition] = useState(0);
   const [variant, setVariant] = useState();
+  const [isPlaying, setPlaying] = useState(false);
 
   useEffect(() => {
     let isCancelled = false;
@@ -64,7 +65,8 @@ function TourPreview() {
     return () => (isCancelled = true);
   }, [TourId, TourStopId]);
 
-  function onEnded() {
+  function onEnded(newIsPlaying) {
+    setPlaying(newIsPlaying);
     if (TourStopId) {
       let index = TourStops.findIndex((ts) => ts.id === TourStopId) + 1;
       if (index < TourStops.length) {
@@ -97,11 +99,12 @@ function TourPreview() {
       <div className="tour-preview">
         {variant && TourStop && (
           <StopViewer
-            autoPlay={true}
+            autoPlay={isPlaying}
             controls={true}
             tour={Tour}
             tourStops={TourStops}
             stop={TourStop.Stop}
+            transition={TourStop.TransitionStop}
             variant={variant}
             onEnded={onEnded}
             onSelect={onSelect}
