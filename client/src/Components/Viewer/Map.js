@@ -3,10 +3,12 @@ import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import mapboxgl from 'mapbox-gl';
+import polyline from '@mapbox/polyline';
 
 import { useStaticContext } from '../../StaticContext';
 
 import './Map.scss';
+import Api from '../../Api';
 
 function Map({ isOpen, onClose, tourStops }) {
   const containerRef = useRef();
@@ -33,6 +35,7 @@ function Map({ isOpen, onClose, tourStops }) {
         }),
         'bottom-right'
       );
+      const coords = [];
       let bounds;
       tourStops?.forEach((ts, i) => {
         if (ts.Stop?.coordinate) {
@@ -46,11 +49,42 @@ function Map({ isOpen, onClose, tourStops }) {
           } else {
             bounds = new mapboxgl.LngLatBounds(coordinates, coordinates);
           }
+          coords.push(coordinates);
         }
       });
       if (bounds) {
         map.fitBounds(bounds, { padding: 50 });
       }
+      // get route path and draw on map
+      map.on('load', () => {
+        map.addSource('route', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+          },
+        });
+        map.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#cccccc',
+            'line-opacity': 0.5,
+            'line-width': 13,
+            'line-blur': 0.5,
+          },
+        });
+        Api.mapbox.directions(coords, mapboxgl.accessToken).then((response) => {
+          if (response.data.routes?.length) {
+            map.getSource('route').setData(polyline.toGeoJSON(response.data.routes[0].geometry));
+            map.setLayoutProperty('route', 'visibility', 'visible');
+          }
+        });
+      });
     }
     return () => map?.remove();
   }, [isOpen, tourStops]);

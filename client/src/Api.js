@@ -57,6 +57,12 @@ const Api = {
     },
   },
   mapbox: {
+    directions(coordinates, access_token) {
+      const coords = coordinates.map((c) => c.join(',')).join(';');
+      return instance.get(`https://api.mapbox.com/directions/v5/mapbox/walking/${coords}`, {
+        params: { access_token },
+      });
+    },
     geocode(query, access_token) {
       return instance.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`, {
         params: { access_token, type: 'address' },
