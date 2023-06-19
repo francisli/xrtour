@@ -38,4 +38,4 @@ done
 
 STACK_NAME=${APP_NAME}-${ENV_NAME}
 
-aws cloudformation update-stack --capabilities CAPABILITY_NAMED_IAM --stack-name $STACK_NAME --use-previous-template --parameters $VALUES
+aws cloudformation update-stack --capabilities CAPABILITY_NAMED_IAM --stack-name $STACK_NAME  --template-body file://./create.cfn.json --parameters $VALUES

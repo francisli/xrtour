@@ -66,6 +66,10 @@
       "Description": "The email address used to request an SSL certificate from Let's Encrypt",
       "Type": "String"
     },
+    "MapboxAccessToken": {
+      "Description": "The access token for MapBox API",
+      "Type": "String"
+    },
     "SessionSecret": {
       "Description": "A secret key for encrypting cookie sessions",
       "Type": "String"
@@ -553,6 +557,11 @@
             "Namespace": "aws:elasticbeanstalk:application:environment",
             "OptionName": "LETSENCRYPT_OPTS",
             "Value": { "Ref": "LetsEncryptOpts" }
+          },
+          {
+            "Namespace": "aws:elasticbeanstalk:application:environment",
+            "OptionName": "MAPBOX_ACCESS_TOKEN",
+            "Value": { "Ref": "MapboxAccessToken" }
           },
           {
             "Namespace": "aws:elasticbeanstalk:application:environment",
