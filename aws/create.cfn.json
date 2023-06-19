@@ -560,11 +560,6 @@
           },
           {
             "Namespace": "aws:elasticbeanstalk:application:environment",
-            "OptionName": "MAPBOX_ACCESS_TOKEN",
-            "Value": { "Ref": "MapboxAccessToken" }
-          },
-          {
-            "Namespace": "aws:elasticbeanstalk:application:environment",
             "OptionName": "NODE_ENV",
             "Value": "production"
           },
@@ -577,6 +572,11 @@
             "Namespace": "aws:elasticbeanstalk:application:environment",
             "OptionName": "REACT_APP_FEATURE_REGISTRATION",
             "Value": { "Ref": "FeatureRegistration" }
+          },
+          {
+            "Namespace": "aws:elasticbeanstalk:application:environment",
+            "OptionName": "REACT_APP_MAPBOX_ACCESS_TOKEN",
+            "Value": { "Ref": "MapboxAccessToken" }
           },
           {
             "Namespace": "aws:elasticbeanstalk:application:environment",
