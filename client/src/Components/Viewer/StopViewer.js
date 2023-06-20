@@ -160,6 +160,8 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
       } else {
         setCurrentTrack(tracks[index + 1]);
       }
+    } else {
+      setCurrentTrack(tracks[index + 1]);
     }
   }
 
