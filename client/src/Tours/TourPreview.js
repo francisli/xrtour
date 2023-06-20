@@ -65,6 +65,18 @@ function TourPreview() {
     return () => (isCancelled = true);
   }, [TourId, TourStopId]);
 
+  useEffect(() => {
+    let newPosition = searchParams.get('position');
+    if (newPosition !== null) {
+      newPosition = parseInt(newPosition, 10);
+      console.log('?', position, newPosition);
+      if (position !== newPosition) {
+        setPosition(newPosition);
+        setSearchParams();
+      }
+    }
+  }, [position, searchParams]);
+
   function onEnded(newIsPlaying) {
     setPlaying(newIsPlaying);
     if (TourStopId) {
@@ -95,15 +107,6 @@ function TourPreview() {
 
   function onPause() {
     setSearchParams(`position=${position}`);
-  }
-
-  let newPosition = searchParams.get('position');
-  if (newPosition) {
-    newPosition = parseInt(newPosition, 10);
-    if (position !== newPosition) {
-      setPosition(newPosition);
-      setSearchParams();
-    }
   }
 
   return (
