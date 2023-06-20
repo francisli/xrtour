@@ -7,7 +7,20 @@ import Scrubber from './Scrubber';
 import Toc from './Toc';
 import './StopViewer.scss';
 
-function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, transition, variant, onEnded, onSelect, onTimeUpdate }) {
+function StopViewer({
+  autoPlay,
+  controls,
+  position,
+  tour,
+  tourStops,
+  stop,
+  transition,
+  variant,
+  onEnded,
+  onPause,
+  onSelect,
+  onTimeUpdate,
+}) {
   const [duration, setDuration] = useState(0);
   const [stopIndex, setStopIndex] = useState(0);
 
@@ -162,6 +175,7 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
         onEnded?.(!sr.pauseAtEnd);
       } else {
         setCurrentTrack(tracks[index + 1]);
+        onPause?.();
       }
     } else {
       setCurrentTrack(tracks[index + 1]);

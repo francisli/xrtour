@@ -13,6 +13,7 @@ function TourPreview() {
   const navigate = useNavigate();
   const { TourId, TourStopId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [position, setPosition] = useState(0);
   const [Tour, setTour] = useState();
   const [TourStops, setTourStops] = useState();
   const [TourStop, setTourStop] = useState();
@@ -69,27 +70,40 @@ function TourPreview() {
     if (TourStopId) {
       let index = TourStops.findIndex((ts) => ts.id === TourStopId) + 1;
       if (index < TourStops.length) {
-        navigate(`../stops/${TourStops[index].id}`);
+        navigate(`../stops/${TourStops[index].id}?position=0`);
       }
     } else {
-      navigate(`stops/${TourStops[0].id}`);
+      navigate(`stops/${TourStops[0].id}?position=0`);
     }
   }
 
   function onSelect(ts) {
     if (TourStopId) {
       if (ts) {
-        navigate(`../stops/${ts.id}`);
+        navigate(`../stops/${ts.id}?position=0`);
       } else {
-        navigate('..');
+        navigate('..?position=0');
       }
     } else if (ts) {
-      navigate(`stops/${ts.id}`);
+      navigate(`stops/${ts.id}?position=0`);
     }
   }
 
   function onTimeUpdate(position) {
+    setPosition(position);
+  }
+
+  function onPause() {
     setSearchParams(`position=${position}`);
+  }
+
+  let newPosition = searchParams.get('position');
+  if (newPosition) {
+    newPosition = parseInt(newPosition, 10);
+    if (position !== newPosition) {
+      setPosition(newPosition);
+      setSearchParams();
+    }
   }
 
   return (
@@ -111,8 +125,9 @@ function TourPreview() {
             variant={variant}
             onEnded={onEnded}
             onSelect={onSelect}
-            position={parseInt(searchParams.get('position') ?? '0', 10)}
+            position={position}
             onTimeUpdate={onTimeUpdate}
+            onPause={onPause}
           />
         )}
         {variant && !TourStop && Tour?.IntroStop && (
@@ -124,8 +139,9 @@ function TourPreview() {
             variant={variant}
             onEnded={onEnded}
             onSelect={onSelect}
-            position={parseInt(searchParams.get('position') ?? '0', 10)}
+            position={position}
             onTimeUpdate={onTimeUpdate}
+            onPause={onPause}
           />
         )}
       </div>
