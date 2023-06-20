@@ -196,6 +196,10 @@ function StopViewer({
   }
 
   function onSelectInternal(ts) {
+    if (isPlaying) {
+      onPlayPause();
+      onTimeUpdate?.(0);
+    }
     setTocOpen(false);
     if (ts && ts.StopId !== stop?.id) {
       onSelect?.(ts);
