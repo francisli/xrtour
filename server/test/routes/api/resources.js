@@ -183,6 +183,44 @@ describe('/api/resources', () => {
     });
   });
 
+  describe('PATCH /:id', () => {
+    it('updates a Resource and its Files', async () => {
+      await helper.loadUploads([['00-04.m4a', '673c0753-f913-474f-9e99-de638fe35de7.m4a']]);
+      const response = await testSession
+        .patch('/api/resources/6ebacda9-8d33-4c3e-beb5-18dffb119046')
+        .set('Accept', 'application/json')
+        .send({
+          name: 'Updated Resource 2',
+          Files: [
+            {
+              id: '84b62056-05a4-4751-953f-7854ac46bc0f',
+              originalName: 'test.m4a',
+            },
+            {
+              variant: 'es-us',
+              key: '673c0753-f913-474f-9e99-de638fe35de7.m4a',
+              originalName: 'new.m4a',
+            },
+          ],
+        })
+        .expect(StatusCodes.OK);
+      assert.deepStrictEqual(response.body.name, 'Updated Resource 2');
+      assert.deepStrictEqual(response.body.Files?.length, 2);
+      response.body.Files.sort((a, b) => a.originalName.localeCompare(b.originalName));
+      assert.deepStrictEqual(response.body.Files[0].originalName, 'new.m4a');
+      assert.deepStrictEqual(response.body.Files[1].originalName, 'test.m4a');
+
+      const record = await models.Resource.findByPk('6ebacda9-8d33-4c3e-beb5-18dffb119046');
+      assert.deepStrictEqual(record?.name, 'Updated Resource 2');
+
+      const files = await record.getFiles();
+      assert.deepStrictEqual(files?.length, 2);
+      files.sort((a, b) => a.originalName.localeCompare(b.originalName));
+      assert.deepStrictEqual(files[0].originalName, 'new.m4a');
+      assert.deepStrictEqual(files[1].originalName, 'test.m4a');
+    });
+  });
+
   describe('DELETE /:id', () => {
     it('deletes a Resource and its associated files', async () => {
       await testSession

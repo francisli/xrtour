@@ -99,7 +99,27 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
       res.status(StatusCodes.UNAUTHORIZED).end();
     } else {
       try {
-        await record.update(_.pick(req.body, ['name', 'type', 'variants']));
+        await models.sequelize.transaction(async (transaction) => {
+          await record.update(_.pick(req.body, ['name', 'type', 'variants']), { transaction });
+          if (req.body.Files) {
+            const files = req.body.Files.map((f) => {
+              const attrs = _.pick(f, ['variant', 'externalURL', 'key', 'originalName', 'duration', 'width', 'height']);
+              return f.id
+                ? models.File.findOne({ where: { id: f.id, ResourceId: record.id }, transaction }).then((f2) =>
+                    f2.update(attrs, { transaction })
+                  )
+                : models.File.create(
+                    {
+                      ...attrs,
+                      ResourceId: record.id,
+                    },
+                    { transaction }
+                  );
+            });
+            await Promise.all(files);
+            record.Files = await record.getFiles({ transaction });
+          }
+        });
         res.json(record.toJSON());
       } catch (error) {
         if (error.name === 'SequelizeValidationError') {
