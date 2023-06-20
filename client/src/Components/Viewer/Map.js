@@ -74,11 +74,15 @@ function Map({ isOpen, onClose, stop, tourStops, variant }) {
       if (bounds) {
         map.fitBounds(bounds, { padding });
       }
+      let found = false;
       geolocate.on('geolocate', (data) => {
-        const newBounds = new mapboxgl.LngLatBounds(bounds.getSouthWest(), bounds.getNorthEast());
-        const { latitude, longitude } = data.coords;
-        newBounds.extend([longitude, latitude]);
-        map.fitBounds(newBounds, { padding });
+        if (!found) {
+          found = true;
+          const newBounds = new mapboxgl.LngLatBounds(bounds.getSouthWest(), bounds.getNorthEast());
+          const { latitude, longitude } = data.coords;
+          newBounds.extend([longitude, latitude]);
+          map.fitBounds(newBounds, { padding });
+        }
       });
       // get route path and draw on map
       map.on('load', () => {
