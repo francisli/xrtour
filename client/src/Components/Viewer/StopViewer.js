@@ -157,6 +157,8 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
       setPlaying(false);
       if (index >= tracks.length - 1) {
         onEnded?.(!sr.pauseAtEnd);
+      } else {
+        setCurrentTrack(tracks[index + 1]);
       }
     }
   }
