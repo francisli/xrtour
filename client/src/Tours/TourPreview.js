@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
 import Api from '../Api';
@@ -12,10 +12,11 @@ function TourPreview() {
   const staticContext = useStaticContext();
   const navigate = useNavigate();
   const { TourId, TourStopId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [Tour, setTour] = useState();
   const [TourStops, setTourStops] = useState();
   const [TourStop, setTourStop] = useState();
-  const [position, setPosition] = useState(0);
+
   const [variant, setVariant] = useState();
   const [isPlaying, setPlaying] = useState(false);
 
@@ -56,11 +57,9 @@ function TourPreview() {
           if (isCancelled) return;
           newTourStop.Stop.Resources = response.data;
           setTourStop(newTourStop);
-          setPosition(0);
         });
     } else {
       setTourStop(undefined);
-      setPosition(0);
     }
     return () => (isCancelled = true);
   }, [TourId, TourStopId]);
@@ -89,6 +88,10 @@ function TourPreview() {
     }
   }
 
+  function onTimeUpdate(position) {
+    setSearchParams(`position=${position}`);
+  }
+
   return (
     <>
       <Helmet>
@@ -108,8 +111,8 @@ function TourPreview() {
             variant={variant}
             onEnded={onEnded}
             onSelect={onSelect}
-            position={position}
-            onTimeUpdate={setPosition}
+            position={parseInt(searchParams.get('position') ?? '0', 10)}
+            onTimeUpdate={onTimeUpdate}
           />
         )}
         {variant && !TourStop && Tour?.IntroStop && (
@@ -121,8 +124,8 @@ function TourPreview() {
             variant={variant}
             onEnded={onEnded}
             onSelect={onSelect}
-            position={position}
-            onTimeUpdate={setPosition}
+            position={parseInt(searchParams.get('position') ?? '0', 10)}
+            onTimeUpdate={onTimeUpdate}
           />
         )}
       </div>

@@ -154,6 +154,9 @@ function StopViewer({ autoPlay, controls, position, tour, tourStops, stop, trans
     const sr = tracks.find((sr) => sr.id === id);
     const index = tracks.indexOf(sr);
     if (sr.pauseAtEnd || index >= tracks.length - 1) {
+      for (const audio of Object.values(ref.current)) {
+        audio.pause();
+      }
       setPlaying(false);
       if (index >= tracks.length - 1) {
         onEnded?.(!sr.pauseAtEnd);
