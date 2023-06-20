@@ -19,6 +19,13 @@ if [[ $BRANCH == 'main' ]]; then
       fi
     fi
 
+    # log in to Docker hub
+    if [[ "$DOCKER_USERNAME" != "" && "$DOCKER_PASSWORD" != "" ]]; then
+      docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    else
+      docker login
+    fi
+
     # get account id
     IDENTITY=`aws sts get-caller-identity --output text`
     if [[ $IDENTITY =~ ([^[:space:]]*) ]]; then
