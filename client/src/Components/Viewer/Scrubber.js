@@ -8,7 +8,7 @@ function Scrubber({ className, position, duration, onSeek }) {
   function onClick(event) {
     const rect = event.target.getBoundingClientRect();
     const dx = event.clientX - rect.left;
-    onSeek?.(Math.round((duration * dx) / rect.width));
+    onSeek?.(Math.ceil((duration * dx) / rect.width));
   }
 
   return (
@@ -17,7 +17,7 @@ function Scrubber({ className, position, duration, onSeek }) {
         <TimeCode seconds={position} />
       </div>
       <div onClick={onClick} className="scrubber__bar">
-        <div className="scrubber__progress" style={{ width: `${Math.round((100 * position) / duration)}%` }}></div>
+        <div className="scrubber__progress" style={{ width: `${Math.ceil((100 * position) / duration)}%` }}></div>
       </div>
       <div className="scrubber__duration">
         <TimeCode seconds={duration} />

@@ -50,7 +50,7 @@ function Recorder({ onCancel, onSave }) {
       setElapsed(0);
       setTimer(
         setInterval(() => {
-          setElapsed(Math.round((Date.now() - startTime) / 1000));
+          setElapsed(Math.ceil((Date.now() - startTime) / 1000));
         }, 250)
       );
     } catch (err) {

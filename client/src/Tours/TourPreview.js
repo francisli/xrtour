@@ -69,13 +69,12 @@ function TourPreview() {
     let newPosition = searchParams.get('position');
     if (newPosition !== null) {
       newPosition = parseInt(newPosition, 10);
-      console.log('?', position, newPosition);
       if (position !== newPosition) {
         setPosition(newPosition);
         setSearchParams();
       }
     }
-  }, [position, searchParams]);
+  }, [position, searchParams, setSearchParams]);
 
   function onEnded(newIsPlaying) {
     setPlaying(newIsPlaying);

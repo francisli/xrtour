@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import mime from 'mime/lite';
 
 import AudioPlayer from './AudioPlayer';
@@ -75,9 +75,12 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
               {valueContentType.startsWith('image/') && (
                 <img className="img-fluid me-3 my-1 file-input__image" alt={value} src={valueURL} />
               )}
-              <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => onRemoved()}>
+              <button type="button" className="btn btn-sm btn-outline-danger" onClick={onRemoved}>
                 <FontAwesomeIcon icon={faTrashCan} />
               </button>
+              <a className="btn btn-sm btn-outline-secondary ms-2" download href={valueURL}>
+                <FontAwesomeIcon icon={faDownload} />
+              </a>
             </div>
           );
         } else if (statuses.length === 0 && !value && children) {

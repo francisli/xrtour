@@ -19,7 +19,7 @@ function AudioPlayer({ className, onCanPlay, onDurationChange, src }) {
   }
 
   function onDurationChangeInternal() {
-    const newDuration = Math.round(ref.current.duration);
+    const newDuration = Math.ceil(ref.current.duration);
     setDuration(newDuration);
     onDurationChange?.(newDuration);
   }
@@ -30,7 +30,7 @@ function AudioPlayer({ className, onCanPlay, onDurationChange, src }) {
   }
 
   function onTimeUpdateInternal() {
-    setPosition(Math.round(ref.current.currentTime));
+    setPosition(Math.ceil(ref.current.currentTime));
   }
 
   function onPlayPause() {

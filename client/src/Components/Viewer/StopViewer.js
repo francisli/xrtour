@@ -158,7 +158,7 @@ function StopViewer({
   function onTimeUpdateInternal(event) {
     const { target: audio } = event;
     if (audio.id === currentTrack?.id) {
-      onTimeUpdate?.(Math.round(audio.currentTime) + currentTrack.start);
+      onTimeUpdate?.(Math.ceil(audio.currentTime) + currentTrack.start);
     }
   }
 
@@ -178,7 +178,9 @@ function StopViewer({
         onPause?.();
       }
     } else {
-      setCurrentTrack(tracks[index + 1]);
+      const nextTrack = tracks[index + 1];
+      setCurrentTrack(nextTrack);
+      ref.current[nextTrack.id]?.play();
     }
   }
 
