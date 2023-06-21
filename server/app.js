@@ -32,6 +32,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 /// support forwarded headers from intermediate proxies
 app.set('trust proxy', 1);
+/// set subdomain offset based on base URL
+app.set('subdomain offset', new URL(process.env.BASE_URL).hostname.split('.').length);
 /// set up session handling in cookies
 app.use(
   cookieSession({
