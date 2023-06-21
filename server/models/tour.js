@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       Tour.belongsTo(models.Resource, { as: 'CoverResource' });
       Tour.belongsTo(models.Stop, { as: 'IntroStop' });
       Tour.hasMany(models.TourStop);
+      Tour.hasMany(models.Version);
     }
 
     toJSON() {
