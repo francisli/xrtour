@@ -6,6 +6,17 @@ const { v4: uuid } = require('uuid');
 
 const s3 = require('../lib/s3');
 
+function resourcesSortComparator(r1, r2) {
+  let result = r1.Resource.type.localeCompare(r2.Resource.type);
+  if (result === 0) {
+    result = Math.sign(r1.start - r2.start);
+    if (result === 0) {
+      result = r1.Resource.name.localeCompare(r2.Resource.name);
+    }
+  }
+  return result;
+}
+
 module.exports = (sequelize, DataTypes) => {
   class Version extends Model {
     static associate(models) {
@@ -59,7 +70,15 @@ module.exports = (sequelize, DataTypes) => {
         ],
         transaction,
       });
-      let data = JSON.stringify(tour.toJSON());
+      // get JSON representation
+      let data = tour.toJSON();
+      // sort resources
+      data.IntroStop?.Resources?.sort(resourcesSortComparator);
+      data.TourStops?.forEach((ts) => {
+        ts?.Stop?.Resources?.sort(resourcesSortComparator);
+        ts?.TransitionStop?.Resources?.sort(resourcesSortComparator);
+      });
+      data = JSON.stringify(data);
       // find all file asset urls
       const regex = /"URL":"\/api\/assets\/(files\/[a-f0-9-]+\/key\/[^"]+)"/g;
       const matches = data.matchAll(regex);

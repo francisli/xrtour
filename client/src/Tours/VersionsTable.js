@@ -19,7 +19,7 @@ function VersionsTable({ versions }) {
           </tr>
         )}
         {versions?.map((v) => (
-          <tr>
+          <tr key={v.id}>
             <td>{DateTime.fromISO(v.createdAt).toLocaleString(DateTime.DATETIME_FULL)}</td>
             <td>{v.isLive && <FontAwesomeIcon icon={faCheck} />}</td>
             <td></td>
