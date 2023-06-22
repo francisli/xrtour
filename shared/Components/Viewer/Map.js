@@ -8,10 +8,10 @@ import polyline from '@mapbox/polyline';
 
 import './Map.scss';
 
-function Map({ accessToken, isOpen, onClose, routeGeometry, stop, tourStops, variant }) {
+function Map({ isOpen, mapboxAccessToken, onClose, routeGeometry, stop, tourStops, variant }) {
   const containerRef = useRef();
 
-  mapboxgl.accessToken = accessToken;
+  mapboxgl.accessToken = mapboxAccessToken;
 
   useEffect(() => {
     let map;

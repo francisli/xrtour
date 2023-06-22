@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 
+import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.scss';
 
 import AppRedirects from './AppRedirects';

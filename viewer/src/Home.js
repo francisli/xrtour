@@ -13,7 +13,7 @@ function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const { tour } = useStaticContext();
+  const { env, tour } = useStaticContext();
   const [Tour, setTour] = useState(tour);
   const [TourStop, setTourStop] = useState();
   const [variant, setVariant] = useState();
@@ -99,6 +99,7 @@ function Home() {
           <StopViewer
             autoPlay={!!TourStop && isPlaying}
             controls={true}
+            mapboxAccessToken={env?.MAPBOX_ACCESS_TOKEN}
             tour={Tour}
             tourStops={Tour.TourStops}
             stop={TourStop ? TourStop.Stop : Tour.IntroStop}
