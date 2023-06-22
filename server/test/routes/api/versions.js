@@ -1,5 +1,6 @@
 const assert = require('assert');
 const { StatusCodes } = require('http-status-codes');
+const path = require('path');
 const session = require('supertest-session');
 
 const helper = require('../../helper');
@@ -14,7 +15,19 @@ describe('/api/versions', () => {
       ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
       ['00-04.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
     ]);
-    await helper.loadFixtures(['users', 'invites', 'teams', 'memberships', 'tours', 'resources', 'files', 'versions']);
+    await helper.loadFixtures([
+      'users',
+      'invites',
+      'teams',
+      'memberships',
+      'tours',
+      'stops',
+      'tourStops',
+      'resources',
+      'files',
+      'stopResources',
+      'versions',
+    ]);
     testSession = session(app);
     await testSession
       .post('/api/auth/login')
@@ -60,7 +73,7 @@ describe('/api/versions', () => {
   describe('POST /', () => {
     it('creates a new Version', async () => {
       const data = {
-        TourId: 'ae61f3e7-7de7-40e2-b9a1-c5ad9ff94806',
+        TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
         isStaging: false,
       };
       const response = await testSession.post('/api/versions').set('Accept', 'application/json').send(data).expect(StatusCodes.CREATED);
@@ -78,6 +91,35 @@ describe('/api/versions', () => {
       assert(record);
       assert.deepStrictEqual(record.isLive, true);
       assert.deepStrictEqual(record.isStaging, false);
+
+      const tourData = JSON.stringify(record.data);
+      const regex = /"URL":"\/api\/assets\/(versions\/[a-f0-9-]+\/files\/[a-f0-9-]+\/key\/[^"]+)"/g;
+      const matches = tourData.match(regex);
+      assert.deepStrictEqual(matches?.length, 2);
+      assert(
+        await helper.assetPathExists(
+          path.join(
+            'versions',
+            record.id,
+            'files',
+            'ed2f158a-e44e-432d-971e-e5da1a2e33b4',
+            'key',
+            'cdd8007d-dcaf-4163-b497-92d378679668.png'
+          )
+        )
+      );
+      assert(
+        await helper.assetPathExists(
+          path.join(
+            'versions',
+            record.id,
+            'files',
+            '84b62056-05a4-4751-953f-7854ac46bc0f',
+            'key',
+            'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'
+          )
+        )
+      );
     });
 
     it('replaces any prior live Version', async () => {

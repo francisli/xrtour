@@ -45,7 +45,6 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
     ..._.pick(req.body, ['TourId', 'isStaging', 'password']),
     isLive: true,
   });
-  record.data = {};
   try {
     await models.sequelize.transaction(async (transaction) => {
       await models.Version.update(
@@ -58,7 +57,7 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
           transaction,
         }
       );
-      await record.save({ transaction });
+      await record.publish({ transaction });
     });
     res.status(StatusCodes.CREATED).json(record.toJSON());
   } catch (error) {
