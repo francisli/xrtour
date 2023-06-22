@@ -1,8 +1,6 @@
 import { Navigate, matchPath, useLocation } from 'react-router-dom';
 
 export const REDIRECTS = [
-  ['/admin', '/admin/users'],
-  ['/passwords', '/passwords/forgot'],
 ];
 
 export function handleRedirects(pathname, callback) {

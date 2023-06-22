@@ -12,7 +12,10 @@ function App() {
         path="*"
         element={
           <AppRedirects>
-            <Home />
+            <Routes>
+              <Route path="stops/:TourStopId" element={<Home />} />
+              <Route path="" element={<Home />} />
+            </Routes>
           </AppRedirects>
         }
       />

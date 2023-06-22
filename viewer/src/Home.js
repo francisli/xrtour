@@ -2,14 +2,16 @@ import { Helmet } from 'react-helmet-async';
 import { useStaticContext } from './StaticContext';
 
 function Home() {
-  const staticContext = useStaticContext();
+  const { tour } = useStaticContext();
+  const title = tour?.names?.[tour?.variants?.[0].code] ?? '';
   return (
     <>
       <Helmet>
-        <title>Home - {staticContext?.env?.REACT_APP_SITE_TITLE}</title>
+        <title>{title}</title>
       </Helmet>
       <main className="container">
-        <h1>Home</h1>
+        <h1>{title}</h1>
+        <p>Testing</p>
       </main>
     </>
   );
