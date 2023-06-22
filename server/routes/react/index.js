@@ -31,6 +31,9 @@ const { handleRedirects } = require('../../../client/src/AppRedirects');
 
 const router = express.Router();
 
+// configure serving up built client app assets
+router.use(express.static(path.join(__dirname, '../../../client/build'), { index: false }));
+
 function readIndexFile() {
   const filePath = path.join(__dirname, '../../../client/build', 'index.html');
   if (fs.existsSync(filePath)) {

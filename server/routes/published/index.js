@@ -1,9 +1,13 @@
 const express = require('express');
 const { StatusCodes } = require('http-status-codes');
+const path = require('path');
 
 const models = require('../../models');
 
 const router = express.Router();
+
+// configure serving up built viewer app assets
+router.use(express.static(path.join(__dirname, '../../../viewer/build'), { index: false }));
 
 router.get('/*', async (req, res) => {
   let [team, tour] = req.subdomains;

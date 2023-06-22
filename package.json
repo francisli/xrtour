@@ -4,15 +4,16 @@
   "private": true,
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "viewer"
   ],
   "scripts": {
-    "heroku-postbuild": "npm run build -w client",
-    "lint": "npm run lint -w client && npm run lint -w server",
-    "lint:changed": "npm run lint:changed -w client; npm run lint:changed -w server",
+    "heroku-postbuild": "npm run build -w client; npm run build -w viewer",
+    "lint": "npm run lint -w client; npm run lint -w server; npm run lint -w viewer",
+    "lint:changed": "npm run lint:changed -w client; npm run lint:changed -w server; npm run lint:changed -w viewer",
     "pp": "prettier --write --ignore-unknown .",
     "pp:changed": "prettier --write --ignore-unknown $(git diff --name-only; git ls-files -o --exclude-standard)",
-    "test": "prettier --check . && npm run lint && CI=true npm test -w client && CI=true npm test -w server"
+    "test": "prettier --check . && npm run lint && CI=true npm test -w client && CI=true npm test -w server && CI=true npm test -w viewer"
   },
   "devDependencies": {
     "prettier": "^2.7.1"
