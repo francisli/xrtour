@@ -2,9 +2,7 @@ import { createContext, useContext } from 'react';
 
 const staticContext = createContext();
 
-const defaultValue = {
-  tour: {}
-};
+const defaultValue = {};
 
 function useStaticContext() {
   return useContext(staticContext);

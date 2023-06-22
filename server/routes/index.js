@@ -1,7 +1,7 @@
 const express = require('express');
 
-const publishedRouter = require('./published');
-const reactRouter = require('./react');
+const clientRouter = require('./client');
+const viewerRouter = require('./viewer');
 
 const router = express.Router();
 
@@ -10,9 +10,9 @@ router.use('/api', require('./api'));
 
 router.use((req, res, next) => {
   if (req.subdomains.length) {
-    publishedRouter(req, res, next);
+    viewerRouter(req, res, next);
   } else {
-    reactRouter(req, res, next);
+    clientRouter(req, res, next);
   }
 });
 
