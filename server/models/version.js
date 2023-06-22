@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const _ = require('lodash');
 const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
@@ -6,7 +7,13 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Version.belongsTo(models.Tour);
     }
+
+    toJSON() {
+      const json = _.pick(this.get(), ['id', 'TourId', 'isStaging', 'isLive', 'passwordHash', 'createdAt']);
+      return json;
+    }
   }
+
   Version.init(
     {
       isStaging: DataTypes.BOOLEAN,
