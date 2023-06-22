@@ -1,7 +1,6 @@
 import { Navigate, matchPath, useLocation } from 'react-router-dom';
 
-export const REDIRECTS = [
-];
+export const REDIRECTS = [];
 
 export function handleRedirects(pathname, callback) {
   for (const redirect of REDIRECTS) {
