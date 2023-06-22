@@ -1,0 +1,44 @@
+.toc {
+  background-color: white;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  overflow-y: scroll;
+  transform: translateX(-100%);
+}
+
+.toc--open {
+  transform: translateX(0);
+  transition: 0.2s;
+}
+
+.toc__close {
+  left: 0;
+  padding: 1rem;
+  position: absolute;
+  top: 0;
+}
+
+.toc__header {
+  padding-top: 100px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.toc__list {
+  margin-top: 2rem;
+}
+
+.toc__item {
+  background: transparent;
+  border-bottom: 1px solid lightgray;
+  padding: 1rem;
+  text-align: left;
+  width: 100%;
+
+  &:first-child {
+    border-top: 1px solid lightgray;
+  }
+}
