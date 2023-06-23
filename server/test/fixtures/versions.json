@@ -1,0 +1,25 @@
+[
+  {
+    "model": "Version",
+    "data": {
+      "id": "6e5fafaa-fa8e-4d46-a17a-38916f4b99e4",
+      "TourId": "ae61f3e7-7de7-40e2-b9a1-c5ad9ff94806",
+      "isStaging": false,
+      "isLive": false,
+      "data": {},
+      "createdAt": "2022-01-29T22:58:56.000Z"
+    }
+  },
+  {
+    "model": "Version",
+    "data": {
+      "id": "2abf432a-9eb2-4bd9-86d9-12645c2d62c7",
+      "TourId": "ae61f3e7-7de7-40e2-b9a1-c5ad9ff94806",
+      "isStaging": true,
+      "isLive": true,
+      "data": {},
+      "passwordHash": "e9cee71ab932fde863338d08be4de9dfe39ea049bdafb342ce659ec5450b69ae",
+      "createdAt": "2022-01-28T22:58:56.000Z"
+    }
+  }
+]

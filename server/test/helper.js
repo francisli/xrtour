@@ -54,6 +54,7 @@ async function cleanAssets() {
 async function resetDatabase() {
   // clear all test data (order matters due to foreign key relationships)
   await models.sequelize.query(`
+    DELETE FROM "Versions";
     DELETE FROM "TourStops";
     DELETE FROM "Tours";
     DELETE FROM "StopResources";

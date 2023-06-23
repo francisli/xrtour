@@ -10,6 +10,7 @@ import './StopViewer.scss';
 function StopViewer({
   autoPlay,
   controls,
+  mapboxAccessToken,
   position,
   tour,
   tourStops,
@@ -256,7 +257,14 @@ function StopViewer({
         tourStops={tourStops}
         variant={variant}
       />
-      <Map isOpen={isMapOpen} onClose={() => setMapOpen(false)} stop={stop} tourStops={tourStops} variant={variant} />
+      <Map
+        mapboxAccessToken={mapboxAccessToken}
+        isOpen={isMapOpen}
+        onClose={() => setMapOpen(false)}
+        stop={stop}
+        tourStops={tourStops}
+        variant={variant}
+      />
     </div>
   );
 }

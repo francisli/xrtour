@@ -13,5 +13,6 @@ router.use('/stops', require('./stops'));
 router.use('/teams', require('./teams'));
 router.use('/tours', require('./tours'));
 router.use('/users', require('./users'));
+router.use('/versions', require('./versions'));
 
 module.exports = router;

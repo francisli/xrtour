@@ -1,18 +1,19 @@
 const express = require('express');
-const path = require('path');
+
+const clientRouter = require('./client');
+const viewerRouter = require('./viewer');
 
 const router = express.Router();
-
-// configure serving up a built client app assets
-router.use(express.static(path.join(__dirname, '../../client/build'), { index: false }));
-
-// configure serving any static file in public folder
-router.use(express.static(path.join(__dirname, '../public')));
 
 // serve some paths from other nested routers
 router.use('/api', require('./api'));
 
-// serve up the client app for all other routes, per SPA client-side routing
-router.get('/*', require('./react'));
+router.use((req, res, next) => {
+  if (req.subdomains.length) {
+    viewerRouter(req, res, next);
+  } else {
+    clientRouter(req, res, next);
+  }
+});
 
 module.exports = router;

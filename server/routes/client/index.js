@@ -6,7 +6,9 @@ const path = require('path');
 require('@babel/register')({
   only: [
     function only(filepath) {
-      return filepath.startsWith(path.resolve(__dirname, '../../../client'));
+      return (
+        filepath.startsWith(path.resolve(__dirname, '../../../client')) || filepath.startsWith(path.resolve(__dirname, '../../../shared'))
+      );
     },
   ],
   presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'automatic' }]],
@@ -30,6 +32,9 @@ const App = require('../../../client/src/App').default;
 const { handleRedirects } = require('../../../client/src/AppRedirects');
 
 const router = express.Router();
+
+// configure serving up built client app assets
+router.use(express.static(path.join(__dirname, '../../../client/build'), { index: false }));
 
 function readIndexFile() {
   const filePath = path.join(__dirname, '../../../client/build', 'index.html');

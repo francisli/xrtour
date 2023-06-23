@@ -41,9 +41,10 @@ ADD . $APP_HOME
 # Set workdir
 WORKDIR $APP_HOME
 
-# Install dependencies, build client app
+# Install dependencies, build client apps
 RUN npm install && \
-    npm run build -w client
+    npm run build -w client && \
+    npm run build -w viewer
 
 # Set up default command to run Node on port 3000
 EXPOSE 3000

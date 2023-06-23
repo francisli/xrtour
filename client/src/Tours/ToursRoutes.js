@@ -8,6 +8,7 @@ import StopForm from '../Stops/StopForm';
 import Tour from './Tour';
 import TourForm from './TourForm';
 import TourPreviewRoutes from './TourPreviewRoutes';
+import TourPublish from './TourPublish';
 import TourStop from './TourStop';
 import TourStopForm from './TourStopForm';
 import ToursList from './ToursList';
@@ -39,6 +40,7 @@ function ToursRoutes() {
       <Route path=":TourId/stops/:TourStopId/edit" element={<TourStopForm />} />
       <Route path=":TourId/stops/:TourStopId" element={<TourStop />} />
       <Route path=":TourId/edit" element={<TourForm />} />
+      <Route path=":TourId/publish" element={<TourPublish />} />
       <Route path=":TourId" element={<Tour />} />
       <Route path="" element={<ToursList />} />
     </Routes>

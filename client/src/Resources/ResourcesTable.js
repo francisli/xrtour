@@ -3,8 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
 
+import TimeCode from 'shared/Components/TimeCode';
+
 import ConfirmModal from '../Components/ConfirmModal';
-import TimeCode from '../Components/TimeCode';
 
 import './ResourcesTable.scss';
 import { useAuthContext } from '../AuthContext';

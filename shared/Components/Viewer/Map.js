@@ -6,15 +6,12 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import mapboxgl from 'mapbox-gl';
 import polyline from '@mapbox/polyline';
 
-import { useStaticContext } from '../../StaticContext';
-
 import './Map.scss';
-import Api from '../../Api';
 
-function Map({ isOpen, onClose, stop, tourStops, variant }) {
+function Map({ isOpen, mapboxAccessToken, onClose, routeGeometry, stop, tourStops, variant }) {
   const containerRef = useRef();
-  const staticContext = useStaticContext();
-  mapboxgl.accessToken = staticContext?.env?.MAPBOX_ACCESS_TOKEN;
+
+  mapboxgl.accessToken = mapboxAccessToken;
 
   useEffect(() => {
     let map;
@@ -108,12 +105,10 @@ function Map({ isOpen, onClose, stop, tourStops, variant }) {
             'line-blur': 0.5,
           },
         });
-        Api.mapbox.directions(coords, mapboxgl.accessToken).then((response) => {
-          if (response.data.routes?.length) {
-            map.getSource('route').setData(polyline.toGeoJSON(response.data.routes[0].geometry));
-            map.setLayoutProperty('route', 'visibility', 'visible');
-          }
-        });
+        if (routeGeometry) {
+          map.getSource('route').setData(polyline.toGeoJSON(routeGeometry));
+          map.setLayoutProperty('route', 'visibility', 'visible');
+        }
       });
     }
     return () => map?.remove();

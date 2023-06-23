@@ -199,6 +199,17 @@ const Api = {
       return instance.patch(`/api/users/${id}`, data);
     },
   },
+  versions: {
+    index(TourId) {
+      return instance.get(`/api/versions`, { params: { TourId } });
+    },
+    create(data) {
+      return instance.post(`/api/versions`, data);
+    },
+    update(id, data) {
+      return instance.patch(`/api/versions/${id}`, data);
+    },
+  },
 };
 
 export default Api;
