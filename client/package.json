@@ -28,15 +28,23 @@
     "react-scripts": "^5.0.1",
     "react-sortablejs": "^6.1.4",
     "sass": "^1.58.0",
+    "shared": "^1.0.11",
     "sortablejs": "^1.15.0",
     "uuid": "^9.0.0",
     "web-vitals": "^3.1.1"
   },
+  "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "craco-babel-loader": "^1.0.4"
+  },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=./jest-env.js",
-    "eject": "react-scripts eject",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test --env=./jest-env.js",
+    "eject": "craco eject",
     "pp": "prettier --write --ignore-unknown .",
     "pp:changed": "prettier --write --ignore-unknown $(git diff --name-only --relative .; git ls-files -o --exclude-standard)",
     "lint": "eslint .",
@@ -65,11 +73,6 @@
     ]
   },
   "proxy": "http://localhost:3100",
-  "devDependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.4.3"
-  },
   "jest": {
     "moduleNameMapper": {
       "axios": "axios/dist/node/axios.cjs"

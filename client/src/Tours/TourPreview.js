@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
+import StopViewer from 'shared/Components/Viewer/StopViewer';
+
 import Api from '../Api';
-import StopViewer from '../Components/Viewer/StopViewer';
 import { useStaticContext } from '../StaticContext';
 
 import './TourPreview.scss';
@@ -120,6 +121,7 @@ function TourPreview() {
           <StopViewer
             autoPlay={isPlaying}
             controls={true}
+            mapboxAccessToken={staticContext?.env?.MAPBOX_ACCESS_TOKEN}
             tour={Tour}
             tourStops={TourStops}
             stop={TourStop.Stop}
@@ -135,6 +137,7 @@ function TourPreview() {
         {variant && !TourStop && Tour?.IntroStop && (
           <StopViewer
             controls={true}
+            mapboxAccessToken={staticContext?.env?.MAPBOX_ACCESS_TOKEN}
             tour={Tour}
             tourStops={TourStops}
             stop={Tour.IntroStop}

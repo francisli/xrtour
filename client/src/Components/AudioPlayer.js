@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
 
-import Scrubber from './Viewer/Scrubber';
+import Scrubber from 'shared/Components/Viewer/Scrubber';
+
 import './AudioPlayer.scss';
 
 function AudioPlayer({ className, onCanPlay, onDurationChange, src }) {

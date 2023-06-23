@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 
 import Api from '../Api';
 import { useStaticContext } from '../StaticContext';
@@ -9,12 +9,17 @@ import VersionsTable from './VersionsTable';
 function TourPublish() {
   const staticContext = useStaticContext();
   const { TourId } = useParams();
+  const [tour, setTour] = useState();
   const [versions, setVersions] = useState();
   const [isPublishing, setPublishing] = useState();
 
   useEffect(() => {
     let isCancelled = false;
     if (TourId) {
+      Api.tours.get(TourId).then((response) => {
+        if (isCancelled) return;
+        setTour(response.data);
+      });
       Api.versions.index(TourId).then((response) => {
         if (isCancelled) return;
         setVersions(response.data);
@@ -75,6 +80,19 @@ function TourPublish() {
       <main className="container">
         <div className="row">
           <div className="col-md-6">
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb">
+                <li className="breadcrumb-item">
+                  <Link to="/">Home</Link>
+                </li>
+                <li className="breadcrumb-item">
+                  <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.names[tour?.variants[0].code]}</Link>
+                </li>
+                <li className="breadcrumb-item active" aria-current="page">
+                  Publish Tour
+                </li>
+              </ol>
+            </nav>
             <h1 className="mb-5">Publish Tour</h1>
             <h2>Production</h2>
             <VersionsTable onPublish={onPublish} onUnpublish={onUnpublish} versions={versions?.filter((v) => !v.isStaging)} />

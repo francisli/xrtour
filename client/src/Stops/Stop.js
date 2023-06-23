@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
+import PhoneScreen from 'shared/Components/Viewer/PhoneScreen';
+import StopViewer from 'shared/Components/Viewer/StopViewer';
+
 import Api from '../Api';
 import FormGroup from '../Components/FormGroup';
 import VariantTabs from '../Components/VariantTabs';
-import PhoneScreen from '../Components/Viewer/PhoneScreen';
-import StopViewer from '../Components/Viewer/StopViewer';
 import Recorder from '../Resources/Recorder';
 import ResourcesModal from '../Resources/ResourcesModal';
 import ResourcesTable from '../Resources/ResourcesTable';

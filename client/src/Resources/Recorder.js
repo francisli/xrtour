@@ -3,8 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faSquare } from '@fortawesome/free-solid-svg-icons';
 import { v4 as uuid } from 'uuid';
 
+import TimeCode from 'shared/Components/TimeCode';
+
 import AudioPlayer from '../Components/AudioPlayer';
-import TimeCode from '../Components/TimeCode';
 import Api from '../Api';
 
 function Recorder({ onCancel, onSave }) {
