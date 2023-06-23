@@ -29,8 +29,42 @@ function TourPublish() {
       TourId,
       isStaging,
     });
+    versions.forEach((v) => {
+      if (v.isStaging === isStaging) {
+        v.isLive = false;
+      }
+    });
     setVersions([response.data, ...versions]);
     setPublishing();
+  }
+
+  async function onPublish(version) {
+    await Api.versions.update(version.id, {
+      isLive: true,
+    });
+    versions.forEach((v) => {
+      if (v.isStaging === version.isStaging) {
+        v.isLive = false;
+      }
+    });
+    version.isLive = true;
+    setVersions([...versions]);
+  }
+
+  async function onUnpublish(version) {
+    await Api.versions.update(version.id, {
+      isLive: false,
+    });
+    version.isLive = false;
+    setVersions([...versions]);
+  }
+
+  async function onPromote(version) {
+    await Api.versions.update(version.id, {
+      isStaging: false,
+    });
+    version.isStaging = false;
+    setVersions([...versions]);
   }
 
   return (
@@ -43,7 +77,7 @@ function TourPublish() {
           <div className="col-md-6">
             <h1 className="mb-5">Publish Tour</h1>
             <h2>Production</h2>
-            <VersionsTable versions={versions?.filter((v) => !v.isStaging)} />
+            <VersionsTable onPublish={onPublish} onUnpublish={onUnpublish} versions={versions?.filter((v) => !v.isStaging)} />
             <div className="d-flex mb-5">
               <button disabled={isPublishing !== undefined} onClick={() => publish(false)} type="button" className="btn btn-primary me-2">
                 Publish to Production
@@ -51,7 +85,12 @@ function TourPublish() {
               {isPublishing === false && <div className="spinner-border"></div>}
             </div>
             <h2>Staging</h2>
-            <VersionsTable versions={versions?.filter((v) => v.isStaging)} />
+            <VersionsTable
+              onPromote={onPromote}
+              onPublish={onPublish}
+              onUnpublish={onUnpublish}
+              versions={versions?.filter((v) => v.isStaging)}
+            />
             <div className="d-flex mb-5">
               <button disabled={isPublishing !== undefined} onClick={() => publish(true)} type="button" className="btn btn-primary me-2">
                 Publish to Staging

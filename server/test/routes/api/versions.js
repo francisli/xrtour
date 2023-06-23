@@ -166,4 +166,20 @@ describe('/api/versions', () => {
       });
     });
   });
+
+  describe('PATCH /:id', () => {
+    it('updates a Version by id', async () => {
+      const response = await testSession
+        .patch('/api/versions/6e5fafaa-fa8e-4d46-a17a-38916f4b99e4')
+        .send({
+          isLive: true,
+        })
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.OK);
+      assert.deepStrictEqual(response.body.isLive, true);
+
+      const record = await models.Version.findByPk('6e5fafaa-fa8e-4d46-a17a-38916f4b99e4');
+      assert.deepStrictEqual(record.isLive, true);
+    });
+  });
 });

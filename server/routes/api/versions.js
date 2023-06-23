@@ -96,7 +96,21 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
       res.status(StatusCodes.UNAUTHORIZED).end();
     } else {
       try {
-        await record.update(_.pick(req.body, ['isStaging', 'isLive', 'password']));
+        await models.sequelize.transaction(async (transaction) => {
+          if (req.body.isLive) {
+            await models.Version.update(
+              { isLive: false },
+              {
+                where: {
+                  TourId: record.TourId,
+                  isStaging: req.body.isStaging ?? record.isStaging,
+                },
+                transaction,
+              }
+            );
+          }
+          await record.update(_.pick(req.body, ['isStaging', 'isLive', 'password']), { transaction });
+        });
         res.json(record.toJSON());
       } catch (error) {
         if (error.name === 'SequelizeValidationError') {
