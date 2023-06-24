@@ -8,7 +8,7 @@ import polyline from '@mapbox/polyline';
 
 import './Map.scss';
 
-function Map({ isOpen, mapboxAccessToken, onClose, routeGeometry, stop, tourStops, variant }) {
+function Map({ isOpen, mapboxAccessToken, onClose, stop, tourStops, variant }) {
   const containerRef = useRef();
 
   mapboxgl.accessToken = mapboxAccessToken;
@@ -105,9 +105,19 @@ function Map({ isOpen, mapboxAccessToken, onClose, routeGeometry, stop, tourStop
             'line-blur': 0.5,
           },
         });
-        if (routeGeometry) {
-          map.getSource('route').setData(polyline.toGeoJSON(routeGeometry));
-          map.setLayoutProperty('route', 'visibility', 'visible');
+        if (coords.length) {
+          fetch(
+            `https://api.mapbox.com/directions/v5/mapbox/walking/${coords
+              .map((c) => c.join(','))
+              .join(';')}?access_token=${mapboxAccessToken}`
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.routes?.length) {
+                map.getSource('route').setData(polyline.toGeoJSON(data.routes[0].geometry));
+                map.setLayoutProperty('route', 'visibility', 'visible');
+              }
+            });
         }
       });
     }
