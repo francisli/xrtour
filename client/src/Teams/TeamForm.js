@@ -10,6 +10,7 @@ import { useAuthContext } from '../AuthContext';
 import { useStaticContext } from '../StaticContext';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
+import FileInput from '../Components/FileInput';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 
@@ -27,7 +28,9 @@ function TeamForm() {
   const [team, setTeam] = useState({
     name: isFirstTeam ? `${user.firstName}'s Personal Team` : '',
     link: isFirstTeam ? `${user.firstName}${user.lastName}`.toLocaleLowerCase() : '',
+    favicon: null,
   });
+  const [isUploading, setUploading] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
 
@@ -128,7 +131,7 @@ function TeamForm() {
                 </h2>
                 <form onSubmit={onSubmit}>
                   {error && error.message && <div className="alert alert-danger">{error.message}</div>}
-                  <fieldset disabled={isLoading}>
+                  <fieldset disabled={isUploading || isLoading}>
                     <FormGroup name="name" label="Name" onChange={onChange} record={team} error={error} />
                     <FormGroup
                       name="link"
@@ -138,6 +141,24 @@ function TeamForm() {
                       record={team}
                       error={error}
                     />
+                    <div className="mb-3">
+                      <label className="form-label" htmlFor="favicon">
+                        Favicon
+                      </label>
+                      <FileInput
+                        id="favicon"
+                        name="favicon"
+                        accept={{ 'image/*': ['.ico'] }}
+                        value={team.favicon}
+                        valueURL={team.faviconURL}
+                        onChange={onChange}
+                        onUploading={setUploading}>
+                        <div className="card-body">
+                          <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
+                        </div>
+                      </FileInput>
+                      {error?.errorMessagesHTMLFor?.('key')}
+                    </div>
                     <div className="mb-3 d-grid">
                       <button className="btn btn-primary" type="submit">
                         Submit

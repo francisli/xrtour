@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'link', 'name', 'variants']);
+      const json = _.pick(this.get(), ['id', 'name', 'link', 'favicon', 'faviconURL', 'variants']);
       if (this.Memberships) {
         json.Memberships = this.Memberships.map((m) => m.toJSON());
       }

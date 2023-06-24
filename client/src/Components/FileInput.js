@@ -35,6 +35,9 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
   let valueContentType;
   if (value) {
     valueContentType = mime.getType(value);
+    if (!valueContentType && value?.toLowerCase().endsWith('.ico')) {
+      valueContentType = 'image/x-icon';
+    }
   }
 
   return (
