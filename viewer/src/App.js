@@ -14,8 +14,8 @@ function App() {
         element={
           <AppRedirects>
             <Routes>
-              <Route path="stops/:TourStopId" element={<Home />} />
-              <Route path="" element={<Home />} />
+              <Route path=":TourLink/stops/:TourStopId" element={<Home />} />
+              <Route path=":TourLink" element={<Home />} />
             </Routes>
           </AppRedirects>
         }

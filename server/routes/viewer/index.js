@@ -48,18 +48,22 @@ function readIndexFile() {
 const HTML = readIndexFile();
 
 router.get('/*', async (req, res) => {
-  let [team, tour] = req.subdomains;
-  const isStaging = tour?.toLowerCase() === 'staging';
+  let { path: tour } = req;
+  let [team] = req.subdomains;
+  const isStaging = team?.toLowerCase() === 'staging';
   if (isStaging) {
-    [, , tour] = req.subdomains;
+    [, team] = req.subdomains;
   }
   if (team && tour) {
     team = await models.Team.findOne({ where: { link: team } });
     if (team) {
+      if (tour.startsWith('/')) {
+        tour = tour.substring(1);
+      }
       tour = await models.Tour.findOne({
         where: {
           TeamId: team.id,
-          link: tour,
+          link: tour.split('/')[0],
         },
       });
       if (tour) {
