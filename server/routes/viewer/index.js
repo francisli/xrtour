@@ -88,6 +88,7 @@ router.get('/*', async (req, res) => {
               });
               if (isRedirected) return;
               const staticContext = { ...defaultStaticContext, tour: version.data };
+              staticContext.env.BASE_URL = `${req.protocol}://${req.headers.host}`;
               const helmetContext = {};
               const reactApp = ReactDOMServer.renderToString(
                 React.createElement(
@@ -103,6 +104,7 @@ router.get('/*', async (req, res) => {
               const { helmet } = helmetContext;
               res.send(
                 HTML.replace(/<title\b[^>]*>(.*?)<\/title>/i, helmet.title.toString())
+                  .replace('<meta property="og:image" content="" data-rh="true"/>', helmet.meta.toString())
                   .replace('window.STATIC_CONTEXT={}', `window.STATIC_CONTEXT=${JSON.stringify(staticContext)}`)
                   .replace('<div id="root"></div>', `<div id="root">${reactApp}</div>`)
               );
