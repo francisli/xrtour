@@ -85,10 +85,16 @@ function Home() {
   }
 
   const title = Tour?.names?.[Tour?.variants?.[0].code] ?? '';
+  const description = Tour?.descriptions?.[Tour?.variants?.[0].code] ?? '';
+  const baseURL = env.BASE_URL ?? `${window.location.protocol}//${window.location.host}`;
+  const image = `${baseURL}${Tour?.CoverResource?.Files?.find((f) => f.variant === Tour?.CoverResource?.variants?.[0]?.code)?.URL}`;
   return (
     <>
       <Helmet>
         <title>{title}</title>
+        <meta property="og:image" content={image} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
       </Helmet>
       <div className="home">
         {Tour && variant && (
