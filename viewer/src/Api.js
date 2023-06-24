@@ -7,8 +7,8 @@ const instance = axios.create({
 });
 
 const Api = {
-  getData() {
-    return instance.get('/data');
+  getData(TourLink) {
+    return instance.get(`/${TourLink}`);
   },
 };
 

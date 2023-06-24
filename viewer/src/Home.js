@@ -9,12 +9,12 @@ import Api from './Api';
 import './Home.scss';
 
 function Home() {
-  const { TourStopId } = useParams();
+  const { TourLink, TourStopId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const { env, tour } = useStaticContext();
-  const [Tour, setTour] = useState(tour);
+  const [Tour, setTour] = useState(tour?.link.toLowerCase() === TourLink?.toLowerCase() ? tour : undefined);
   const [TourStop, setTourStop] = useState();
   const [variant, setVariant] = useState();
 
@@ -24,13 +24,13 @@ function Home() {
   useEffect(() => {
     let isCancelled = false;
     if (!Tour) {
-      Api.getData().then((response) => {
+      Api.getData(TourLink).then((response) => {
         if (isCancelled) return;
         setTour(response.data);
       });
     }
     return () => (isCancelled = true);
-  }, [Tour]);
+  }, [TourLink, Tour]);
 
   useEffect(() => {
     if (Tour) {
@@ -61,22 +61,18 @@ function Home() {
     if (TourStopId) {
       let index = Tour.TourStops.findIndex((ts) => ts.id === TourStopId) + 1;
       if (index < Tour.TourStops.length) {
-        navigate(`../stops/${Tour.TourStops[index].id}?position=0`);
+        navigate(`/${TourLink}/stops/${Tour.TourStops[index].id}?position=0`);
       }
     } else {
-      navigate(`stops/${Tour.TourStops[0].id}?position=0`);
+      navigate(`/${TourLink}/stops/${Tour.TourStops[0].id}?position=0`);
     }
   }
 
   function onSelect(ts) {
-    if (TourStopId) {
-      if (ts) {
-        navigate(`../stops/${ts.id}?position=0`);
-      } else {
-        navigate('..?position=0');
-      }
-    } else if (ts) {
-      navigate(`stops/${ts.id}?position=0`);
+    if (ts) {
+      navigate(`/${TourLink}/stops/${ts.id}?position=0`);
+    } else {
+      navigate(`/${TourLink}?position=0`);
     }
   }
 
