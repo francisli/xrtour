@@ -138,6 +138,8 @@ describe('/api/teams', () => {
         id: '1a93d46d-89bf-463b-ab23-8f22f5777907',
         name: "Regular's Personal Team",
         link: 'regularuser',
+        favicon: null,
+        faviconURL: null,
         variants: [
           {
             code: 'en-us',
