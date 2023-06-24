@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       }
       const tour = await sequelize.models.Tour.findByPk(this.TourId, {
         include: [
+          'Team',
           { model: sequelize.models.Resource, as: 'CoverResource', include: 'Files' },
           {
             model: sequelize.models.Stop,

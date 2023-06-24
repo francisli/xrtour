@@ -165,6 +165,8 @@ describe('/api/tours', () => {
         Team: {
           id: '1a93d46d-89bf-463b-ab23-8f22f5777907',
           link: 'regularuser',
+          favicon: null,
+          faviconURL: null,
           name: "Regular's Personal Team",
           variants: [
             {

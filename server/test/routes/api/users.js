@@ -46,6 +46,8 @@ describe('/api/users', () => {
                 id: '1a93d46d-89bf-463b-ab23-8f22f5777907',
                 link: 'regularuser',
                 name: "Regular's Personal Team",
+                favicon: null,
+                faviconURL: null,
                 variants: [
                   {
                     code: 'en-us',
@@ -133,6 +135,8 @@ describe('/api/users', () => {
                 id: '1a93d46d-89bf-463b-ab23-8f22f5777907',
                 link: 'regularuser',
                 name: "Regular's Personal Team",
+                favicon: null,
+                faviconURL: null,
                 variants: [
                   {
                     code: 'en-us',

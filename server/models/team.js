@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'link', 'name', 'variants']);
+      const json = _.pick(this.get(), ['id', 'name', 'link', 'favicon', 'faviconURL', 'variants']);
       if (this.Memberships) {
         json.Memberships = this.Memberships.map((m) => m.toJSON());
       }
@@ -63,6 +63,13 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      favicon: DataTypes.TEXT,
+      faviconURL: {
+        type: DataTypes.VIRTUAL(DataTypes.TEXT, ['favicon']),
+        get() {
+          return this.assetUrl('favicon');
+        },
+      },
       variants: DataTypes.JSONB,
     },
     {
@@ -70,6 +77,15 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'Team',
     }
   );
+
+  Team.afterSave(async (record, options) => {
+    record.handleAssetFile('favicon', options);
+  });
+
+  Team.afterDestroy(async (record, options) => {
+    record.key = null;
+    record.handleAssetFile('favicon', options);
+  });
 
   return Team;
 };
