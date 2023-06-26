@@ -70,6 +70,10 @@
       "Description": "The access token for MapBox API",
       "Type": "String"
     },
+    "MixpanelToken": {
+      "Description": "The access token for Mixpanel analytics",
+      "Type": "String"
+    },
     "SessionSecret": {
       "Description": "A secret key for encrypting cookie sessions",
       "Type": "String"
@@ -557,6 +561,11 @@
             "Namespace": "aws:elasticbeanstalk:application:environment",
             "OptionName": "LETSENCRYPT_OPTS",
             "Value": { "Ref": "LetsEncryptOpts" }
+          },
+          {
+            "Namespace": "aws:elasticbeanstalk:application:environment",
+            "OptionName": "MIXPANEL_TOKEN",
+            "Value": { "Ref": "MixpanelToken" }
           },
           {
             "Namespace": "aws:elasticbeanstalk:application:environment",
