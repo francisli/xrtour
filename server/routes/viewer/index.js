@@ -36,7 +36,7 @@ const { handleRedirects } = require('../../../viewer/src/AppRedirects');
 
 const models = require('../../models');
 
-const mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
+const mixpanel = process.env.MIXPANEL_TOKEN ? Mixpanel.init(process.env.MIXPANEL_TOKEN) : undefined;
 const router = express.Router();
 
 // configure serving up built viewer app assets
@@ -74,7 +74,7 @@ router.post('/view', (req, res) => {
     if (!properties.$referrer) {
       properties.$referrer = req.get('Referrer');
     }
-    mixpanel.track(event, {
+    mixpanel?.track(event, {
       ...properties,
       distinct_id: distinctId,
       ip,
