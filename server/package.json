@@ -33,6 +33,7 @@
     "lodash": "^4.17.21",
     "luxon": "^3.2.1",
     "mime-types": "^2.1.35",
+    "mixpanel": "^0.17.0",
     "morgan": "~1.10.0",
     "mv": "^2.1.1",
     "nodemailer": "^6.9.1",
@@ -47,6 +48,7 @@
     "react-router-dom": "^6.10.0",
     "sequelize": "^6.31.0",
     "sequelize-cli": "^6.6.0",
+    "ua-parser-js": "^1.0.35",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
