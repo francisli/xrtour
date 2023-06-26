@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useStaticContext } from './StaticContext';
 
 import StopViewer from 'shared/Components/Viewer/StopViewer';
 
 import Api from './Api';
+import { useStaticContext } from './StaticContext';
 import './Home.scss';
 
 function Home() {
@@ -42,6 +42,14 @@ function Home() {
       } else {
         setTourStop();
       }
+      Api.post('Page Viewed', {
+        $referrer: document.referrer,
+        current_page_title: document.title,
+        current_domain: window.location.hostname,
+        current_url_path: window.location.pathname,
+        current_url_protocol: window.location.protocol,
+        current_url_search: window.location.search,
+      });
     }
   }, [variant, Tour, TourStopId]);
 
@@ -62,6 +70,15 @@ function Home() {
       let index = Tour.TourStops.findIndex((ts) => ts.id === TourStopId) + 1;
       if (index < Tour.TourStops.length) {
         navigate(`/${TourLink}/stops/${Tour.TourStops[index].id}?position=0`);
+      } else {
+        Api.post('Tour Completed', {
+          $referrer: document.referrer,
+          current_page_title: document.title,
+          current_domain: window.location.hostname,
+          current_url_path: window.location.pathname,
+          current_url_protocol: window.location.protocol,
+          current_url_search: window.location.search,
+        });
       }
     } else {
       navigate(`/${TourLink}/stops/${Tour.TourStops[0].id}?position=0`);

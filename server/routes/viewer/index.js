@@ -1,7 +1,10 @@
 const express = require('express');
 const fs = require('fs');
 const { StatusCodes } = require('http-status-codes');
+const Mixpanel = require('mixpanel');
 const path = require('path');
+const UAParser = require('ua-parser-js');
+const { v4: uuid } = require('uuid');
 
 require('@babel/register')({
   only: [
@@ -33,6 +36,7 @@ const { handleRedirects } = require('../../../viewer/src/AppRedirects');
 
 const models = require('../../models');
 
+const mixpanel = process.env.MIXPANEL_TOKEN ? Mixpanel.init(process.env.MIXPANEL_TOKEN) : undefined;
 const router = express.Router();
 
 // configure serving up built viewer app assets
@@ -46,6 +50,38 @@ function readIndexFile() {
   return '';
 }
 const HTML = readIndexFile();
+
+router.post('/view', (req, res) => {
+  if (!req.session) {
+    req.session = {};
+  }
+  if (!req.session.distinctId) {
+    req.session.distinctId = uuid();
+  }
+  const { distinctId } = req.session;
+  if (distinctId) {
+    const { ip } = req;
+    const { event, properties } = req.body;
+    const userAgent = req.get('User-Agent');
+    if (userAgent) {
+      const results = UAParser(userAgent);
+      properties.userAgent = results;
+      properties.$browser = results.browser?.name;
+      properties.$browser_version = results.browser?.version;
+      properties.$device = `${results.device?.vendor ?? ''} ${results.device?.model ?? ''} ${results.device?.type ?? ''}`.trim();
+      properties.$os = `${results.os?.name ?? ''} ${results.os?.version ?? ''}`.trim();
+    }
+    if (!properties.$referrer) {
+      properties.$referrer = req.get('Referrer');
+    }
+    mixpanel?.track(event, {
+      ...properties,
+      distinct_id: distinctId,
+      ip,
+    });
+  }
+  res.status(StatusCodes.NO_CONTENT).end();
+});
 
 router.get('/*', async (req, res) => {
   let { path: tour } = req;
