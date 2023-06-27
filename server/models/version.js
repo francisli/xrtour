@@ -73,6 +73,8 @@ module.exports = (sequelize, DataTypes) => {
       });
       // get JSON representation
       let data = tour.toJSON();
+      // sort stops
+      data.TourStops?.sort((a, b) => Math.sign(a.position - b.position));
       // sort resources
       data.IntroStop?.Resources?.sort(resourcesSortComparator);
       data.TourStops?.forEach((ts) => {
