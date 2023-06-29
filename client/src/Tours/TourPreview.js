@@ -118,14 +118,14 @@ function TourPreview() {
       </Helmet>
       <div className="tour-preview">
         <div className="tour-preview__content">
-          {variant && (
+          {Tour && variant && (
             <StopViewer
               autoPlay={!!TourStop && isPlaying}
               controls={true}
               mapboxAccessToken={staticContext?.env?.MAPBOX_ACCESS_TOKEN}
               tour={Tour}
               tourStops={TourStops}
-              stop={!!TourStop ? TourStop.Stop : Tour?.IntroStop}
+              stop={!!TourStop ? TourStop.Stop : Tour.IntroStop}
               transition={TourStop?.TransitionStop}
               variant={variant}
               onEnded={onEnded}

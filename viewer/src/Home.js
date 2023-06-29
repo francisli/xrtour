@@ -116,23 +116,25 @@ function Home() {
         <meta property="og:description" content={description} />
       </Helmet>
       <div className="home">
-        {Tour && variant && (
-          <StopViewer
-            autoPlay={!!TourStop && isPlaying}
-            controls={true}
-            mapboxAccessToken={env?.MAPBOX_ACCESS_TOKEN}
-            tour={Tour}
-            tourStops={Tour.TourStops}
-            stop={TourStop ? TourStop.Stop : Tour.IntroStop}
-            transition={TourStop?.TransitionStop}
-            variant={variant}
-            onEnded={onEnded}
-            onSelect={onSelect}
-            position={position}
-            onTimeUpdate={onTimeUpdate}
-            onPause={onPause}
-          />
-        )}
+        <div className="home__content">
+          {Tour && variant && (
+            <StopViewer
+              autoPlay={!!TourStop && isPlaying}
+              controls={true}
+              mapboxAccessToken={env?.MAPBOX_ACCESS_TOKEN}
+              tour={Tour}
+              tourStops={Tour.TourStops}
+              stop={TourStop ? TourStop.Stop : Tour.IntroStop}
+              transition={TourStop?.TransitionStop}
+              variant={variant}
+              onEnded={onEnded}
+              onSelect={onSelect}
+              position={position}
+              onTimeUpdate={onTimeUpdate}
+              onPause={onPause}
+            />
+          )}
+        </div>
       </div>
     </>
   );
