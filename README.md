@@ -5,7 +5,7 @@ This repository contains the code for XR Tour, a platform and content management
 - React 18.2.0
 - React Router 6.10.0
 - Bootstrap 5.2.3
-- Node.js 18.16.0
+- Node.js 20.16.0
 - Express 4.18.2
 - Sequelize 6.31.0
 - Postgres 14
