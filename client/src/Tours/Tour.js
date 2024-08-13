@@ -4,7 +4,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Popover from 'react-bootstrap/Popover';
 import QRCode from 'react-qr-code';
-import inflection from 'inflection';
+import { pluralize } from 'inflection';
 
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
@@ -82,7 +82,7 @@ function Tour() {
   }
 
   function onClickStop(type, stop) {
-    navigate(`${inflection.pluralize(type).toLocaleLowerCase()}/${stop.id}`);
+    navigate(`${pluralize(type).toLocaleLowerCase()}/${stop.id}`);
   }
 
   async function onRemoveIntro() {
