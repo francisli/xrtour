@@ -20,7 +20,7 @@ LETSENCRYPT_ALL_DOMAINS=`/opt/elasticbeanstalk/bin/get-config environment -k LET
 
 4. Execute certbot renewal, adding wildcard domains
 
-certbot certonly ${LETSENCRYPT_OPTS} --manual --debug --email ${LETSENCRYPT_EMAIL} --agree-tos --domains ${LETSENCRYPT_ALL_DOMAINS},*.xrtour.org,*.staging.xrtour.org --keep-until-expiring
+certbot certonly ${LETSENCRYPT_OPTS} --manual --debug --email ${LETSENCRYPT_EMAIL} --agree-tos --domains ${LETSENCRYPT_ALL_DOMAINS},_.xrtour.org,_.staging.xrtour.org --keep-until-expiring
 
 5. Follow instructions to create needed files, logging in through another tab.
 
