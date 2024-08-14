@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import inflection from 'inflection';
+import { transform } from 'inflection';
 
 import './StopsModal.scss';
 import StopsList from './StopsList';
@@ -27,7 +27,7 @@ function StopsModal({ type, isShowing, onHide, onSelect, startingAddress }) {
   return (
     <Modal show={isShowing} onHide={onHide} size="xl" dialogClassName="resources-modal">
       <Modal.Header closeButton>
-        <Modal.Title>{inflection.transform(type, ['pluralize', 'capitalize'])}</Modal.Title>
+        <Modal.Title>{transform(type, ['pluralize', 'capitalize'])}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {!isEditing && <StopsList type={type} onNewStop={onNewStop} onSelect={onSelect} />}

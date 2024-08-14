@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ReactSortable } from 'react-sortablejs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import inflection from 'inflection';
+import { pluralize } from 'inflection';
 
 import { useAuthContext } from '../AuthContext';
 import ConfirmModal from '../Components/ConfirmModal';
@@ -57,7 +57,7 @@ function StopsTable({ type = 'STOP', stops, onClick, onRemove, onReorderStops })
         {stops?.length === 0 && (
           <tbody>
             <tr>
-              <td colSpan="4">No {inflection.pluralize(type).toLocaleLowerCase()} yet.</td>
+              <td colSpan="4">No {pluralize(type).toLocaleLowerCase()} yet.</td>
             </tr>
           </tbody>
         )}

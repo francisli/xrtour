@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import inflection from 'inflection';
+import { capitalize } from 'inflection';
 
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
@@ -46,7 +46,7 @@ function StopsList({ onNewStop, onSelect, type }) {
         </div>
         <div className="mb-3">
           <button onClick={() => onNewStop()} type="button" className="btn btn-primary">
-            New {inflection.capitalize(type)}
+            New {capitalize(type)}
           </button>
         </div>
       </div>
