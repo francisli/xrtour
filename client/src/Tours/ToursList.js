@@ -35,10 +35,10 @@ function ToursList() {
         {!tours && <div className="spinner-border"></div>}
         {tours && (
           <div className="row">
+            {membership?.role !== 'VIEWER' && <TourCard href="new" />}
             {tours.map((tour) => (
               <TourCard key={tour.id} tour={tour} href={tour.id} />
             ))}
-            {membership?.role !== 'VIEWER' && <TourCard title="New Tour" href="new" />}
             {membership?.role === 'VIEWER' && tours.length === 0 && <div>No tours to view yet.</div>}
           </div>
         )}
