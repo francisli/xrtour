@@ -23,6 +23,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.aws:/root/.aws
+      - ~/.gitconfig:/root/.gitconfig
       - ~/.ssh:/root/.ssh
       - .:/opt/node/app
       - /opt/node/app/server/node_modules
