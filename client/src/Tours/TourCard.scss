@@ -1,6 +1,28 @@
+.tour-card {
+  margin-bottom: 2rem;
+}
+
 .tour-card__img {
   background-color: lightgray;
   background-position: center;
   background-size: cover;
   aspect-ratio: 2 / 3;
+}
+
+.tour-card--new {
+  .card:hover {
+    .tour-card__img {
+      background-color: gray;
+    }
+  }
+}
+
+.tour-card__overlay {
+  position: relative;
+  top: 50%;
+  text-align: center;
+  .fa-plus {
+    transform: scale(6);
+    transform-origin: center bottom;
+  }
 }
