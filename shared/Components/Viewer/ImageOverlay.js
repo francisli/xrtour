@@ -19,7 +19,15 @@ function ImageOverlay({ onClose, resource, variant }) {
         <Camera ref={camera} facingMode="environment" />
       </div>
       <div className="image-overlay__image" style={{ backgroundImage: `url(${imageURL})`, opacity }}></div>
-      <Scrubber className="image-overlay__scrubber" position={opacity} duration={1} from="Then" to="Now" onSeek={setOpacity} />
+      <Scrubber
+        className="image-overlay__scrubber"
+        position={1 - opacity}
+        duration={1}
+        from="Then"
+        to="Now"
+        scrub={true}
+        onSeek={(value) => setOpacity(1 - value)}
+      />
       <div className="image-overlay__close">
         <button onClick={() => onClose()} className="btn btn-lg btn-primary btn-round">
           <FontAwesomeIcon icon={faXmark} />

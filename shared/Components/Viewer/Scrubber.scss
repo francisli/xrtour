@@ -23,7 +23,7 @@
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.5);
   flex-grow: 1;
   height: 0.5rem;
-  margin: 0 0.5rem;
+  margin: 0 1rem;
   position: relative;
 }
 
@@ -33,4 +33,15 @@
   border-radius: 4px;
   pointer-events: none;
   min-width: 8px;
+}
+
+.scrubber__thumb {
+  background-color: $chsa-red;
+  border-radius: 0.5rem;
+  height: 1rem;
+  pointer-events: none;
+  position: absolute;
+  top: -0.25rem;
+  transform: translateX(-0.5rem);
+  width: 1rem;
 }
