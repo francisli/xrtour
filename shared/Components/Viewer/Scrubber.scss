@@ -25,6 +25,7 @@
   height: 0.5rem;
   margin: 0 1rem;
   position: relative;
+  touch-action: none;
 }
 
 .scrubber__progress {

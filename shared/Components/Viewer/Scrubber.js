@@ -50,7 +50,7 @@ function Scrubber({ className, position, duration, from, to, scrub, onSeek }) {
   return (
     <div className={classNames('scrubber', className)}>
       <div className="scrubber__position">{from ? from : <TimeCode seconds={position} />}</div>
-      <div ref={barRef} onClick={onClick} onMouseMove={onDragThumb} onMouseUp={onDragEndThumb} className="scrubber__bar">
+      <div ref={barRef} onClick={onClick} onPointerMove={onDragThumb} onPointerUp={onDragEndThumb} className="scrubber__bar">
         <div className="scrubber__progress" style={{ width: `${Math.ceil((100 * position) / duration)}%` }}></div>
         <div className="scrubber__thumb" style={{ left: `${thumbLeft}%` }}></div>
       </div>
