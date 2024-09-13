@@ -46,7 +46,7 @@ function FormGroup({
           placeholder={placeholder}
           readOnly={plaintext}
           onChange={onChange}
-          value={record ? record[name] : value}>
+          value={record ? record[name] ?? '' : value}>
           {children}
         </select>
       )}
@@ -64,7 +64,7 @@ function FormGroup({
           placeholder={placeholder}
           readOnly={plaintext}
           onChange={onChange}
-          value={record ? record[name] : value}></textarea>
+          value={record ? record[name] ?? '' : value}></textarea>
       )}
       {type === 'address' && <AddressInput id={id} name={name} record={record} value={value} onChange={onChange} />}
       {type !== 'address' && type !== 'textarea' && type !== 'select' && (
@@ -81,7 +81,7 @@ function FormGroup({
           placeholder={placeholder}
           readOnly={plaintext}
           onChange={onChange}
-          value={record ? record[name] : value}
+          value={record ? record[name] ?? '' : value}
         />
       )}
       {error?.errorMessagesHTMLFor?.(name)}

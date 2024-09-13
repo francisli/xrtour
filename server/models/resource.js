@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'variants', 'data']);
+      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'data', 'variants']);
       if (this.Files) {
         json.Files = this.Files.map((f) => f.toJSON());
       }
@@ -43,8 +43,8 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
-      variants: DataTypes.JSONB,
       data: DataTypes.JSONB,
+      variants: DataTypes.JSONB,
     },
     {
       sequelize,

@@ -49,14 +49,6 @@ function ResourcesList({ onNew, onSelect, onEdit, type: initialType = 'IMAGE', t
     <div className="row">
       <div className="col-md-3">
         <ul className="list-group mb-3">
-          {(!types || types.includes('IMAGE')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('IMAGE')}
-              className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE' })}>
-              Images
-            </button>
-          )}
           {(!types || types.includes('AUDIO')) && (
             <button
               type="button"
@@ -71,6 +63,22 @@ function ResourcesList({ onNew, onSelect, onEdit, type: initialType = 'IMAGE', t
               onClick={() => onClickType('AR_LINK')}
               className={classNames('list-group-item list-group-item-action', { active: type === 'AR_LINK' })}>
               AR Links
+            </button>
+          )}
+          {(!types || types.includes('IMAGE')) && (
+            <button
+              type="button"
+              onClick={() => onClickType('IMAGE')}
+              className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE' })}>
+              Images
+            </button>
+          )}
+          {(!types || types.includes('IMAGE_OVERLAY')) && (
+            <button
+              type="button"
+              onClick={() => onClickType('IMAGE_OVERLAY')}
+              className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE_OVERLAY' })}>
+              Image Overlays
             </button>
           )}
         </ul>
