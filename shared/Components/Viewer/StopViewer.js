@@ -195,7 +195,7 @@ function StopViewer({
       setPlaying(false);
       setCurrentTrack();
     }
-    onTimeUpdate?.(newPosition);
+    onTimeUpdate?.(Math.ceil(newPosition));
   }
 
   function onSelectInternal(ts) {
