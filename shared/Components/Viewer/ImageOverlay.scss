@@ -1,0 +1,38 @@
+@import '../../Assets/Variables';
+
+.image-overlay {
+  background-color: black;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  overflow-y: scroll;
+}
+
+.image-overlay__close {
+  right: 0;
+  padding: 1rem;
+  position: absolute;
+  top: 0;
+}
+
+.image-overlay__container {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.image-overlay__image {
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}

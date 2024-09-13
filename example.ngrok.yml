@@ -1,0 +1,12 @@
+version: 2
+authtoken:
+tunnels:
+  minio:
+    proto: http
+    addr: 9000
+    domain: minio.mydomain.ngrok.io
+  root:
+    proto: http
+    addr: 3000
+    domain: mydomain.ngrok.io
+    host_header: rewrite
