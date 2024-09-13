@@ -39,7 +39,8 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
         TeamId: membership.TeamId,
         name: '',
         type,
-        variants: [membership.Team.variants[0]],
+        variants: [...membership.Team.variants],
+        data: {},
         Files: [],
       });
       setVariant(membership.Team.variants[0]);
@@ -90,19 +91,26 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
   function onChange(event) {
     const newResource = { ...resource };
     const { name, value } = event.target;
-    if (['externalURL', 'key', 'originalName', 'duration', 'width', 'height'].includes(name)) {
-      variantFile[name] = value;
-    } else {
-      newResource[name] = value;
-      if (name === 'type') {
-        newResource.externalURL = null;
-        newResource.key = null;
-        newResource.originalName = null;
-        newResource.duration = null;
-        newResource.width = null;
-        newResource.height = null;
-      }
+    newResource[name] = value;
+    if (name === 'type') {
+      newResource.data = {};
+      newResource.variants = [...membership.Team.variants];
+      setVariant(membership.Team.variants[0]);
     }
+    setResource(newResource);
+  }
+
+  function onChangeVariant(event) {
+    const newResource = { ...resource };
+    const { name, value } = event.target;
+    variantFile[name] = value;
+    setResource(newResource);
+  }
+
+  function onChangeData(event) {
+    const newResource = { ...resource };
+    const { name, value } = event.target;
+    newResource.data[name] = value;
     setResource(newResource);
   }
 
@@ -129,14 +137,23 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                   <option value="AUDIO">Audio</option>
                   <option value="AR_LINK">AR Link</option>
                   <option value="IMAGE">Image</option>
+                  <option value="IMAGE_OVERLAY">Image Overlay</option>
                 </FormGroup>
+              )}
+              {resource.type === 'IMAGE_OVERLAY' && (
+                <>
+                  <FormGroup name="address" type="address" label="Address" onChange={onChangeData} record={resource.data} error={error} />
+                  <FormGroup name="lat" label="Latitude" onChange={onChangeData} record={resource.data} error={error} />
+                  <FormGroup name="lng" label="Longitude" onChange={onChangeData} record={resource.data} error={error} />
+                  <FormGroup name="degree" label="Degrees" onChange={onChangeData} record={resource.data} error={error} />
+                </>
               )}
               <VariantTabs variants={resource.variants} current={variant} setVariant={setVariant} />
               {resource.type === 'AR_LINK' && (
                 <FormGroup
                   name="externalURL"
                   label="External URL"
-                  onChange={onChange}
+                  onChange={onChangeVariant}
                   disabled={variantFile.key}
                   value={variantFile.externalURL}
                   error={error}
@@ -153,8 +170,8 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                     accept={ACCEPTED_FILES[resource.type]}
                     value={variantFile.key}
                     valueURL={variantFile.keyURL}
-                    onChange={onChange}
-                    onChangeMetadata={onChange}
+                    onChange={onChangeVariant}
+                    onChangeMetadata={onChangeVariant}
                     onUploading={setUploading}>
                     <div className="card-body">
                       <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>

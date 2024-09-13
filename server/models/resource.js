@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'variants']);
+      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'data', 'variants']);
       if (this.Files) {
         json.Files = this.Files.map((f) => f.toJSON());
       }
@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       type: {
         allowNull: false,
-        type: DataTypes.ENUM('AR_LINK', 'AUDIO', 'IMAGE', 'LINK', 'VIDEO'),
+        type: DataTypes.ENUM('AR_LINK', 'AUDIO', 'IMAGE', 'IMAGE_OVERLAY', 'LINK', 'VIDEO'),
         validate: {
           notNull: {
             msg: 'Type is required',
@@ -43,6 +43,7 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       },
+      data: DataTypes.JSONB,
       variants: DataTypes.JSONB,
     },
     {

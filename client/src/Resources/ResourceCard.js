@@ -10,7 +10,7 @@ function ResourceCard({ resource, onSelect, onEdit }) {
             <AudioPlayer src={resource.Files[0].URL} />
           </div>
         )}
-        {resource.type === 'IMAGE' && (
+        {(resource.type === 'IMAGE' || resource.type === 'IMAGE_OVERLAY') && (
           <div className="resource-card__image card-img-top" style={{ backgroundImage: `url(${resource.Files[0].URL})` }}></div>
         )}
         <div className="card-body">

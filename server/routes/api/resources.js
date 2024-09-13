@@ -44,7 +44,7 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
     res.status(StatusCodes.UNAUTHORIZED).end();
     return;
   }
-  let record = models.Resource.build(_.pick(req.body, ['TeamId', 'name', 'type', 'variants']));
+  let record = models.Resource.build(_.pick(req.body, ['TeamId', 'name', 'type', 'data', 'variants']));
   try {
     await models.sequelize.transaction(async (transaction) => {
       await record.save({ transaction });
@@ -100,7 +100,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
     } else {
       try {
         await models.sequelize.transaction(async (transaction) => {
-          await record.update(_.pick(req.body, ['name', 'type', 'variants']), { transaction });
+          await record.update(_.pick(req.body, ['name', 'type', 'data', 'variants']), { transaction });
           if (req.body.Files) {
             const files = req.body.Files.map((f) => {
               const attrs = _.pick(f, ['variant', 'externalURL', 'key', 'originalName', 'duration', 'width', 'height']);

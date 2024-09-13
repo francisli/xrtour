@@ -71,6 +71,7 @@ describe('/api/resources', () => {
         name: 'New Resource',
         type: 'LINK',
         variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
+        data: {},
       };
       const response = await testSession
         .post('/api/resources')
@@ -163,6 +164,7 @@ describe('/api/resources', () => {
         TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
         name: 'Resource 2',
         type: 'AUDIO',
+        data: {},
         variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
         Files: [
           {
