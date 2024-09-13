@@ -59,6 +59,7 @@ describe('/api/stops/:StopId/resources', () => {
             id: '6ebacda9-8d33-4c3e-beb5-18dffb119046',
             name: 'Resource 2',
             type: 'AUDIO',
+            data: {},
             variants: [
               {
                 code: 'en-us',
@@ -95,6 +96,7 @@ describe('/api/stops/:StopId/resources', () => {
             id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
             name: 'Resource 1',
             type: 'IMAGE',
+            data: {},
             variants: [
               {
                 code: 'en-us',
@@ -145,6 +147,7 @@ describe('/api/stops/:StopId/resources', () => {
           TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
           name: 'Resource 1',
           type: 'IMAGE',
+          data: {},
           variants: [
             {
               code: 'en-us',
@@ -210,6 +213,7 @@ describe('/api/stops/:StopId/resources', () => {
           id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
           name: 'Resource 1',
           type: 'IMAGE',
+          data: {},
           variants: [
             {
               code: 'en-us',
