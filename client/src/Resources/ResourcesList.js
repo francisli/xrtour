@@ -81,6 +81,14 @@ function ResourcesList({ onNew, onSelect, onEdit, type: initialType = 'IMAGE', t
               Image Overlays
             </button>
           )}
+          {(!types || types.includes('IMAGE_SPHERE')) && (
+            <button
+              type="button"
+              onClick={() => onClickType('IMAGE_SPHERE')}
+              className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE_SPHERE' })}>
+              360&deg; Image Spheres
+            </button>
+          )}
         </ul>
         <div className="mb-3">
           <input onChange={onSearchChange} value={search} type="search" className="form-control" placeholder="Search..." />

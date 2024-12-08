@@ -10,14 +10,14 @@ function ResourceCard({ resource, onSelect, onEdit }) {
             <AudioPlayer src={resource.Files[0].URL} />
           </div>
         )}
-        {(resource.type === 'IMAGE' || resource.type === 'IMAGE_OVERLAY') && (
+        {resource.type?.startsWith('IMAGE') && (
           <div className="resource-card__image card-img-top" style={{ backgroundImage: `url(${resource.Files[0].URL})` }}></div>
         )}
         <div className="card-body">
           <h3 className="card-title h6">{resource.name}</h3>
           {resource.type === 'AR_LINK' && (
             <p>
-              <a target="_blank" href={resource.Files[0].URL}>
+              <a target="_blank" rel="noreferrer" href={resource.Files[0].URL}>
                 {resource.Files[0].URL}
               </a>
             </p>
