@@ -138,6 +138,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                   <option value="AR_LINK">AR Link</option>
                   <option value="IMAGE">Image</option>
                   <option value="IMAGE_OVERLAY">Image Overlay</option>
+                  <option value="IMAGE_SPHERE">360&deg; Image Sphere</option>
                 </FormGroup>
               )}
               {resource.type === 'IMAGE_OVERLAY' && (

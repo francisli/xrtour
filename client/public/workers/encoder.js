@@ -20,18 +20,20 @@ class EncoderProcessor extends AudioWorkletProcessor {
 
   process(inputs, outputs) {
     const [[input]] = inputs;
-    const output = new Int16Array(input.length);
-    for (let i = 0; i < input.length; i++) {
-      const s = Math.max(-1, Math.min(1, input[i]));
-      output[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
-    }
-    const samplesPerFrame = 1152;
-    let samplesRemaining = output.length;
-    for (let i = 0; samplesRemaining > 0; i += samplesPerFrame) {
-      const frame = output.subarray(i, i + samplesPerFrame);
-      const result = this.encoder.encodeBuffer(frame);
-      this.buffer.push(result);
-      samplesRemaining -= samplesPerFrame;
+    if (input) {
+      const output = new Int16Array(input.length);
+      for (let i = 0; i < input.length; i++) {
+        const s = Math.max(-1, Math.min(1, input[i]));
+        output[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+      }
+      const samplesPerFrame = 1152;
+      let samplesRemaining = output.length;
+      for (let i = 0; samplesRemaining > 0; i += samplesPerFrame) {
+        const frame = output.subarray(i, i + samplesPerFrame);
+        const result = this.encoder.encodeBuffer(frame);
+        this.buffer.push(result);
+        samplesRemaining -= samplesPerFrame;
+      }
     }
     return true;
   }

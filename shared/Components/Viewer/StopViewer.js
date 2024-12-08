@@ -3,9 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faLocationDot, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 
 import ImageOverlay from './ImageOverlay';
+import ImageSphere from './ImageSphere';
 import Map from './Map';
 import Scrubber from './Scrubber';
 import Toc from './Toc';
+
 import './StopViewer.scss';
 
 function StopViewer({
@@ -34,6 +36,7 @@ function StopViewer({
   const [imageURL, setImageURL] = useState();
   const [currentOverlay, setCurrentOverlay] = useState();
   const [selectedOverlay, setSelectedOverlay] = useState();
+  const [selectedSphere, setSelectedSphere] = useState();
 
   const ref = useRef({});
 
@@ -58,7 +61,7 @@ function StopViewer({
           newTracks.push(sr);
         } else if (sr.Resource.type === 'IMAGE') {
           newImages.push({ ...sr });
-        } else if (sr.Resource.type === 'AR_LINK' || sr.Resource.type === 'IMAGE_OVERLAY') {
+        } else if (sr.Resource.type === 'AR_LINK' || sr.Resource.type === 'IMAGE_OVERLAY' || sr.Resource.type === 'IMAGE_SPHERE') {
           newOverlays.push({ ...sr });
         }
       }
@@ -88,7 +91,7 @@ function StopViewer({
             newTracks.push({ ...sr, start: offset + sr.start });
           } else if (sr.Resource.type === 'IMAGE') {
             newImages.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
-          } else if (sr.Resource.type === 'AR_LINK' || sr.Resource.type === 'IMAGE_OVERLAY') {
+          } else if (sr.Resource.type === 'AR_LINK' || sr.Resource.type === 'IMAGE_OVERLAY' || sr.Resource.type === 'IMAGE_SPHERE') {
             newOverlays.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
           }
         }
@@ -220,6 +223,9 @@ function StopViewer({
       case 'IMAGE_OVERLAY':
         setSelectedOverlay(currentOverlay);
         break;
+      case 'IMAGE_SPHERE':
+        setSelectedSphere(currentOverlay);
+        break;
       default:
         break;
     }
@@ -234,7 +240,14 @@ function StopViewer({
           )}
         </>
       )}
-      {!selectedOverlay && (
+      {selectedSphere && (
+        <>
+          {selectedSphere.Resource?.type === 'IMAGE_SPHERE' && (
+            <ImageSphere onClose={() => setSelectedSphere()} resource={selectedSphere.Resource} variant={variant} />
+          )}
+        </>
+      )}
+      {!selectedOverlay && !selectedSphere && (
         <>
           <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
           {currentOverlay && <a tabIndex={0} onClick={onClickOverlay} className="stop-viewer__ar-link"></a>}
