@@ -1,11 +1,17 @@
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { ReactPhotoSphereViewer } from 'react-photo-sphere-viewer';
 import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
 
 import './ImageSphere.scss';
 
 function ImageSphere({ onClose, resource, variant }) {
+  const [ReactPhotoSphereViewer, setReactPhotoSphereViewer] = useState();
+
+  useEffect(() => {
+    import('react-photo-sphere-viewer').then((pkg) => setReactPhotoSphereViewer(pkg.ReactPhotoSphereViewer));
+  }, []);
+
   const imageURL = resource.Files.find((f) => f.variant === variant.code)?.URL;
 
   async function onReady(instance) {
@@ -20,7 +26,9 @@ function ImageSphere({ onClose, resource, variant }) {
   return (
     <div className="image-sphere">
       <div className="image-sphere__container">
-        <ReactPhotoSphereViewer src={imageURL} height={'100%'} width={'100%'} plugins={[GyroscopePlugin]} onReady={onReady} />
+        {ReactPhotoSphereViewer && (
+          <ReactPhotoSphereViewer src={imageURL} height={'100%'} width={'100%'} plugins={[GyroscopePlugin]} onReady={onReady} />
+        )}
       </div>
       <div className="image-sphere__close">
         <button onClick={() => onClose()} className="btn btn-lg btn-primary btn-round">
