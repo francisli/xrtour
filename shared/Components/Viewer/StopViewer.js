@@ -5,6 +5,7 @@ import { faBars, faLocationDot, faPause, faPlay } from '@fortawesome/free-solid-
 import ImageOverlay from './ImageOverlay';
 import ImageSphere from './ImageSphere';
 import Map from './Map';
+import ModelOverlay from './ModelOverlay';
 import Scrubber from './Scrubber';
 import Toc from './Toc';
 
@@ -37,6 +38,7 @@ function StopViewer({
   const [currentOverlay, setCurrentOverlay] = useState();
   const [selectedOverlay, setSelectedOverlay] = useState();
   const [selectedSphere, setSelectedSphere] = useState();
+  const [selectedModel, setSelectedModel] = useState();
 
   const ref = useRef({});
 
@@ -61,7 +63,12 @@ function StopViewer({
           newTracks.push(sr);
         } else if (sr.Resource.type === 'IMAGE') {
           newImages.push({ ...sr });
-        } else if (sr.Resource.type === 'AR_LINK' || sr.Resource.type === 'IMAGE_OVERLAY' || sr.Resource.type === 'IMAGE_SPHERE') {
+        } else if (
+          sr.Resource.type === '3D_MODEL' ||
+          sr.Resource.type === 'AR_LINK' ||
+          sr.Resource.type === 'IMAGE_OVERLAY' ||
+          sr.Resource.type === 'IMAGE_SPHERE'
+        ) {
           newOverlays.push({ ...sr });
         }
       }
@@ -91,7 +98,12 @@ function StopViewer({
             newTracks.push({ ...sr, start: offset + sr.start });
           } else if (sr.Resource.type === 'IMAGE') {
             newImages.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
-          } else if (sr.Resource.type === 'AR_LINK' || sr.Resource.type === 'IMAGE_OVERLAY' || sr.Resource.type === 'IMAGE_SPHERE') {
+          } else if (
+            sr.Resource.type === '3D_MODEL' ||
+            sr.Resource.type === 'AR_LINK' ||
+            sr.Resource.type === 'IMAGE_OVERLAY' ||
+            sr.Resource.type === 'IMAGE_SPHERE'
+          ) {
             newOverlays.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
           }
         }
@@ -217,6 +229,9 @@ function StopViewer({
   function onClickOverlay(event) {
     event.preventDefault();
     switch (currentOverlay?.Resource?.type) {
+      case '3D_MODEL':
+        setSelectedModel(currentOverlay);
+        break;
       case 'AR_LINK':
         window.open(currentOverlay.Resource.Files.find((f) => f.variant === variant.code)?.URL, '_blank');
         break;
@@ -303,6 +318,13 @@ function StopViewer({
             tourStops={tourStops}
             variant={variant}
           />
+        </>
+      )}
+      {selectedModel && (
+        <>
+          {selectedModel.Resource?.type === '3D_MODEL' && (
+            <ModelOverlay onClose={() => setSelectedModel()} resource={selectedModel.Resource} variant={variant} />
+          )}
         </>
       )}
     </div>

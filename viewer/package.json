@@ -3,6 +3,7 @@
   "version": "1.0.19",
   "private": true,
   "dependencies": {
+    "@google/model-viewer": "^4.0.0",
     "@photo-sphere-viewer/core": "^5.11.1",
     "@photo-sphere-viewer/gyroscope-plugin": "^5.11.1",
     "axios": "^1.7.4",

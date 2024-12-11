@@ -11,10 +11,16 @@ import VariantTabs from '../Components/VariantTabs';
 import FileInput from '../Components/FileInput';
 
 const ACCEPTED_FILES = {
+  '3D_MODEL': {
+    'model/*': ['.glb'],
+  },
   AUDIO: {
     'audio/*': ['.mp3', '.mp4', '.m4a'],
   },
   IMAGE: {
+    'image/*': ['.jpg', '.jpeg', '.png'],
+  },
+  IMAGE_OVERLAY: {
     'image/*': ['.jpg', '.jpeg', '.png'],
   },
 };
@@ -134,6 +140,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
               <FormGroup name="name" label="Name" onChange={onChange} record={resource} error={error} />
               {!resource.id && (
                 <FormGroup type="select" name="type" label="Type" onChange={onChange} record={resource} error={error}>
+                  <option value="3D_MODEL">3D Model</option>
                   <option value="AUDIO">Audio</option>
                   <option value="AR_LINK">AR Link</option>
                   <option value="IMAGE">Image</option>
