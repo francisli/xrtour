@@ -5,6 +5,11 @@ function ResourceCard({ resource, onSelect, onEdit }) {
   return (
     <div className="resource-card col-md-4 mb-3">
       <div className="card">
+        {resource.type === '3D_MODEL' && (
+          <div className="card-img-top">
+            <model-viewer class="resource-card__3d-model" src={resource.Files[0].URL} />
+          </div>
+        )}
         {resource.type === 'AUDIO' && (
           <div className="resource-card__audio card-img-top">
             <AudioPlayer src={resource.Files[0].URL} />
