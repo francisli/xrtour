@@ -3,8 +3,6 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import './ModelOverlay.scss';
 
-import('@google/model-viewer').then();
-
 function ModelOverlay({ onClose, resource, variant }) {
   const modelURL = resource.Files.find((f) => f.variant === variant.code)?.URL;
 
