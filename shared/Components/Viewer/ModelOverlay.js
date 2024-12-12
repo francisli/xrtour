@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import '@google/model-viewer';
 
 import './ModelOverlay.scss';
+
+import('@google/model-viewer').then();
 
 function ModelOverlay({ onClose, resource, variant }) {
   const modelURL = resource.Files.find((f) => f.variant === variant.code)?.URL;
