@@ -49,6 +49,14 @@ function ResourcesList({ onNew, onSelect, onEdit, type: initialType = 'IMAGE', t
     <div className="row">
       <div className="col-md-3">
         <ul className="list-group mb-3">
+          {(!types || types.includes('3D_MODEL')) && (
+            <button
+              type="button"
+              onClick={() => onClickType('3D_MODEL')}
+              className={classNames('list-group-item list-group-item-action', { active: type === '3D_MODEL' })}>
+              3D Model
+            </button>
+          )}
           {(!types || types.includes('AUDIO')) && (
             <button
               type="button"

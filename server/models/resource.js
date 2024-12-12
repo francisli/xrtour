@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       type: {
         allowNull: false,
-        type: DataTypes.ENUM('AR_LINK', 'AUDIO', 'IMAGE', 'IMAGE_OVERLAY', 'IMAGE_SPHERE', 'LINK', 'VIDEO'),
+        type: DataTypes.ENUM('3D_MODEL', 'AR_LINK', 'AUDIO', 'IMAGE', 'IMAGE_OVERLAY', 'IMAGE_SPHERE', 'LINK', 'VIDEO'),
         validate: {
           notNull: {
             msg: 'Type is required',
