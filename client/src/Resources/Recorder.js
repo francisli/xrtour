@@ -105,6 +105,11 @@ function Recorder({ onCancel, onSave }) {
           <TimeCode seconds={elapsed} />
         </>
       )}
+      {error && (
+        <>
+          <span className="me-3">{error}</span>
+        </>
+      )}
       {!!file && (
         <>
           <AudioPlayer className="flex-grow-1 me-3" src={file.preview} />
