@@ -1,6 +1,6 @@
 {
   "name": "xrtour-viewer",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "private": true,
   "dependencies": {
     "@photo-sphere-viewer/core": "^5.11.1",
