@@ -167,7 +167,21 @@ function StopViewer({
       }
     } else {
       if (currentTrack) {
-        ref.current[currentTrack.id]?.play();
+        let audio = ref.current[currentTrack.id];
+        if (audio.currentTime < audio.duration) {
+          audio?.play();
+        } else {
+          const index = tracks.indexOf(currentTrack);
+          if (index >= tracks.length - 1) {
+            onEnded?.(true);
+            return;
+          } else {
+            const nextTrack = tracks[index + 1];
+            setCurrentTrack(nextTrack);
+            audio = ref.current[nextTrack.id];
+            audio?.play();
+          }
+        }
       }
     }
     setPlaying(!isPlaying);
@@ -181,7 +195,8 @@ function StopViewer({
   }
 
   function onEndedInternal(event) {
-    const { id } = event.target;
+    const { target: audio } = event;
+    const { id } = audio;
     const sr = tracks.find((sr) => sr.id === id);
     const index = tracks.indexOf(sr);
     if (sr.pauseAtEnd || index >= tracks.length - 1) {

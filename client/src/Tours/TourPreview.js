@@ -82,7 +82,9 @@ function TourPreview() {
     if (TourStopId) {
       let index = TourStops.findIndex((ts) => ts.id === TourStopId) + 1;
       if (index < TourStops.length) {
-        navigate(`../stops/${TourStops[index].id}?position=0`);
+        if (newIsPlaying) {
+          navigate(`../stops/${TourStops[index].id}?position=0`);
+        }
       }
     } else {
       navigate(`stops/${TourStops[0].id}?position=0`);
