@@ -69,7 +69,9 @@ function Home() {
     if (TourStopId) {
       let index = Tour.TourStops.findIndex((ts) => ts.id === TourStopId) + 1;
       if (index < Tour.TourStops.length) {
-        navigate(`/${TourLink}/stops/${Tour.TourStops[index].id}?position=0`);
+        if (newIsPlaying) {
+          navigate(`/${TourLink}/stops/${Tour.TourStops[index].id}?position=0`);
+        }
       } else {
         Api.post('Tour Completed', {
           $referrer: document.referrer,
