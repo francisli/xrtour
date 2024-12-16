@@ -37,8 +37,6 @@ function StopViewer({
   const [imageURL, setImageURL] = useState();
   const [currentOverlay, setCurrentOverlay] = useState();
   const [selectedOverlay, setSelectedOverlay] = useState();
-  const [selectedSphere, setSelectedSphere] = useState();
-  const [selectedModel, setSelectedModel] = useState();
 
   const ref = useRef({});
 
@@ -203,12 +201,15 @@ function StopViewer({
       for (const audio of Object.values(ref.current)) {
         audio.pause();
       }
-      setPlaying(false);
-      if (index >= tracks.length - 1) {
-        onEnded?.(!sr.pauseAtEnd);
-      } else {
-        setCurrentTrack(tracks[index + 1]);
-        onPause?.();
+      if (isPlaying) {
+        setPlaying(false);
+        if (index >= tracks.length - 1) {
+          onEnded?.(!sr.pauseAtEnd);
+        } else {
+          setCurrentTrack(tracks[index + 1]);
+          console.log('onEndedInternal?', isPlaying, event);
+          onPause?.();
+        }
       }
     } else {
       const nextTrack = tracks[index + 1];
@@ -245,7 +246,7 @@ function StopViewer({
     event.preventDefault();
     switch (currentOverlay?.Resource?.type) {
       case '3D_MODEL':
-        setSelectedModel(currentOverlay);
+        setSelectedOverlay(currentOverlay);
         break;
       case 'AR_LINK':
         window.open(currentOverlay.Resource.Files.find((f) => f.variant === variant.code)?.URL, '_blank');
@@ -254,7 +255,7 @@ function StopViewer({
         setSelectedOverlay(currentOverlay);
         break;
       case 'IMAGE_SPHERE':
-        setSelectedSphere(currentOverlay);
+        setSelectedOverlay(currentOverlay);
         break;
       default:
         break;
@@ -263,82 +264,72 @@ function StopViewer({
 
   return (
     <div className="stop-viewer">
+      <>
+        <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
+        {currentOverlay && <a tabIndex={0} onClick={onClickOverlay} className="stop-viewer__ar-link"></a>}
+        {!!controls && (
+          <div className="stop-viewer__toc">
+            <button onClick={() => setTocOpen(true)} className="btn btn-lg btn-primary btn-round">
+              <FontAwesomeIcon icon={faBars} />
+            </button>
+          </div>
+        )}
+        {!!controls && (
+          <div className="stop-viewer__map">
+            <button onClick={() => setMapOpen(true)} className="btn btn-lg btn-primary btn-round">
+              <FontAwesomeIcon icon={faLocationDot} />
+            </button>
+          </div>
+        )}
+        <div className="stop-viewer__title h5">
+          {stopIndex ?? '#'}. {stop?.names[variant?.code]}
+        </div>
+        <div className="stop-viewer__controls">
+          <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber mb-2" />
+          <button onClick={onPlayPause} type="button" className="btn btn-lg btn-warning btn-round">
+            {!isPlaying && <FontAwesomeIcon icon={faPlay} />}
+            {isPlaying && <FontAwesomeIcon icon={faPause} />}
+          </button>
+        </div>
+        {tracks?.map((sr, i) => (
+          <audio
+            autoPlay={autoPlay && i === 0}
+            onPlay={() => !isPlaying && setPlaying(true)}
+            id={sr.id}
+            key={sr.id}
+            ref={(el) => el && (ref.current[el.id] = el)}
+            src={sr.Resource.Files.find((f) => f.variant === variant.code)?.URL}
+            onTimeUpdate={onTimeUpdateInternal}
+            onEnded={onEndedInternal}
+          />
+        ))}
+        <Toc
+          isOpen={isTocOpen}
+          onClose={() => setTocOpen(false)}
+          onSelect={onSelectInternal}
+          tour={tour}
+          tourStops={tourStops}
+          variant={variant}
+        />
+        <Map
+          mapboxAccessToken={mapboxAccessToken}
+          isOpen={isMapOpen}
+          onClose={() => setMapOpen(false)}
+          stop={stop}
+          tourStops={tourStops}
+          variant={variant}
+        />
+      </>
       {selectedOverlay && (
         <>
+          {selectedOverlay.Resource?.type === '3D_MODEL' && (
+            <ModelOverlay onClose={() => setSelectedOverlay()} resource={selectedOverlay.Resource} variant={variant} />
+          )}
           {selectedOverlay.Resource?.type === 'IMAGE_OVERLAY' && (
             <ImageOverlay onClose={() => setSelectedOverlay()} resource={selectedOverlay.Resource} variant={variant} />
           )}
-        </>
-      )}
-      {selectedSphere && (
-        <>
-          {selectedSphere.Resource?.type === 'IMAGE_SPHERE' && (
-            <ImageSphere onClose={() => setSelectedSphere()} resource={selectedSphere.Resource} variant={variant} />
-          )}
-        </>
-      )}
-      {!selectedOverlay && !selectedSphere && (
-        <>
-          <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
-          {currentOverlay && <a tabIndex={0} onClick={onClickOverlay} className="stop-viewer__ar-link"></a>}
-          {!!controls && (
-            <div className="stop-viewer__toc">
-              <button onClick={() => setTocOpen(true)} className="btn btn-lg btn-primary btn-round">
-                <FontAwesomeIcon icon={faBars} />
-              </button>
-            </div>
-          )}
-          {!!controls && (
-            <div className="stop-viewer__map">
-              <button onClick={() => setMapOpen(true)} className="btn btn-lg btn-primary btn-round">
-                <FontAwesomeIcon icon={faLocationDot} />
-              </button>
-            </div>
-          )}
-          <div className="stop-viewer__title h5">
-            {stopIndex ?? '#'}. {stop?.names[variant?.code]}
-          </div>
-          <div className="stop-viewer__controls">
-            <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber mb-2" />
-            <button onClick={onPlayPause} type="button" className="btn btn-lg btn-warning btn-round">
-              {!isPlaying && <FontAwesomeIcon icon={faPlay} />}
-              {isPlaying && <FontAwesomeIcon icon={faPause} />}
-            </button>
-          </div>
-          {tracks?.map((sr, i) => (
-            <audio
-              autoPlay={autoPlay && i === 0}
-              onPlay={() => !isPlaying && setPlaying(true)}
-              id={sr.id}
-              key={sr.id}
-              ref={(el) => el && (ref.current[el.id] = el)}
-              src={sr.Resource.Files.find((f) => f.variant === variant.code)?.URL}
-              onTimeUpdate={onTimeUpdateInternal}
-              onEnded={onEndedInternal}
-            />
-          ))}
-          <Toc
-            isOpen={isTocOpen}
-            onClose={() => setTocOpen(false)}
-            onSelect={onSelectInternal}
-            tour={tour}
-            tourStops={tourStops}
-            variant={variant}
-          />
-          <Map
-            mapboxAccessToken={mapboxAccessToken}
-            isOpen={isMapOpen}
-            onClose={() => setMapOpen(false)}
-            stop={stop}
-            tourStops={tourStops}
-            variant={variant}
-          />
-        </>
-      )}
-      {selectedModel && (
-        <>
-          {selectedModel.Resource?.type === '3D_MODEL' && (
-            <ModelOverlay onClose={() => setSelectedModel()} resource={selectedModel.Resource} variant={variant} />
+          {selectedOverlay.Resource?.type === 'IMAGE_SPHERE' && (
+            <ImageSphere onClose={() => setSelectedOverlay()} resource={selectedOverlay.Resource} variant={variant} />
           )}
         </>
       )}
