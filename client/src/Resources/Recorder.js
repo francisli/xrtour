@@ -112,7 +112,7 @@ function Recorder({ onCancel, onSave }) {
       )}
       {!!file && (
         <>
-          <AudioPlayer className="flex-grow-1 me-3" src={file.preview} />
+          <AudioPlayer className="flex-grow-1 me-3" src={file.preview} onDurationChange={(newDuration) => setElapsed(newDuration)} />
           <div className="spinner-border me-3" style={{ visibility: isLoading ? 'visible' : 'hidden' }}></div>
           <button disabled={isLoading} onClick={() => onSaveInternal()} className="btn btn-primary me-2" type="button">
             Save
