@@ -123,7 +123,7 @@ function StopViewer({
     if (images && overlays && tracks && Number.isInteger(position)) {
       let newImageURL;
       for (const sr of images) {
-        if ((position === 0 || sr.start < position) && (sr.end ?? Number.MAX_SAFE_INTEGER) >= position) {
+        if (((position === 0 && sr.start <= position) || sr.start < position) && (sr.end ?? Number.MAX_SAFE_INTEGER) >= position) {
           newImageURL = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
           break;
         }
@@ -133,7 +133,7 @@ function StopViewer({
       }
       let newOverlay;
       for (const sr of overlays) {
-        if ((position === 0 || sr.start < position) && (sr.end ?? Number.MAX_SAFE_INTEGER) >= position) {
+        if (((position === 0 && sr.start <= position) || sr.start < position) && (sr.end ?? Number.MAX_SAFE_INTEGER) >= position) {
           newOverlay = sr;
           break;
         }
