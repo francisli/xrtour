@@ -6,7 +6,9 @@
     "client",
     "server",
     "shared",
-    "viewer"
+    "viewer",
+    "vite",
+    "viteviewer"
   ],
   "scripts": {
     "heroku-postbuild": "npm run build -w client; npm run build -w viewer",
