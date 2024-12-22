@@ -83,6 +83,43 @@ router.post('/view', (req, res) => {
   res.status(StatusCodes.NO_CONTENT).end();
 });
 
+router.get('/tours/:tour', async (req, res) => {
+  let { tour } = req.params;
+  let [team] = req.subdomains;
+  const isStaging = team?.toLowerCase() === 'staging';
+  if (isStaging) {
+    [, team] = req.subdomains;
+  }
+  if (team && tour) {
+    team = await models.Team.findOne({ where: { link: team } });
+    if (team) {
+      if (tour.startsWith('/')) {
+        tour = tour.substring(1);
+      }
+      tour = await models.Tour.findOne({
+        where: {
+          TeamId: team.id,
+          link: tour.split('/')[0],
+        },
+      });
+      if (tour) {
+        const version = await models.Version.findOne({
+          where: {
+            TourId: tour.id,
+            isStaging,
+            isLive: true,
+          },
+        });
+        if (version) {
+          res.json(version.data);
+          return;
+        }
+      }
+    }
+  }
+  res.status(StatusCodes.NOT_FOUND).end();
+});
+
 router.get('/*', async (req, res) => {
   let { path: tour } = req;
   let [team] = req.subdomains;
