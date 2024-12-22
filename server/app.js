@@ -1,17 +1,19 @@
-require('dotenv').config();
+import 'dotenv/config';
 
-const createError = require('http-errors');
-const express = require('express');
-const path = require('path');
-const cookieSession = require('cookie-session');
-const logger = require('morgan');
-const passport = require('passport');
-const fileUpload = require('express-fileupload');
-const i18n = require('i18n');
-const { StatusCodes } = require('http-status-codes');
+import createError from 'http-errors';
+import express from 'express';
+import path from 'path';
+import cookieSession from 'cookie-session';
+import logger from 'morgan';
+import passport from 'passport';
+import fileUpload from 'express-fileupload';
+import i18n from 'i18n';
+import { StatusCodes } from 'http-status-codes';
+import { fileURLToPath } from 'url';
 
-const routes = require('./routes');
+import routes from './routes/index.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 /// router logging output
@@ -71,4 +73,4 @@ app.use((err, req, res) => {
   res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
 });
 
-module.exports = app;
+export default app;

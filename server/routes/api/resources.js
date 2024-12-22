@@ -1,11 +1,11 @@
-const express = require('express');
-const { StatusCodes } = require('http-status-codes');
-const _ = require('lodash');
-const { Op } = require('sequelize');
+import express from 'express';
+import { StatusCodes } from 'http-status-codes';
+import _ from 'lodash';
+import { Op } from 'sequelize';
 
-const helpers = require('../helpers');
-const models = require('../../models');
-const interceptors = require('../interceptors');
+import helpers from '../helpers.js';
+import interceptors from '../interceptors.js';
+import models from '../../models/index.js';
 
 const router = express.Router();
 
@@ -167,4 +167,4 @@ router.delete('/:id', interceptors.requireLogin, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

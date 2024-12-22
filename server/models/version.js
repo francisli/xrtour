@@ -1,10 +1,10 @@
-const crypto = require('crypto');
-const _ = require('lodash');
-const path = require('path');
-const { Model } = require('sequelize');
-const { v4: uuid } = require('uuid');
+import crypto from 'crypto';
+import { Model } from 'sequelize';
+import _ from 'lodash';
+import path from 'path';
+import { v4 as uuid } from 'uuid';
 
-const s3 = require('../lib/s3');
+import s3 from '../lib/s3.js';
 
 function resourcesSortComparator(r1, r2) {
   let result = r1.Resource.type.localeCompare(r2.Resource.type);
@@ -17,7 +17,7 @@ function resourcesSortComparator(r1, r2) {
   return result;
 }
 
-module.exports = (sequelize, DataTypes) => {
+export default function (sequelize, DataTypes) {
   class Version extends Model {
     static associate(models) {
       Version.belongsTo(models.Tour);
@@ -118,4 +118,4 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
   return Version;
-};
+}

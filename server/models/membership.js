@@ -1,5 +1,5 @@
-const _ = require('lodash');
-const { Model } = require('sequelize');
+import { Model } from 'sequelize';
+import _ from 'lodash';
 
 const ROLE_OWNER = 'OWNER';
 const ROLE_VIEWER = 'VIEWER';
@@ -7,7 +7,7 @@ const ROLE_EDITOR = 'EDITOR';
 const ROLES = [ROLE_OWNER, ROLE_VIEWER, ROLE_EDITOR];
 Object.freeze(ROLES);
 
-module.exports = (sequelize, DataTypes) => {
+export default function (sequelize, DataTypes) {
   class Membership extends Model {
     get isOwner() {
       return this.role === ROLE_OWNER;
@@ -54,4 +54,4 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   return Membership;
-};
+}

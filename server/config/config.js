@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 process.env.DATABASE_TEST_URL = `${process.env.DATABASE_URL}_test`;
 
 module.exports = {
