@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Modal from 'react-bootstrap/Modal';
+import { Modal } from 'react-bootstrap';
 import { transform } from 'inflection';
 
 import './StopsModal.scss';

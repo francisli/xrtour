@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Popover from 'react-bootstrap/Popover';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 import QRCode from 'react-qr-code';
 import { pluralize } from 'inflection';
 

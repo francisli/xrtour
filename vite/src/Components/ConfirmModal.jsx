@@ -1,4 +1,4 @@
-import Modal from 'react-bootstrap/Modal';
+import { Modal } from 'react-bootstrap';
 
 import './ConfirmModal.scss';
 
