@@ -20,7 +20,7 @@ const HTML = readIndexFile();
 router.get('/*', async (req, res, next) => {
   if (req.accepts('html')) {
     try {
-      const { render } = await import('../../../vite/dist/server/entry-server.js');
+      const { render } = await import('../../../vite/dist/server/main-server.js');
       const helmetContext = {};
       const staticContext = { context: { env: {} } };
       Object.keys(process.env).forEach((key) => {
