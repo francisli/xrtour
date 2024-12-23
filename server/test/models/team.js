@@ -1,7 +1,7 @@
-const assert = require('assert');
+import assert from 'assert';
 
-const helper = require('../helper');
-const models = require('../../models');
+import helper from '../helper.js';
+import models from '../../models/index.js';
 
 describe('models.Team', () => {
   beforeEach(async () => {

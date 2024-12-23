@@ -49,8 +49,8 @@ if (process.env.SMTP_ENABLED === 'true') {
 }
 
 if (process.env.NODE_ENV === 'test') {
-  // eslint-disable-next-line global-require, import/no-extraneous-dependencies
-  transport = require('nodemailer-mock').createTransport(transport);
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  transport = (await import('nodemailer-mock')).createTransport(transport);
 }
 
 const email = new Email({

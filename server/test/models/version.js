@@ -1,8 +1,8 @@
-const assert = require('assert');
-const crypto = require('crypto');
+import assert from 'assert';
+import crypto from 'crypto';
 
-const helper = require('../helper');
-const models = require('../../models');
+import helper from '../helper.js';
+import models from '../../models/index.js';
 
 describe('models.Team', () => {
   beforeEach(async () => {

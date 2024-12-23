@@ -1,10 +1,10 @@
-const assert = require('assert');
-const { StatusCodes } = require('http-status-codes');
-const path = require('path');
-const session = require('supertest-session');
+import assert from 'assert';
+import { StatusCodes } from 'http-status-codes';
+import path from 'path';
+import session from 'supertest-session';
 
-const helper = require('../../helper');
-const app = require('../../../app');
+import helper from '../../helper.js';
+import app from '../../../app.js';
 
 describe('/api/files', () => {
   let testSession;
