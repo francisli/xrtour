@@ -2,7 +2,7 @@
 
 if (process.argv.length != 6) {
   console.log('Usage: bin/create-admin First Last email@address.com password');
-  return;
+  process.exit(1);
 }
 
 import bcrypt from 'bcrypt';

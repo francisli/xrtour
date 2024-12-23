@@ -2,7 +2,7 @@
 
 if (process.argv.length != 3) {
   console.log('Usage: bin/create-bucket bucketname');
-  return;
+  process.exit(1);
 }
 
 import 'dotenv/config';
