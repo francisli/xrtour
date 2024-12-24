@@ -29,7 +29,6 @@ services:
       - /opt/node/app/server/node_modules
       - /opt/node/app/client/node_modules
       - /opt/node/app/viewer/node_modules
-      - /opt/node/app/vite/node_modules
       - /opt/node/app/viteviewer/node_modules
       - /opt/node/app/node_modules
     environment:
@@ -48,7 +47,6 @@ services:
       - 3000:3000
       - 3100:3100
       - 3200:3200
-      - 3300:3300
       - 3400:3400
     depends_on:
       - db

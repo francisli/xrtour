@@ -7,7 +7,6 @@
     "server",
     "shared",
     "viewer",
-    "vite",
     "viteviewer"
   ],
   "scripts": {
