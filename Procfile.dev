@@ -1,4 +1,3 @@
 client: cp .env client/.env && cd client && npm run dev -- --host --port 3000
 server: cp .env server/.env && cd server && PORT=3100 npm start
-viewer: cp .env viewer/.env && cd viewer && PORT=3200 npm start
-viteviewer: cp .env viteviewer/.env && cd viteviewer && npm run dev -- --host --port 3400
+viewer: cp .env viewer/.env && cd viewer && npm run dev -- --host --port 3200

@@ -14,10 +14,10 @@ const router = express.Router();
 const mixpanel = process.env.MIXPANEL_TOKEN ? Mixpanel.init(process.env.MIXPANEL_TOKEN) : undefined;
 
 // configure serving up built viewer app assets
-router.use(express.static(path.join(__dirname, '../../../viteviewer/dist/client'), { index: false }));
+router.use(express.static(path.join(__dirname, '../../../viewer/dist/client'), { index: false }));
 
 function readIndexFile() {
-  const filePath = path.join(__dirname, '../../../viteviewer/dist/client', 'index.html');
+  const filePath = path.join(__dirname, '../../../viewer/dist/client', 'index.html');
   if (fs.existsSync(filePath)) {
     return fs.readFileSync(filePath, { encoding: 'utf8' });
   }
@@ -125,7 +125,7 @@ router.get('/*', async (req, res) => {
         if (version) {
           if (req.accepts('html')) {
             try {
-              const { render } = await import('../../../viteviewer/dist/server/main-server.js');
+              const { render } = await import('../../../viewer/dist/server/main-server.js');
               const helmetContext = {};
               const staticContext = { context: { env: {}, tour: version.data } };
               staticContext.context.env.BASE_URL = `${req.protocol}://${req.headers.host}`;
