@@ -7,6 +7,9 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = express.Router();
 
+// configure serving up built viewer app assets
+router.use(express.static(path.join(__dirname, '../../../client/dist/client'), { index: false }));
+
 function readIndexFile() {
   const filePath = path.join(__dirname, '../../../client/dist/client', 'index.html');
   if (fs.existsSync(filePath)) {

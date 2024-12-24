@@ -1,54 +1,29 @@
-const express = require('express');
-const fs = require('fs');
-const { StatusCodes } = require('http-status-codes');
-const Mixpanel = require('mixpanel');
-const path = require('path');
-const UAParser = require('ua-parser-js');
-const { v4: uuid } = require('uuid');
+import express from 'express';
+import fs from 'fs';
+import { StatusCodes } from 'http-status-codes';
+import Mixpanel from 'mixpanel';
+import path from 'path';
+import UAParser from 'ua-parser-js';
+import { fileURLToPath } from 'url';
+import { v4 as uuid } from 'uuid';
+import models from '../../models/index.js';
 
-require('@babel/register')({
-  only: [
-    function only(filepath) {
-      return (
-        filepath.startsWith(path.resolve(__dirname, '../../../viewer')) || filepath.startsWith(path.resolve(__dirname, '../../../shared'))
-      );
-    },
-  ],
-  presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'automatic' }]],
-  plugins: [
-    [
-      'transform-assets',
-      {
-        extensions: ['css', 'svg'],
-        name: 'static/media/[name].[hash:8].[ext]',
-      },
-    ],
-  ],
-});
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const { StaticRouter } = require('react-router-dom/server');
-const { HelmetProvider } = require('react-helmet-async');
-
-const { defaultValue: defaultStaticContext, StaticContextProvider } = require('../../../viewer/src/StaticContext');
-const App = require('../../../viewer/src/App').default;
-const { handleRedirects } = require('../../../viewer/src/AppRedirects');
-
-const models = require('../../models');
-
-const mixpanel = process.env.MIXPANEL_TOKEN ? Mixpanel.init(process.env.MIXPANEL_TOKEN) : undefined;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = express.Router();
 
+const mixpanel = process.env.MIXPANEL_TOKEN ? Mixpanel.init(process.env.MIXPANEL_TOKEN) : undefined;
+
 // configure serving up built viewer app assets
-router.use(express.static(path.join(__dirname, '../../../viewer/build'), { index: false }));
+router.use(express.static(path.join(__dirname, '../../../viteviewer/dist/client'), { index: false }));
 
 function readIndexFile() {
-  const filePath = path.join(__dirname, '../../../viewer/build', 'index.html');
+  const filePath = path.join(__dirname, '../../../viteviewer/dist/client', 'index.html');
   if (fs.existsSync(filePath)) {
     return fs.readFileSync(filePath, { encoding: 'utf8' });
   }
   return '';
 }
+
 const HTML = readIndexFile();
 
 router.post('/view', (req, res) => {
@@ -150,39 +125,28 @@ router.get('/*', async (req, res) => {
         if (version) {
           if (req.accepts('html')) {
             try {
-              const { path: urlPath, url: location } = req;
-              const isRedirected = handleRedirects(req, location, urlPath, (to, state) => {
-                if (state) {
-                  res.redirect(`${to}?${new URLSearchParams({ from: location }).toString()}`);
-                } else {
-                  res.redirect(to);
-                }
-                return true;
-              });
-              if (isRedirected) return;
-              const staticContext = { ...defaultStaticContext, tour: version.data };
-              staticContext.env.BASE_URL = `${req.protocol}://${req.headers.host}`;
+              const { render } = await import('../../../viteviewer/dist/server/main-server.js');
               const helmetContext = {};
-              const reactApp = ReactDOMServer.renderToString(
-                React.createElement(
-                  StaticContextProvider,
-                  { value: staticContext },
-                  React.createElement(
-                    HelmetProvider,
-                    { context: helmetContext },
-                    React.createElement(StaticRouter, { location }, React.createElement(App))
-                  )
-                )
-              );
-              const { helmet } = helmetContext;
-              res.send(
-                HTML.replace(/<title\b[^>]*>(.*?)<\/title>/i, helmet.title.toString())
-                  .replace('<link rel="icon" href="" data-rh="true"/>', helmet.link.toString())
-                  .replace('<meta property="og:image" content="" data-rh="true"/>', helmet.meta.toString())
-                  .replace('window.STATIC_CONTEXT={}', `window.STATIC_CONTEXT=${JSON.stringify(staticContext)}`)
-                  .replace('<div id="root"></div>', `<div id="root">${reactApp}</div>`)
-              );
+              const staticContext = { context: { env: {}, tour: version.data } };
+              staticContext.context.env.BASE_URL = `${req.protocol}://${req.headers.host}`;
+              Object.keys(process.env).forEach((key) => {
+                if (key.startsWith('VITE_')) {
+                  staticContext.context.env[key] = process.env[key];
+                }
+              });
+              const app = render(req, res, helmetContext, staticContext);
+              if (app) {
+                const { helmet } = helmetContext;
+                res.send(
+                  HTML.replace(/<title\b[^>]*>(.*?)<\/title>/i, helmet.title.toString())
+                    .replace('<link rel="icon" href="" data-rh="true"/>', helmet.link.toString())
+                    .replace('<meta property="og:image" content="" data-rh="true"/>', helmet.meta.toString())
+                    .replace('window.STATIC_CONTEXT = {}', `window.STATIC_CONTEXT=${JSON.stringify(staticContext.context)}`)
+                    .replace('<div id="root"></div>', `<div id="root">${app}</div>`)
+                );
+              }
             } catch (error) {
+              console.error(error);
               res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
             }
           } else {
@@ -196,4 +160,4 @@ router.get('/*', async (req, res) => {
   res.status(StatusCodes.NOT_FOUND).end();
 });
 
-module.exports = router;
+export default router;

@@ -11,4 +11,7 @@ export default defineConfig({
       '/view': 'http://localhost:3100',
     },
   },
+  ssr: {
+    noExternal: ['react-helmet-async'],
+  },
 });
