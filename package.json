@@ -9,12 +9,14 @@
     "viewer"
   ],
   "scripts": {
-    "heroku-postbuild": "npm run build -w client; npm run build -w viewer",
+    "build": "npm run build -w client && npm run build -w viewer",
+    "heroku-postbuild": "npm run build",
     "lint": "npm run lint -w client; npm run lint -w server; npm run lint -w viewer",
     "lint:changed": "npm run lint:changed -w client; npm run lint:changed -w server; npm run lint:changed -w viewer",
+    "lint:test": "npm run lint -w client && npm run lint -w server && npm run lint -w viewer",
     "pp": "prettier --write --ignore-unknown .",
     "pp:changed": "prettier --write --ignore-unknown $(git diff --name-only; git ls-files -o --exclude-standard)",
-    "test": "prettier --check . && npm run lint && CI=true npm test -w server"
+    "test": "prettier --check . && npm run build && npm run lint:test && CI=true npm test -w server"
   },
   "devDependencies": {
     "prettier": "^2.7.1",
