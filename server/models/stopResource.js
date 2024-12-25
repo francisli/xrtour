@@ -1,7 +1,7 @@
-const _ = require('lodash');
-const { Model } = require('sequelize');
+import { Model } from 'sequelize';
+import _ from 'lodash';
 
-module.exports = (sequelize, DataTypes) => {
+export default function (sequelize, DataTypes) {
   class StopResource extends Model {
     static associate(models) {
       StopResource.belongsTo(models.Stop);
@@ -28,4 +28,4 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
   return StopResource;
-};
+}

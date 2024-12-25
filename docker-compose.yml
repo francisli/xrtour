@@ -28,6 +28,7 @@ services:
       - .:/opt/node/app
       - /opt/node/app/server/node_modules
       - /opt/node/app/client/node_modules
+      - /opt/node/app/viewer/node_modules
       - /opt/node/app/node_modules
     environment:
       - SMTP_HOST=mailcatcher
@@ -45,6 +46,7 @@ services:
       - 3000:3000
       - 3100:3100
       - 3200:3200
+      - 3400:3400
     depends_on:
       - db
       - mailcatcher

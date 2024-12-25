@@ -1,6 +1,9 @@
-const crypto = require('crypto');
-const Email = require('email-templates');
-const path = require('path');
+import crypto from 'crypto';
+import Email from 'email-templates';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let transport;
 
@@ -46,8 +49,8 @@ if (process.env.SMTP_ENABLED === 'true') {
 }
 
 if (process.env.NODE_ENV === 'test') {
-  // eslint-disable-next-line global-require, import/no-extraneous-dependencies
-  transport = require('nodemailer-mock').createTransport(transport);
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  transport = (await import('nodemailer-mock')).createTransport(transport);
 }
 
 const email = new Email({
@@ -71,4 +74,4 @@ const email = new Email({
   },
 });
 
-module.exports = email;
+export default email;

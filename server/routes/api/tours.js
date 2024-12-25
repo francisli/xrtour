@@ -1,10 +1,12 @@
-const express = require('express');
-const { StatusCodes } = require('http-status-codes');
-const _ = require('lodash');
+import express from 'express';
+import { StatusCodes } from 'http-status-codes';
+import _ from 'lodash';
 
-const helpers = require('../helpers');
-const models = require('../../models');
-const interceptors = require('../interceptors');
+import helpers from '../helpers.js';
+import interceptors from '../interceptors.js';
+import models from '../../models/index.js';
+
+import tourStopsRouter from './tourStops.js';
 
 const router = express.Router();
 
@@ -51,7 +53,7 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
   }
 });
 
-router.use('/:TourId/stops', require('./tourStops'));
+router.use('/:TourId/stops', tourStopsRouter);
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {
   const record = await models.Tour.findByPk(req.params.id, {
@@ -129,4 +131,4 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

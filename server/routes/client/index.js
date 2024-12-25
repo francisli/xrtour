@@ -1,43 +1,17 @@
-const express = require('express');
-const fs = require('fs');
-const { StatusCodes } = require('http-status-codes');
-const path = require('path');
+import express from 'express';
+import fs from 'fs';
+import { StatusCodes } from 'http-status-codes';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-require('@babel/register')({
-  only: [
-    function only(filepath) {
-      return (
-        filepath.startsWith(path.resolve(__dirname, '../../../client')) || filepath.startsWith(path.resolve(__dirname, '../../../shared'))
-      );
-    },
-  ],
-  presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'automatic' }]],
-  plugins: [
-    [
-      'transform-assets',
-      {
-        extensions: ['css', 'svg'],
-        name: 'static/media/[name].[hash:8].[ext]',
-      },
-    ],
-  ],
-});
-const React = require('react');
-const ReactDOMServer = require('react-dom/server');
-const { StaticRouter } = require('react-router-dom/server');
-const { HelmetProvider } = require('react-helmet-async');
-
-const { defaultValue: defaultStaticContext, StaticContextProvider } = require('../../../client/src/StaticContext');
-const App = require('../../../client/src/App').default;
-const { handleRedirects } = require('../../../client/src/AppRedirects');
-
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = express.Router();
 
-// configure serving up built client app assets
-router.use(express.static(path.join(__dirname, '../../../client/build'), { index: false }));
+// configure serving up built viewer app assets
+router.use(express.static(path.join(__dirname, '../../../client/dist/client'), { index: false }));
 
 function readIndexFile() {
-  const filePath = path.join(__dirname, '../../../client/build', 'index.html');
+  const filePath = path.join(__dirname, '../../../client/dist/client', 'index.html');
   if (fs.existsSync(filePath)) {
     return fs.readFileSync(filePath, { encoding: 'utf8' });
   }
@@ -49,46 +23,35 @@ const HTML = readIndexFile();
 router.get('/*', async (req, res, next) => {
   if (req.accepts('html')) {
     try {
-      const { path: urlPath, url: location } = req;
-      const isRedirected = handleRedirects(req, location, urlPath, (to, state) => {
-        if (state) {
-          res.redirect(`${to}?${new URLSearchParams({ from: location }).toString()}`);
-        } else {
-          res.redirect(to);
+      const { render } = await import('../../../client/dist/server/main-server.js');
+      const helmetContext = {};
+      const staticContext = { context: { env: {} } };
+      Object.keys(process.env).forEach((key) => {
+        if (key.startsWith('VITE_')) {
+          staticContext.context.env[key] = process.env[key];
         }
-        return true;
       });
-      if (isRedirected) return;
       if (req.user) {
         req.user.Memberships = await req.user.getMemberships({
           include: 'Team',
           order: [['Team', 'name', 'ASC']],
         });
-        if (urlPath === '/') {
+        if (req.path === '/') {
           res.redirect('/teams');
           return;
         }
       }
-      const staticContext = { ...defaultStaticContext, authContext: { user: req.user?.toJSON() ?? null } };
-      const helmetContext = {};
-      const reactApp = ReactDOMServer.renderToString(
-        React.createElement(
-          StaticContextProvider,
-          { value: staticContext },
-          React.createElement(
-            HelmetProvider,
-            { context: helmetContext },
-            React.createElement(StaticRouter, { location }, React.createElement(App))
-          )
-        )
-      );
-      const { helmet } = helmetContext;
-      res.send(
-        HTML.replace(/<title\b[^>]*>(.*?)<\/title>/i, helmet.title.toString())
-          .replace('window.STATIC_CONTEXT={}', `window.STATIC_CONTEXT=${JSON.stringify(staticContext)}`)
-          .replace('<div id="root"></div>', `<div id="root">${reactApp}</div>`)
-      );
+      const app = render(req, res, helmetContext, staticContext);
+      if (app) {
+        const { helmet } = helmetContext;
+        res.send(
+          HTML.replace(/<title\b[^>]*>(.*?)<\/title>/i, helmet.title.toString())
+            .replace('window.STATIC_CONTEXT = {}', `window.STATIC_CONTEXT=${JSON.stringify(staticContext.context)}`)
+            .replace('<div id="root"></div>', `<div id="root">${app}</div>`)
+        );
+      }
     } catch (error) {
+      console.error(error);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
     }
   } else {
@@ -96,4 +59,4 @@ router.get('/*', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+export default router;
