@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
@@ -121,4 +122,13 @@ function ResourcesList({ onNew, onSelect, onEdit, type: initialType = 'IMAGE', t
     </div>
   );
 }
+
+ResourcesList.propTypes = {
+  onNew: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  type: PropTypes.string,
+  types: PropTypes.array,
+};
+
 export default ResourcesList;

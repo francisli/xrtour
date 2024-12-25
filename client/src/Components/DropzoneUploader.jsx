@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Dropzone from 'react-dropzone';
 import { v4 as uuid } from 'uuid';
+import PropTypes from 'prop-types';
 
 import Api from '../Api';
 
@@ -106,4 +107,18 @@ function DropzoneUploader({ accept, className, children, disabled, id, maxFiles 
     </Dropzone>
   );
 }
+
+DropzoneUploader.propTypes = {
+  accept: PropTypes.string,
+  className: PropTypes.string,
+  children: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+  id: PropTypes.string,
+  maxFiles: PropTypes.number,
+  multiple: PropTypes.bool,
+  onRemoved: PropTypes.func,
+  onUploaded: PropTypes.func,
+  onUploading: PropTypes.func,
+};
+
 export default DropzoneUploader;

@@ -1,4 +1,7 @@
+import PropTypes from 'prop-types';
+
 import AudioPlayer from '../Components/AudioPlayer';
+
 import './ResourceCard.scss';
 
 function ResourceCard({ resource, onSelect, onEdit }) {
@@ -40,4 +43,19 @@ function ResourceCard({ resource, onSelect, onEdit }) {
     </div>
   );
 }
+
+ResourceCard.propTypes = {
+  resource: PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    Files: PropTypes.arrayOf(
+      PropTypes.shape({
+        URL: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+  onSelect: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+};
+
 export default ResourceCard;

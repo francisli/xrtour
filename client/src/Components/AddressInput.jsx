@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
+import PropTypes from 'prop-types';
+
 import Api from '../Api';
 import { useStaticContext } from '../StaticContext';
 
@@ -49,4 +51,13 @@ function AddressInput({ id, name, onChange, record, value }) {
     />
   );
 }
+
+AddressInput.propTypes = {
+  id: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func,
+  record: PropTypes.object,
+  value: PropTypes.string,
+};
+
 export default AddressInput;

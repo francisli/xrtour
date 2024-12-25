@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle, faSquare } from '@fortawesome/free-solid-svg-icons';
 import { v4 as uuid } from 'uuid';
+import PropTypes from 'prop-types';
 
 import TimeCode from 'shared/Components/TimeCode';
 
@@ -125,4 +126,10 @@ function Recorder({ onCancel, onSave }) {
     </div>
   );
 }
+
+Recorder.propTypes = {
+  onCancel: PropTypes.func,
+  onSave: PropTypes.func,
+};
+
 export default Recorder;

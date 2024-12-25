@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 
 function VariantTabs({ variants, current, setVariant }) {
   return (
@@ -20,4 +21,11 @@ function VariantTabs({ variants, current, setVariant }) {
     </ul>
   );
 }
+
+VariantTabs.propTypes = {
+  variants: PropTypes.array.isRequired,
+  current: PropTypes.object.isRequired,
+  setVariant: PropTypes.func.isRequired,
+};
+
 export default VariantTabs;

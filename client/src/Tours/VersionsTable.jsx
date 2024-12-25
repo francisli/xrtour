@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import PropTypes from 'prop-types';
 
 function VersionsTable({ versions, onPromote, onPublish, onUnpublish }) {
   return (
@@ -45,4 +46,19 @@ function VersionsTable({ versions, onPromote, onPublish, onUnpublish }) {
     </table>
   );
 }
+
+VersionsTable.propTypes = {
+  versions: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      isLive: PropTypes.bool.isRequired,
+      isStaging: PropTypes.bool.isRequired,
+      createdAt: PropTypes.string.isRequired,
+    })
+  ),
+  onPromote: PropTypes.func,
+  onPublish: PropTypes.func,
+  onUnpublish: PropTypes.func,
+};
+
 export default VersionsTable;

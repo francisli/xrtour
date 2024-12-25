@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 function Pagination({ page, lastPage, url }) {
   function onClick() {
@@ -88,4 +89,11 @@ function Pagination({ page, lastPage, url }) {
     </nav>
   );
 }
+
+Pagination.propTypes = {
+  page: PropTypes.number.isRequired,
+  lastPage: PropTypes.number.isRequired,
+  url: PropTypes.string.isRequired,
+};
+
 export default Pagination;

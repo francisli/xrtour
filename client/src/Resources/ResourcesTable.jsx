@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 
 import TimeCode from 'shared/Components/TimeCode';
 
@@ -170,4 +171,32 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
     </>
   );
 }
+
+ResourcesTable.propTypes = {
+  variant: PropTypes.shape({
+    code: PropTypes.string.isRequired,
+  }).isRequired,
+  resources: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      start: PropTypes.number.isRequired,
+      end: PropTypes.number,
+      pauseAtEnd: PropTypes.bool,
+      Resource: PropTypes.shape({
+        type: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        Files: PropTypes.arrayOf(
+          PropTypes.shape({
+            variant: PropTypes.string.isRequired,
+            duration: PropTypes.number.isRequired,
+          })
+        ).isRequired,
+      }).isRequired,
+    })
+  ),
+  onClick: PropTypes.func,
+  onChange: PropTypes.func,
+  onRemove: PropTypes.func,
+};
+
 export default ResourcesTable;

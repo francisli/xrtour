@@ -1,4 +1,5 @@
 import { Modal } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 import './ConfirmModal.scss';
 
@@ -28,5 +29,14 @@ function ConfirmModal({ nested, isShowing, onCancel, onOK, title, children }) {
     </Modal>
   );
 }
+
+ConfirmModal.propTypes = {
+  nested: PropTypes.bool,
+  isShowing: PropTypes.bool,
+  onCancel: PropTypes.func,
+  onOK: PropTypes.func,
+  title: PropTypes.string,
+  children: PropTypes.node,
+};
 
 export default ConfirmModal;

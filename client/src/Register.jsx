@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, Link } from 'react-router-dom';
 import { StatusCodes } from 'http-status-codes';
+import PropTypes from 'prop-types';
 
 import Api from './Api';
 import { useAuthContext } from './AuthContext';
@@ -68,5 +69,17 @@ function Register() {
     </>
   );
 }
+
+Register.propTypes = {
+  user: PropTypes.shape({
+    firstName: PropTypes.string,
+    lastName: PropTypes.string,
+    email: PropTypes.string,
+    password: PropTypes.string,
+  }),
+  error: PropTypes.instanceOf(Error),
+  onChange: PropTypes.func,
+  onSubmit: PropTypes.func,
+};
 
 export default Register;

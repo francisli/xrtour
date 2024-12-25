@@ -1,8 +1,8 @@
-import React from 'react';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import mime from 'mime/lite';
+import PropTypes from 'prop-types';
 
 import AudioPlayer from './AudioPlayer';
 import DropzoneUploader from './DropzoneUploader';
@@ -93,4 +93,17 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
     </DropzoneUploader>
   );
 }
+
+FileInput.propTypes = {
+  accept: PropTypes.string,
+  className: PropTypes.string,
+  children: PropTypes.node,
+  id: PropTypes.string,
+  name: PropTypes.string,
+  onChange: PropTypes.func,
+  onChangeMetadata: PropTypes.func,
+  value: PropTypes.string,
+  valueURL: PropTypes.string,
+};
+
 export default FileInput;

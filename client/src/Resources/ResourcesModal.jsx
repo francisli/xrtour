@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Modal } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 import './ResourcesModal.scss';
 import ResourcesList from './ResourcesList';
@@ -27,7 +28,7 @@ function ResourcesModal({ isShowing, onHide, onSelect, types }) {
     onSelect(resource);
   }
 
-  function onUpdate(resource) {
+  function onUpdate() {
     setEditing(false);
   }
 
@@ -45,5 +46,12 @@ function ResourcesModal({ isShowing, onHide, onSelect, types }) {
     </Modal>
   );
 }
+
+ResourcesModal.propTypes = {
+  isShowing: PropTypes.bool,
+  onHide: PropTypes.func,
+  onSelect: PropTypes.func,
+  types: PropTypes.array,
+};
 
 export default ResourcesModal;

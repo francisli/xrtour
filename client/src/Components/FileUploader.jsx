@@ -1,7 +1,8 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import classNames from 'classnames';
 import Dropzone from 'react-dropzone';
 import mime from 'mime/lite';
+import PropTypes from 'prop-types';
 
 import Api from '../Api';
 
@@ -110,4 +111,15 @@ function FileUploader({ className, children, id, name, onChange, onUploading, va
     </Dropzone>
   );
 }
+
+FileUploader.propTypes = {
+  className: PropTypes.string,
+  children: PropTypes.node,
+  id: PropTypes.string,
+  name: PropTypes.string,
+  onChange: PropTypes.func,
+  onUploading: PropTypes.func,
+  value: PropTypes.string,
+};
+
 export default FileUploader;

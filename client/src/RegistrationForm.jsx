@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 
 function RegistrationForm({ error, isLoading, onChange, onSubmit, user }) {
   return (
@@ -70,5 +71,13 @@ function RegistrationForm({ error, isLoading, onChange, onSubmit, user }) {
     </form>
   );
 }
+
+RegistrationForm.propTypes = {
+  error: PropTypes.object,
+  isLoading: PropTypes.bool,
+  onChange: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
+};
 
 export default RegistrationForm;

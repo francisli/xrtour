@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 
 import Scrubber from 'shared/Components/Viewer/Scrubber';
 
@@ -61,4 +62,12 @@ function AudioPlayer({ className, onCanPlay, onDurationChange, src }) {
     </div>
   );
 }
+
+AudioPlayer.propTypes = {
+  className: PropTypes.string,
+  onCanPlay: PropTypes.func,
+  onDurationChange: PropTypes.func,
+  src: PropTypes.string.isRequired,
+};
+
 export default AudioPlayer;

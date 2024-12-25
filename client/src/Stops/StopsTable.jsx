@@ -3,6 +3,7 @@ import { ReactSortable } from 'react-sortablejs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { pluralize } from 'inflection';
+import PropTypes from 'prop-types';
 
 import { useAuthContext } from '../AuthContext';
 import ConfirmModal from '../Components/ConfirmModal';
@@ -89,4 +90,26 @@ function StopsTable({ type = 'STOP', stops, onClick, onRemove, onReorderStops })
     </>
   );
 }
+
+StopsTable.propTypes = {
+  type: PropTypes,
+  stops: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      Stop: PropTypes.shape({
+        names: PropTypes.object.isRequired,
+        variants: PropTypes.arrayOf(
+          PropTypes.shape({
+            code: PropTypes.string.isRequired,
+          })
+        ),
+        address: PropTypes.string,
+      }),
+    })
+  ),
+  onClick: PropTypes.func,
+  onRemove: PropTypes.func,
+  onReorderStops: PropTypes.func,
+};
+
 export default StopsTable;

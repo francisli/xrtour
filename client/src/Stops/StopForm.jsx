@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { capitalize, pluralize } from 'inflection';
 import { StatusCodes } from 'http-status-codes';
 import { v4 as uuid } from 'uuid';
+import PropTypes from 'prop-types';
 
 import { useAuthContext } from '../AuthContext';
 import Api from '../Api';
@@ -162,4 +163,14 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
     return form;
   }
 }
+
+StopForm.propTypes = {
+  StopId: PropTypes.string,
+  onCancel: PropTypes.func,
+  onCreate: PropTypes.func,
+  onUpdate: PropTypes.func,
+  startingAddress: PropTypes.string,
+  type: PropTypes.oneOf(['STOP', 'TRANSITION']).isRequired,
+};
+
 export default StopForm;

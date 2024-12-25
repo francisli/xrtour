@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import './SharePreview.scss';
 
 function SharePreview({ tour }) {
@@ -17,4 +19,9 @@ function SharePreview({ tour }) {
     </div>
   );
 }
+
+SharePreview.propTypes = {
+  tour: PropTypes.object,
+};
+
 export default SharePreview;

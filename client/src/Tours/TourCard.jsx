@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import PropTypes from 'prop-types';
 
 import './TourCard.scss';
 
@@ -33,4 +34,24 @@ function TourCard({ tour, href }) {
     </div>
   );
 }
+
+TourCard.propTypes = {
+  tour: PropTypes.shape({
+    names: PropTypes.object.isRequired,
+    variants: PropTypes.arrayOf(
+      PropTypes.shape({
+        code: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+    CoverResource: PropTypes.shape({
+      Files: PropTypes.arrayOf(
+        PropTypes.shape({
+          URL: PropTypes.string.isRequired,
+        })
+      ).isRequired,
+    }),
+  }),
+  href: PropTypes.string.isRequired,
+};
+
 export default TourCard;

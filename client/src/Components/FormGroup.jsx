@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 
 import AddressInput from './AddressInput';
 
@@ -89,4 +90,21 @@ function FormGroup({
     </div>
   );
 }
+
+FormGroup.propTypes = {
+  children: PropTypes.node,
+  disabled: PropTypes.bool,
+  id: PropTypes.string,
+  type: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  helpText: PropTypes.string,
+  placeholder: PropTypes.string,
+  plaintext: PropTypes.bool,
+  record: PropTypes.object,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  error: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
+};
+
 export default FormGroup;

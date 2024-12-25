@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import './StopCard.scss';
 
 function StopCard({ stop, onSelect }) {
@@ -27,4 +29,32 @@ function StopCard({ stop, onSelect }) {
     </div>
   );
 }
+
+StopCard.propTypes = {
+  stop: PropTypes.shape({
+    Resources: PropTypes.arrayOf(
+      PropTypes.shape({
+        Resource: PropTypes.shape({
+          type: PropTypes.string.isRequired,
+          Files: PropTypes.arrayOf(
+            PropTypes.shape({
+              URL: PropTypes.string.isRequired,
+            })
+          ).isRequired,
+        }),
+      })
+    ).isRequired,
+    names: PropTypes.object.isRequired,
+    variants: PropTypes.arrayOf(
+      PropTypes.shape({
+        code: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+    address: PropTypes.string,
+    destAddress: PropTypes.string,
+    type: PropTypes.string.isRequired,
+  }).isRequired,
+  onSelect: PropTypes.func.isRequired,
+};
+
 export default StopCard;

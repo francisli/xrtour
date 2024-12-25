@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import PropTypes from 'prop-types';
 
 import PhoneScreen from 'shared/Components/Viewer/PhoneScreen';
 import StopViewer from 'shared/Components/Viewer/StopViewer';
@@ -230,5 +231,11 @@ function Stop({ StopId, transition, children }) {
     </>
   );
 }
+
+Stop.propTypes = {
+  StopId: PropTypes.string,
+  transition: PropTypes.object,
+  children: PropTypes.node,
+};
 
 export default Stop;

@@ -127,7 +127,7 @@ function TourPreview() {
               mapboxAccessToken={staticContext?.env?.MAPBOX_ACCESS_TOKEN}
               tour={Tour}
               tourStops={TourStops}
-              stop={!!TourStop ? TourStop.Stop : Tour.IntroStop}
+              stop={TourStop ? TourStop.Stop : Tour.IntroStop}
               transition={TourStop?.TransitionStop}
               variant={variant}
               onEnded={onEnded}

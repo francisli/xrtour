@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StatusCodes } from 'http-status-codes';
+import PropTypes from 'prop-types';
 
 import { useAuthContext } from '../AuthContext';
 import Api from '../Api';
@@ -216,4 +217,13 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     </div>
   );
 }
+
+ResourceForm.propTypes = {
+  ResourceId: PropTypes.number,
+  type: PropTypes.string.isRequired,
+  onCancel: PropTypes.func,
+  onCreate: PropTypes.func,
+  onUpdate: PropTypes.func,
+};
+
 export default ResourceForm;

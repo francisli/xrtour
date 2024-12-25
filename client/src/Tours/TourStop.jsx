@@ -39,7 +39,7 @@ function TourStop() {
     navigate(`transitions/${stop.id}`);
   }
 
-  async function onRemoveTransition(stop) {
+  async function onRemoveTransition() {
     const newTourStop = { ...TourStop };
     newTourStop.TransitionStopId = null;
     delete newTourStop.TransitionStop;

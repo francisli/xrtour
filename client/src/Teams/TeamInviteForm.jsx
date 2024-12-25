@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Api from '../Api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import PropTypes from 'prop-types';
 
 function TeamInviteForm({ TeamId, onCreate }) {
   const [data, setData] = useState({
@@ -60,4 +61,10 @@ function TeamInviteForm({ TeamId, onCreate }) {
     </>
   );
 }
+
+TeamInviteForm.propTypes = {
+  TeamId: PropTypes.number.isRequired,
+  onCreate: PropTypes.func,
+};
+
 export default TeamInviteForm;

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { capitalize } from 'inflection';
+import PropTypes from 'prop-types';
 
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
@@ -64,4 +65,11 @@ function StopsList({ onNewStop, onSelect, type }) {
     </div>
   );
 }
+
+StopsList.propTypes = {
+  onNewStop: PropTypes.func.isRequired,
+  onSelect: PropTypes.func.isRequired,
+  type: PropTypes.string.isRequired,
+};
+
 export default StopsList;

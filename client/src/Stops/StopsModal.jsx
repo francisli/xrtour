@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { transform } from 'inflection';
+import PropTypes from 'prop-types';
 
 import './StopsModal.scss';
 import StopsList from './StopsList';
@@ -20,7 +21,7 @@ function StopsModal({ type, isShowing, onHide, onSelect, startingAddress }) {
     onSelect(stop);
   }
 
-  function onUpdate(stop) {
+  function onUpdate() {
     setEditing(false);
   }
 
@@ -45,5 +46,13 @@ function StopsModal({ type, isShowing, onHide, onSelect, startingAddress }) {
     </Modal>
   );
 }
+
+StopsModal.propTypes = {
+  type: PropTypes.string,
+  isShowing: PropTypes.bool,
+  onHide: PropTypes.func,
+  onSelect: PropTypes.func,
+  startingAddress: PropTypes.string,
+};
 
 export default StopsModal;
