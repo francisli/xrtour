@@ -16,7 +16,7 @@
     "lint:test": "npm run lint -w client && npm run lint -w server && npm run lint -w viewer",
     "pp": "prettier --write --ignore-unknown .",
     "pp:changed": "prettier --write --ignore-unknown $(git diff --name-only; git ls-files -o --exclude-standard)",
-    "test": "prettier --check . && npm run build && npm run lint:test && CI=true npm test -w server"
+    "test": "npm run build && prettier --check . && npm run lint:test && CI=true npm test -w server"
   },
   "devDependencies": {
     "prettier": "^2.7.1",
