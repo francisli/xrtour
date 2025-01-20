@@ -56,7 +56,7 @@ ResourceCard.propTypes = {
       })
     ).isRequired,
   }).isRequired,
-  onSelect: PropTypes.func.isRequired,
+  onSelect: PropTypes.func,
   onEdit: PropTypes.func.isRequired,
 };
 

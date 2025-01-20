@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
 
+import { useAuthContext } from '../AuthContext';
 import { useStaticContext } from '../StaticContext';
 import ResourceForm from '../Resources/ResourceForm';
 import ResourcesList from '../Resources/ResourcesList';
 
 function AssetsList() {
+  const { membership } = useAuthContext();
   const staticContext = useStaticContext();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!membership) {
+      navigate('/');
+    }
+  }, [membership, navigate]);
 
   const [isEditing, setEditing] = useState(false);
   const [ResourceId, setResourceId] = useState();

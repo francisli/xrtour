@@ -8,7 +8,7 @@ import { useAuthContext } from './AuthContext';
 
 function Header() {
   const navigate = useNavigate();
-  const { user, setUser } = useAuthContext();
+  const { user, setUser, membership } = useAuthContext();
   const [isNavbarShowing, setNavbarShowing] = useState(false);
 
   useEffect(
@@ -56,10 +56,10 @@ function Header() {
                 Home
               </Link>
             </li>
-            {user && (
+            {membership && (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" aria-current="page" to="/assets" onClick={hideNavbar}>
+                  <Link className="nav-link" aria-current="page" to={`/teams/${membership.TeamId}/assets`} onClick={hideNavbar}>
                     Assets
                   </Link>
                 </li>

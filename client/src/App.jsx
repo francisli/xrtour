@@ -15,7 +15,6 @@ import PasswordsRoutes from './Passwords/PasswordsRoutes';
 import Register from './Register';
 import TeamsRoutes from './Teams/TeamsRoutes';
 import UsersRoutes from './Users/UsersRoutes';
-import AssetsList from './Assets/AssetsList';
 
 function App() {
   const staticContext = useStaticContext();
@@ -33,7 +32,6 @@ function App() {
                 <Route path="/passwords/*" element={<PasswordsRoutes />} />
                 <Route path="/invites/*" element={<InvitesRoutes />} />
                 {staticContext?.env?.FEATURE_REGISTRATION === 'true' && <Route path="/register" element={<Register />} />}
-                <Route path="/assets/*" element={<AssetsList />} />
                 <Route path="/teams/*" element={<TeamsRoutes />} />
                 <Route path="/account/*" element={<UsersRoutes />} />
                 <Route path="/admin/*" element={<AdminRoutes />} />
