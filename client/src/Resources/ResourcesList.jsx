@@ -125,7 +125,7 @@ function ResourcesList({ onNew, onSelect, onEdit, type: initialType = 'IMAGE', t
 
 ResourcesList.propTypes = {
   onNew: PropTypes.func.isRequired,
-  onSelect: PropTypes.func.isRequired,
+  onSelect: PropTypes.func,
   onEdit: PropTypes.func.isRequired,
   type: PropTypes.string,
   types: PropTypes.array,

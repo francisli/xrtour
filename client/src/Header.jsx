@@ -59,8 +59,8 @@ function Header() {
             {user && (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" aria-current="page" to="/teams" onClick={hideNavbar}>
-                    Teams
+                  <Link className="nav-link" aria-current="page" to="/assets" onClick={hideNavbar}>
+                    Assets
                   </Link>
                 </li>
               </>
@@ -68,6 +68,11 @@ function Header() {
             <div className="flex-grow-1 d-flex justify-content-end">
               {user && (
                 <>
+                  <li className="nav-item">
+                    <Link className="nav-link" aria-current="page" to="/teams" onClick={hideNavbar}>
+                      Teams
+                    </Link>
+                  </li>
                   {user.isAdmin && (
                     <li className="nav-item">
                       <Link className="nav-link" to="/admin" onClick={hideNavbar}>
