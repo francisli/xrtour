@@ -22,6 +22,7 @@ function AssetsList() {
   const [isEditing, setEditing] = useState(false);
   const [ResourceId, setResourceId] = useState();
   const [type, setType] = useState();
+  const [refreshToken, setRefreshToken] = useState(0);
 
   function onNew(newType) {
     setResourceId(undefined);
@@ -37,10 +38,12 @@ function AssetsList() {
 
   function onCreate() {
     setEditing(false);
+    setRefreshToken(refreshToken + 1);
   }
 
   function onUpdate() {
     setEditing(false);
+    setRefreshToken(refreshToken + 1);
   }
 
   return (
@@ -49,7 +52,7 @@ function AssetsList() {
         <title>Assets - {staticContext?.env?.SITE_TITLE}</title>
       </Helmet>
       <main className="container">
-        <ResourcesList onNew={onNew} onEdit={onEdit} />
+        <ResourcesList onNew={onNew} onEdit={onEdit} refreshToken={refreshToken} />
       </main>
       {isEditing && (
         <Modal show={true} onHide={() => setEditing(false)} size="xl" dialogClassName="resources-modal">

@@ -207,7 +207,6 @@ function StopViewer({
           onEnded?.(!sr.pauseAtEnd);
         } else {
           setCurrentTrack(tracks[index + 1]);
-          console.log('onEndedInternal?', isPlaying, event);
           onPause?.();
         }
       }

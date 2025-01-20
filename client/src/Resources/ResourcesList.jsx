@@ -6,7 +6,7 @@ import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
 import ResourceCard from './ResourceCard';
 
-function ResourcesList({ onNew, onSelect, onEdit, type: initialType = 'IMAGE', types }) {
+function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initialType = 'IMAGE', types }) {
   const { membership } = useAuthContext();
 
   const [type, setType] = useState(types ? types[0] : initialType);
@@ -26,7 +26,7 @@ function ResourcesList({ onNew, onSelect, onEdit, type: initialType = 'IMAGE', t
       });
     }
     return () => (isCancelled = true);
-  }, [membership, type, searchDebounced]);
+  }, [membership, type, refreshToken, searchDebounced]);
 
   function onClickType(newType) {
     if (type !== newType) {
@@ -127,6 +127,7 @@ ResourcesList.propTypes = {
   onNew: PropTypes.func.isRequired,
   onSelect: PropTypes.func,
   onEdit: PropTypes.func.isRequired,
+  refreshToken: PropTypes.number,
   type: PropTypes.string,
   types: PropTypes.array,
 };
