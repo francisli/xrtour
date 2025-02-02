@@ -1,18 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faList, faTableCells } from '@fortawesome/free-solid-svg-icons';
+import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
+import Pagination from '../Components/Pagination';
 import ResourceCard from './ResourceCard';
 
 function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initialType = 'IMAGE', types }) {
   const { membership } = useAuthContext();
 
-  const [type, setType] = useState(types ? types[0] : initialType);
-  const [search, setSearch] = useState('');
-  const [searchDebounced, setSearchDebounced] = useState(search);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const view = searchParams.get('view') ?? 'list';
+  const type = searchParams.get('type') ?? (types ? types[0] : initialType);
+  const searchDebounced = searchParams.get('q') ?? '';
+  const page = parseInt(searchParams.get('page') ?? '1', 10);
+
+  const [search, setSearch] = useState(searchDebounced);
   const [resources, setResources] = useState();
+  const [lastPage, setLastPage] = useState(page);
 
   const timeoutRef = useRef();
 
@@ -20,17 +30,26 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
     let isCancelled = false;
     if (membership) {
       setResources(undefined);
-      Api.resources.index(membership.TeamId, type, searchDebounced).then((response) => {
+      Api.resources.index(membership.TeamId, type, searchDebounced, page).then((response) => {
         if (isCancelled) return;
         setResources(response.data);
+        const linkHeader = Api.parseLinkHeader(response);
+        let newLastPage = page;
+        if (linkHeader?.last) {
+          const match = linkHeader.last.match(/page=(\d+)/);
+          newLastPage = parseInt(match[1], 10);
+        } else if (linkHeader?.next) {
+          newLastPage = page + 1;
+        }
+        setLastPage(newLastPage);
       });
     }
     return () => (isCancelled = true);
-  }, [membership, type, refreshToken, searchDebounced]);
+  }, [membership, type, refreshToken, searchDebounced, page]);
 
   function onClickType(newType) {
     if (type !== newType) {
-      setType(newType);
+      setSearchParams({ q: searchDebounced, view, type: newType });
     }
   }
 
@@ -42,8 +61,14 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
       clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = setTimeout(() => {
-      setSearchDebounced(value);
+      setSearchParams({ q: value, view, type });
     }, 300);
+  }
+
+  function setView(newView) {
+    if (newView !== view) {
+      setSearchParams({ q: searchDebounced, view: newView, type });
+    }
   }
 
   return (
@@ -109,14 +134,65 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
         </div>
       </div>
       <div className="col-md-9">
+        <div className="mb-3">
+          <span className="me-2">View:</span>
+          <div className="btn-group" role="group" aria-label="View options button group">
+            <button
+              type="button"
+              className={classNames('btn btn-outline-secondary', { active: view === 'list' })}
+              onClick={() => setView('list')}>
+              <FontAwesomeIcon icon={faList} />
+            </button>
+            <button
+              type="button"
+              className={classNames('btn btn-outline-secondary', { active: view === 'card' })}
+              onClick={() => setView('card')}>
+              <FontAwesomeIcon icon={faTableCells} />
+            </button>
+          </div>
+        </div>
         {!resources && <div className="spinner-border"></div>}
         {resources?.length === 0 && <p>No assets yet.</p>}
         {!!resources?.length && (
-          <div className="row">
-            {resources?.map((r) => (
-              <ResourceCard key={r.id} resource={r} onSelect={onSelect} onEdit={onEdit} />
-            ))}
-          </div>
+          <>
+            {view === 'card' && (
+              <div className="row">
+                {resources?.map((r) => (
+                  <ResourceCard key={r.id} resource={r} onSelect={onSelect} onEdit={onEdit} />
+                ))}
+              </div>
+            )}
+            {view === 'list' && (
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Uploaded At</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {resources.map((r) => (
+                    <tr key={r.id}>
+                      <td>{r.name}</td>
+                      <td>{DateTime.fromISO(r.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}</td>
+                      <td>
+                        {onSelect && (
+                          <button onClick={() => onSelect(r)} type="button" className="btn btn-link">
+                            Select
+                          </button>
+                        )}
+                        <button onClick={() => onEdit(r)} type="button" className="btn btn-link border-0 p-0">
+                          Edit
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            <Pagination page={page} lastPage={lastPage} otherParams={{ view, type, q: searchDebounced }} />
+          </>
         )}
       </div>
     </div>

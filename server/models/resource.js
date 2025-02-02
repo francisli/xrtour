@@ -10,7 +10,7 @@ export default function (sequelize, DataTypes) {
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'data', 'variants']);
+      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'data', 'variants', 'createdAt', 'updatedAt']);
       if (this.Files) {
         json.Files = this.Files.map((f) => f.toJSON());
       }

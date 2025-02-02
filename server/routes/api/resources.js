@@ -32,7 +32,7 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
     };
   }
   const { records, pages, total } = await models.Resource.paginate(options);
-  helpers.setPaginationHeaders(req, res, options.page, pages, total);
+  helpers.setPaginationHeaders(req, res, page, pages, total);
   res.json(records.map((record) => record.toJSON()));
 });
 

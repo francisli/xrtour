@@ -6,11 +6,11 @@ function setPaginationHeaders(req, res, page, pages, total) {
   const query = _.clone(req.query);
   let link = '';
   const pageNum = parseInt(page, 10);
-  if (pageNum < pages - 1) {
+  if (pageNum < pages) {
     query.page = pageNum + 1;
     link += `<${baseURL}${querystring.stringify(query)}>; rel="next"`;
   }
-  if (pageNum < pages - 2) {
+  if (pageNum < pages - 1) {
     if (link.length > 0) {
       link += ',';
     }

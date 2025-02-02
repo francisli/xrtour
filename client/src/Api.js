@@ -16,7 +16,23 @@ instance.interceptors.response.use(
   }
 );
 
+function parseLinkHeader(response) {
+  const link = response.headers?.link;
+  if (link) {
+    const linkRe = /<([^>]+)>; rel="([^"]+)"/g;
+    const urls = {};
+    let m;
+    while ((m = linkRe.exec(link)) !== null) {
+      const url = m[1];
+      urls[m[2]] = url;
+    }
+    return urls;
+  }
+  return null;
+}
+
 const Api = {
+  parseLinkHeader,
   assets: {
     create(data) {
       return instance.post('/api/assets', data);
@@ -92,8 +108,8 @@ const Api = {
     },
   },
   resources: {
-    index(TeamId, type, search) {
-      return instance.get(`/api/resources`, { params: { TeamId, type, search } });
+    index(TeamId, type, search, page) {
+      return instance.get(`/api/resources`, { params: { TeamId, type, search, page } });
     },
     create(data) {
       return instance.post('/api/resources', data);
