@@ -82,6 +82,8 @@ describe('/api/stops/:StopId/resources', () => {
                 URL: '/api/assets/files/84b62056-05a4-4751-953f-7854ac46bc0f/key/d2e150be-b277-4f68-96c7-22a477e0022f.m4a',
               },
             ],
+            createdAt: response.body[0].Resource.createdAt,
+            updatedAt: response.body[0].Resource.updatedAt,
           },
         },
         {
@@ -119,6 +121,8 @@ describe('/api/stops/:StopId/resources', () => {
                 URL: '/api/assets/files/ed2f158a-e44e-432d-971e-e5da1a2e33b4/key/cdd8007d-dcaf-4163-b497-92d378679668.png',
               },
             ],
+            createdAt: response.body[1].Resource.createdAt,
+            updatedAt: response.body[1].Resource.updatedAt,
           },
         },
       ]);
@@ -170,6 +174,8 @@ describe('/api/stops/:StopId/resources', () => {
               variant: 'en-us',
             },
           ],
+          createdAt: response.body.Resource.createdAt,
+          updatedAt: response.body.Resource.updatedAt,
         },
       });
     });
@@ -221,6 +227,8 @@ describe('/api/stops/:StopId/resources', () => {
               name: 'English (US)',
             },
           ],
+          createdAt: response.body.Resource.createdAt,
+          updatedAt: response.body.Resource.updatedAt,
         },
       });
     });

@@ -42,6 +42,7 @@ function TeamAssetsList() {
         <title>Assets - {staticContext?.env?.SITE_TITLE}</title>
       </Helmet>
       <main className="container">
+        <h1 className="mb-5">Assets</h1>
         <ResourcesList onNew={onNew} onEdit={onEdit} refreshToken={refreshToken} />
       </main>
       {isEditing && (
