@@ -22,6 +22,8 @@ export default function (sequelize, DataTypes) {
         'descriptions',
         'variants',
         'visibility',
+        'createdAt',
+        'updatedAt',
       ]);
       if (this.CoverResource) {
         json.CoverResource = this.CoverResource.toJSON();

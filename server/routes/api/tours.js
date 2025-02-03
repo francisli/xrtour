@@ -25,7 +25,7 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
     where: { TeamId },
   };
   const { records, pages, total } = await models.Tour.paginate(options);
-  helpers.setPaginationHeaders(req, res, options.page, pages, total);
+  helpers.setPaginationHeaders(req, res, page, pages, total);
   res.json(records.map((record) => record.toJSON()));
 });
 

@@ -166,8 +166,8 @@ const Api = {
     },
   },
   tours: {
-    index(TeamId) {
-      return instance.get(`/api/tours`, { params: { TeamId } });
+    index(TeamId, page) {
+      return instance.get(`/api/tours`, { params: { TeamId, page } });
     },
     create(data) {
       return instance.post('/api/tours', data);

@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
 
+import { useAuthContext } from '../AuthContext';
 import { useStaticContext } from '../StaticContext';
 import ResourceForm from '../Resources/ResourceForm';
 import ResourcesList from '../Resources/ResourcesList';
 
 function TeamAssetsList() {
+  const { membership } = useAuthContext();
   const staticContext = useStaticContext();
 
   const [isEditing, setEditing] = useState(false);
@@ -39,10 +41,12 @@ function TeamAssetsList() {
   return (
     <>
       <Helmet>
-        <title>Assets - {staticContext?.env?.SITE_TITLE}</title>
+        <title>
+          {membership?.Team?.name ?? ''} - Assets - {staticContext?.env?.SITE_TITLE}
+        </title>
       </Helmet>
       <main className="container">
-        <h1 className="mb-5">Assets</h1>
+        <h1 className="mb-5">{membership?.Team?.name ?? ''} - Assets</h1>
         <ResourcesList onNew={onNew} onEdit={onEdit} refreshToken={refreshToken} />
       </main>
       {isEditing && (
