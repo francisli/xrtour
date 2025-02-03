@@ -10,7 +10,7 @@ export default function (sequelize, DataTypes) {
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'data', 'variants', 'createdAt', 'updatedAt']);
+      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'data', 'variants', 'createdAt', 'updatedAt', 'archivedAt']);
       if (this.Files) {
         json.Files = this.Files.map((f) => f.toJSON());
       }
@@ -45,6 +45,7 @@ export default function (sequelize, DataTypes) {
       },
       data: DataTypes.JSONB,
       variants: DataTypes.JSONB,
+      archivedAt: DataTypes.DATE,
     },
     {
       sequelize,

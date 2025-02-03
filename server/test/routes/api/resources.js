@@ -93,6 +93,7 @@ describe('/api/resources', () => {
         id: response.body.id,
         createdAt: response.body.createdAt,
         updatedAt: response.body.updatedAt,
+        archivedAt: null,
       });
 
       const record = await models.Resource.findByPk(response.body.id);
@@ -188,6 +189,7 @@ describe('/api/resources', () => {
         ],
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
+        archivedAt: null,
       });
     });
   });

@@ -84,6 +84,7 @@ describe('/api/stops/:StopId/resources', () => {
             ],
             createdAt: response.body[0].Resource.createdAt,
             updatedAt: response.body[0].Resource.updatedAt,
+            archivedAt: null,
           },
         },
         {
@@ -123,6 +124,7 @@ describe('/api/stops/:StopId/resources', () => {
             ],
             createdAt: response.body[1].Resource.createdAt,
             updatedAt: response.body[1].Resource.updatedAt,
+            archivedAt: null,
           },
         },
       ]);
@@ -176,6 +178,7 @@ describe('/api/stops/:StopId/resources', () => {
           ],
           createdAt: response.body.Resource.createdAt,
           updatedAt: response.body.Resource.updatedAt,
+          archivedAt: null,
         },
       });
     });
@@ -229,6 +232,7 @@ describe('/api/stops/:StopId/resources', () => {
           ],
           createdAt: response.body.Resource.createdAt,
           updatedAt: response.body.Resource.updatedAt,
+          archivedAt: null,
         },
       });
     });

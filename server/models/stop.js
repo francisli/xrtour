@@ -23,6 +23,9 @@ export default function (sequelize, DataTypes) {
         'names',
         'descriptions',
         'variants',
+        'createdAt',
+        'updatedAt',
+        'archivedAt',
       ]);
       if (this.Resources) {
         json.Resources = this.Resources.map((sr) => sr.toJSON());
@@ -78,6 +81,7 @@ export default function (sequelize, DataTypes) {
       names: DataTypes.JSONB,
       descriptions: DataTypes.JSONB,
       variants: DataTypes.JSONB,
+      archivedAt: DataTypes.DATE,
     },
     {
       sequelize,

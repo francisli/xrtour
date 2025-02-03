@@ -59,6 +59,7 @@ describe('/api/tours', () => {
         CoverResourceId: null,
         createdAt: response.body.createdAt,
         updatedAt: response.body.updatedAt,
+        archivedAt: null,
       });
 
       const record = await models.Tour.findByPk(response.body.id);
@@ -166,6 +167,7 @@ describe('/api/tours', () => {
         visibility: 'PRIVATE',
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
+        archivedAt: null,
         Team: {
           id: '1a93d46d-89bf-463b-ab23-8f22f5777907',
           link: 'regularuser',

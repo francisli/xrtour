@@ -64,6 +64,9 @@ describe('/api/stops', () => {
         destAddress: null,
         destCoordinate: null,
         destRadius: null,
+        createdAt: response.body.createdAt,
+        updatedAt: response.body.updatedAt,
+        archivedAt: null,
       });
 
       const record = await models.Stop.findByPk(response.body.id);
@@ -188,6 +191,9 @@ describe('/api/stops', () => {
           'en-us': 'CHSA is the oldest organization in the country dedicated to the preservation of Chinese American history.',
         },
         variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        archivedAt: null,
       });
     });
   });

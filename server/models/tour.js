@@ -24,6 +24,7 @@ export default function (sequelize, DataTypes) {
         'visibility',
         'createdAt',
         'updatedAt',
+        'archivedAt',
       ]);
       if (this.CoverResource) {
         json.CoverResource = this.CoverResource.toJSON();
@@ -83,6 +84,7 @@ export default function (sequelize, DataTypes) {
       descriptions: DataTypes.JSONB,
       variants: DataTypes.JSONB,
       visibility: DataTypes.ENUM('PUBLIC', 'UNLISTED', 'PRIVATE'),
+      archivedAt: DataTypes.DATE,
     },
     {
       sequelize,
