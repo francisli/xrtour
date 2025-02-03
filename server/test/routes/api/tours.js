@@ -57,6 +57,8 @@ describe('/api/tours', () => {
         id: response.body.id,
         IntroStopId: null,
         CoverResourceId: null,
+        createdAt: response.body.createdAt,
+        updatedAt: response.body.updatedAt,
       });
 
       const record = await models.Tour.findByPk(response.body.id);
@@ -162,6 +164,8 @@ describe('/api/tours', () => {
         descriptions: { 'en-us': 'Tour 2 description' },
         variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
         visibility: 'PRIVATE',
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
         Team: {
           id: '1a93d46d-89bf-463b-ab23-8f22f5777907',
           link: 'regularuser',
