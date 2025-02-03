@@ -1,8 +1,8 @@
 import { Helmet } from 'react-helmet-async';
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faList, faTableCells } from '@fortawesome/free-solid-svg-icons';
+import { faList, faPlus, faTableCells } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
 import { DateTime } from 'luxon';
 
@@ -58,21 +58,30 @@ function ToursList() {
       </Helmet>
       <main className="container">
         <h1 className="mb-3">{membership?.Team?.name} - Tours</h1>
-        <div className="mb-3 text-end">
-          <span className="me-2">View:</span>
-          <div className="btn-group" role="group" aria-label="View options button group">
-            <button
-              type="button"
-              className={classNames('btn btn-outline-secondary', { active: view === 'list' })}
-              onClick={() => setView('list')}>
-              <FontAwesomeIcon icon={faList} />
-            </button>
-            <button
-              type="button"
-              className={classNames('btn btn-outline-secondary', { active: view === 'card' })}
-              onClick={() => setView('card')}>
-              <FontAwesomeIcon icon={faTableCells} />
-            </button>
+        <div className="mb-3 d-flex justify-content-between align-items-center">
+          <div>
+            {membership?.role !== 'VIEWER' && (
+              <Link to="new" className="btn btn-primary">
+                <FontAwesomeIcon icon={faPlus} /> New Tour
+              </Link>
+            )}
+          </div>
+          <div>
+            <span className="me-2">View:</span>
+            <div className="btn-group" role="group" aria-label="View options button group">
+              <button
+                type="button"
+                className={classNames('btn btn-outline-secondary', { active: view === 'list' })}
+                onClick={() => setView('list')}>
+                <FontAwesomeIcon icon={faList} />
+              </button>
+              <button
+                type="button"
+                className={classNames('btn btn-outline-secondary', { active: view === 'card' })}
+                onClick={() => setView('card')}>
+                <FontAwesomeIcon icon={faTableCells} />
+              </button>
+            </div>
           </div>
         </div>
         {!tours && <div className="spinner-border"></div>}
@@ -95,16 +104,20 @@ function ToursList() {
                       <td></td>
                     </tr>
                   ))}
+                  {tours.length === 0 && (
+                    <tr>
+                      <td colSpan={3}>No tours yet.</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             )}
             {view === 'card' && (
               <div className="row">
-                {membership?.role !== 'VIEWER' && <TourCard href="new" />}
                 {tours.map((tour) => (
                   <TourCard key={tour.id} tour={tour} href={tour.id} />
                 ))}
-                {membership?.role === 'VIEWER' && tours.length === 0 && <div>No tours to view yet.</div>}
+                {tours.length === 0 && <div>No tours yet.</div>}
               </div>
             )}
             <Pagination page={page} lastPage={lastPage} otherParams={{ view }} />
