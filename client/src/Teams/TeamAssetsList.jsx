@@ -46,7 +46,7 @@ function TeamAssetsList() {
         </title>
       </Helmet>
       <main className="container">
-        <h1 className="mb-5">{membership?.Team?.name ?? ''} - Assets</h1>
+        <h1 className="mb-3">{membership?.Team?.name ?? ''} - Assets</h1>
         <ResourcesList onNew={onNew} onEdit={onEdit} refreshToken={refreshToken} />
       </main>
       {isEditing && (

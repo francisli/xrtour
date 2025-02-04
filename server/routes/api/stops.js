@@ -1,6 +1,7 @@
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
 import _ from 'lodash';
+import { Op } from 'sequelize';
 
 import helpers from '../helpers.js';
 import interceptors from '../interceptors.js';
@@ -11,7 +12,7 @@ import stopResourcesRouter from './stopResources.js';
 const router = express.Router();
 
 router.get('/', interceptors.requireLogin, async (req, res) => {
-  const { page = '1', TeamId, type = 'STOP' } = req.query;
+  const { page = '1', TeamId, type = 'STOP', show, search } = req.query;
   const team = await models.Team.findByPk(TeamId);
   const membership = await team?.getMembership(req.user);
   if (!membership) {
@@ -24,6 +25,16 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
     order: [['name', 'ASC']],
     where: { TeamId, type },
   };
+  if (show === 'active') {
+    options.where.archivedAt = null;
+  } else if (show === 'archived') {
+    options.where.archivedAt = { [models.Sequelize.Op.ne]: null };
+  }
+  if (search && search.trim() !== '') {
+    options.where.name = {
+      [Op.iLike]: `%${search.trim()}%`,
+    };
+  }
   const { records, pages, total } = await models.Stop.paginate(options);
   helpers.setPaginationHeaders(req, res, options.page, pages, total);
   res.json(records.map((record) => record.toJSON()));

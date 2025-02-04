@@ -153,9 +153,16 @@ function Stop({ StopId, transition, children }) {
                     <li className="breadcrumb-item">
                       <Link to="/">Home</Link>
                     </li>
-                    <li className="breadcrumb-item">
-                      <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.names[tour?.variants[0].code]}</Link>
-                    </li>
+                    {tour && (
+                      <li className="breadcrumb-item">
+                        <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.names[tour?.variants[0].code]}</Link>
+                      </li>
+                    )}
+                    {!tour && (
+                      <li className="breadcrumb-item">
+                        <Link to={`/teams/${membership?.TeamId}/stops`}>Stops</Link>
+                      </li>
+                    )}
                     <li className="breadcrumb-item active" aria-current="page">
                       {title}
                     </li>

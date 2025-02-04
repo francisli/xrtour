@@ -68,13 +68,13 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
       clearTimeout(timeoutRef.current);
     }
     timeoutRef.current = setTimeout(() => {
-      setSearchParams({ q: value, view, type });
+      setSearchParams({ q: value, view, type, show });
     }, 300);
   }
 
   function setView(newView) {
     if (newView !== view) {
-      setSearchParams({ q: searchDebounced, view: newView, type, show });
+      setSearchParams({ q: searchDebounced, view: newView, type, show, page });
     }
   }
 

@@ -125,8 +125,8 @@ const Api = {
     },
   },
   stops: {
-    index(TeamId, search, type) {
-      return instance.get(`/api/stops`, { params: { TeamId, search, type } });
+    index(TeamId, type, show, search, page) {
+      return instance.get(`/api/stops`, { params: { TeamId, type, show, search, page } });
     },
     create(data) {
       return instance.post('/api/stops', data);

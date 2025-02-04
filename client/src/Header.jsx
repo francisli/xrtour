@@ -53,11 +53,16 @@ function Header() {
           <ul className="navbar-nav flex-grow-1 mb-2 mb-md-0">
             <li className="nav-item">
               <Link className="nav-link" aria-current="page" to="/" onClick={hideNavbar}>
-                Home
+                {membership ? 'Tours' : 'Home'}
               </Link>
             </li>
             {membership && (
               <>
+                <li className="nav-item">
+                  <Link className="nav-link" aria-current="page" to={`/teams/${membership.TeamId}/stops`} onClick={hideNavbar}>
+                    Stops
+                  </Link>
+                </li>
                 <li className="nav-item">
                   <Link className="nav-link" aria-current="page" to={`/teams/${membership.TeamId}/assets`} onClick={hideNavbar}>
                     Assets
