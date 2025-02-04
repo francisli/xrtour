@@ -103,8 +103,8 @@ function ToursList() {
               <table className="table table-striped table-hover">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Created</th>
+                    <th className="w-75">Name</th>
+                    <th className="w-25">Created</th>
                   </tr>
                 </thead>
                 <tbody>

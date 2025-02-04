@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faList, faTableCells } from '@fortawesome/free-solid-svg-icons';
+import { faList, faPlus, faTableCells } from '@fortawesome/free-solid-svg-icons';
 import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 
@@ -124,31 +124,34 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
             </button>
           )}
         </ul>
-        <div className="mb-3">
-          <input onChange={onSearchChange} value={search} type="search" className="form-control" placeholder="Search..." />
-        </div>
-        <div className="mb-3">
-          <button onClick={() => onNew(type)} type="button" className="btn btn-primary">
-            New Asset
-          </button>
-        </div>
       </div>
       <div className="col-md-9">
-        <div className="mb-3">
-          <span className="me-2">View:</span>
-          <div className="btn-group" role="group" aria-label="View options button group">
-            <button
-              type="button"
-              className={classNames('btn btn-outline-secondary', { active: view === 'list' })}
-              onClick={() => setView('list')}>
-              <FontAwesomeIcon icon={faList} />
-            </button>
-            <button
-              type="button"
-              className={classNames('btn btn-outline-secondary', { active: view === 'card' })}
-              onClick={() => setView('card')}>
-              <FontAwesomeIcon icon={faTableCells} />
-            </button>
+        <div className="mb-3 d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center">
+            {membership?.role !== 'VIEWER' && (
+              <button onClick={() => onNew(type)} type="button" className="btn btn-primary flex-shrink-0 me-3">
+                <FontAwesomeIcon icon={faPlus} />
+                &nbsp;New&nbsp;Asset
+              </button>
+            )}
+            <input onChange={onSearchChange} value={search} type="search" className="form-control" placeholder="Search..." />
+          </div>
+          <div className="d-flex align-items-center">
+            <span className="me-2">View:</span>
+            <div className="btn-group" role="group" aria-label="View options button group">
+              <button
+                type="button"
+                className={classNames('btn btn-outline-secondary', { active: view === 'list' })}
+                onClick={() => setView('list')}>
+                <FontAwesomeIcon icon={faList} />
+              </button>
+              <button
+                type="button"
+                className={classNames('btn btn-outline-secondary', { active: view === 'card' })}
+                onClick={() => setView('card')}>
+                <FontAwesomeIcon icon={faTableCells} />
+              </button>
+            </div>
           </div>
         </div>
         {!resources && <div className="spinner-border"></div>}
@@ -163,11 +166,11 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
               </div>
             )}
             {view === 'list' && (
-              <table className="table">
+              <table className="table table-striped table-hover">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Uploaded At</th>
+                    <th className="w-50">Name</th>
+                    <th className="w-25">Uploaded At</th>
                     <th></th>
                   </tr>
                 </thead>
