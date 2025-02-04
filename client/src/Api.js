@@ -181,6 +181,12 @@ const Api = {
     archive(id) {
       return instance.delete(`/api/tours/${id}`);
     },
+    restore(id) {
+      return instance.patch(`/api/tours/${id}/restore`);
+    },
+    delete(id) {
+      return instance.delete(`/api/tours/${id}?isPermanent=true`);
+    },
     stops(TourId) {
       return {
         index() {

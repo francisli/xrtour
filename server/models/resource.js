@@ -50,6 +50,11 @@ export default function (sequelize, DataTypes) {
       const { transaction } = options ?? {};
       return this.update({ archivedAt: new Date() }, { transaction });
     }
+
+    async restore(options) {
+      const { transaction } = options ?? {};
+      return this.update({ archivedAt: null }, { transaction });
+    }
   }
 
   Resource.init(

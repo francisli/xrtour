@@ -9,10 +9,8 @@ import TimeCode from 'shared/Components/TimeCode';
 import ConfirmModal from '../Components/ConfirmModal';
 
 import './ResourcesTable.scss';
-import { useAuthContext } from '../AuthContext';
 
-function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
-  const { membership } = useAuthContext();
+function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEditable }) {
   const [selectedResource, setSelectedResource] = useState();
   const [selectedResourceClone, setSelectedResourceClone] = useState();
   const [isEditing, setEditing] = useState(false);
@@ -122,13 +120,14 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove }) {
                         name="pauseAtEnd"
                         checked={r.pauseAtEnd}
                         className="form-check-input"
+                        disabled={!isEditable}
                       />
                     </span>
                   )}
                 </div>
               </td>
               <td className="resources-table__col-actions">
-                {membership.role !== 'VIEWER' && (
+                {isEditable && (
                   <>
                     {isEditing && selectedResource === r && (
                       <>
@@ -197,6 +196,7 @@ ResourcesTable.propTypes = {
   onClick: PropTypes.func,
   onChange: PropTypes.func,
   onRemove: PropTypes.func,
+  isEditable: PropTypes.bool,
 };
 
 export default ResourcesTable;

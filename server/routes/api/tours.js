@@ -136,7 +136,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
   }
 });
 
-router.delete('/:id', interceptors.requireLogin, async (req, res) => {
+router.patch('/:id/restore', interceptors.requireLogin, async (req, res) => {
   let status = StatusCodes.INTERNAL_SERVER_ERROR;
   await models.sequelize.transaction(async (transaction) => {
     const record = await models.Tour.findByPk(req.params.id, { include: 'Team', transaction });
@@ -146,15 +146,39 @@ router.delete('/:id', interceptors.requireLogin, async (req, res) => {
     }
     const membership = await record.Team.getMembership(req.user, { transaction });
     if (!membership || !membership.isEditor) {
-      status = StatusCodes.UNAUTHORIZED;
+      status = StatusCodes.FORBIDDEN;
       return;
     }
     try {
-      await record.archive({ transaction });
+      await record.restore({ transaction });
+      status = StatusCodes.NO_CONTENT;
     } catch (error) {
       console.log(error);
     }
-    status = StatusCodes.NO_CONTENT;
+  });
+  res.status(status).end();
+});
+
+router.delete('/:id', interceptors.requireLogin, async (req, res) => {
+  const { isPermanent = 'false' } = req.query;
+  let status = StatusCodes.INTERNAL_SERVER_ERROR;
+  await models.sequelize.transaction(async (transaction) => {
+    const record = await models.Tour.findByPk(req.params.id, { include: 'Team', transaction });
+    if (!record) {
+      status = StatusCodes.NOT_FOUND;
+      return;
+    }
+    const membership = await record.Team.getMembership(req.user, { transaction });
+    if (!membership || !membership.isEditor) {
+      status = StatusCodes.FORBIDDEN;
+      return;
+    }
+    try {
+      await record.delete({ isPermanent: isPermanent === 'true', transaction });
+      status = StatusCodes.NO_CONTENT;
+    } catch (error) {
+      console.log(error);
+    }
   });
   res.status(status).end();
 });

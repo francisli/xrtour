@@ -33,6 +33,15 @@ export default function (sequelize, DataTypes) {
       return this.update({ archivedAt: new Date() }, { transaction });
     }
 
+    async restore(options) {
+      const { transaction } = options ?? {};
+      const archivedAt = null;
+      const stopResources = await this.getResources({ transaction });
+      const resourceIds = stopResources.map((sr) => sr.ResourceId);
+      await sequelize.models.Resource.update({ archivedAt }, { where: { id: resourceIds }, transaction });
+      return this.update({ archivedAt }, { transaction });
+    }
+
     toJSON() {
       const json = _.pick(this.get(), [
         'id',

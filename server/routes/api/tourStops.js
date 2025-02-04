@@ -137,6 +137,7 @@ router.get('/:id', interceptors.requireLogin, async (req, res) => {
       if (!membership) {
         res.status(StatusCodes.UNAUTHORIZED).end();
       } else {
+        tourStop.Tour = tour;
         res.json(tourStop.toJSON());
       }
     } else {

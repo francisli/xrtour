@@ -47,6 +47,10 @@ function TourStop() {
     await Api.tours.stops(TourId).update(TourStopId, { TransitionStopId: null });
   }
 
+  const isEditor = membership?.role !== 'VIEWER';
+  const isArchived = !!TourStop?.Tour?.archivedAt;
+  const isEditable = isEditor && !isArchived;
+
   return (
     <>
       <Stop StopId={TourStop?.StopId} transition={TourStop?.TransitionStop}>
@@ -58,7 +62,7 @@ function TourStop() {
           onRemove={onRemoveTransition}
         />
         <div className="mb-5">
-          {membership?.role !== 'VIEWER' && (
+          {isEditable && (
             <button
               onClick={() => {
                 setShowingStopsModal(true);

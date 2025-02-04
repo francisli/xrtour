@@ -129,6 +129,10 @@ function Stop({ StopId, transition, children }) {
     return onSelectResource(response.data);
   }
 
+  const isEditor = membership?.role !== 'VIEWER';
+  const isArchived = !!stop?.archivedAt;
+  const isEditable = isEditor && !isArchived;
+
   const title = stop?.names[stop.variants[0].code] ?? '';
 
   return (
@@ -175,7 +179,7 @@ function Stop({ StopId, transition, children }) {
                   <FormGroup plaintext name="name" label="Name" value={stop.names[variant.code]} />
                   <FormGroup plaintext type="textarea" name="description" label="Description" value={stop.descriptions[variant.code]} />
                   <div className="mb-3">
-                    {membership.role !== 'VIEWER' && (
+                    {isEditable && (
                       <>
                         {!isRecording && (
                           <>
@@ -200,9 +204,10 @@ function Stop({ StopId, transition, children }) {
                   onClick={onClickResource}
                   onChange={onChangeResource}
                   onRemove={onRemoveResource}
+                  isEditable={isEditable}
                 />
                 <div className="mb-5">
-                  {membership.role !== 'VIEWER' && (
+                  {isEditable && (
                     <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
                       Add Asset
                     </button>

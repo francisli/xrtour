@@ -117,5 +117,16 @@ export default function (sequelize, DataTypes) {
       modelName: 'Version',
     }
   );
+
+  Version.afterDestroy((record, options) => {
+    const assetPrefix = process.env.ASSET_PATH_PREFIX || '';
+    const prefix = path.join(assetPrefix, 'versions', record.id);
+    if (options.transaction) {
+      options.transaction.afterCommit(() => s3.deleteObjects(prefix));
+    } else {
+      return s3.deleteObjects(prefix);
+    }
+  });
+
   return Version;
 }

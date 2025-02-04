@@ -41,22 +41,18 @@ export default function (sequelize, DataTypes) {
       return json;
     }
 
-    async archive(options) {
-      const { transaction } = options ?? {};
+    async delete(options) {
+      const { isPermanent = false, transaction } = options ?? {};
       const resourceIds = new Set();
       const stopIds = new Set();
-      // archive cover resource if it is only used by this Tour
+      // helper function to check for and archive resource
       async function archiveResource(resource) {
         const tourIds = await resource.getReferencingTourIds({ transaction });
         if (tourIds.length === 1) {
           resourceIds.add(resource.id);
         }
       }
-      const resource = await this.getCoverResource({ transaction });
-      if (resource) {
-        await archiveResource(resource);
-      }
-      // archive intro stop if it is only used by this Tour
+      // helper function to check for and archive stop
       async function archiveStop(stop) {
         const tourIds = await stop.getReferencingTourIds({ transaction });
         if (tourIds.length === 1) {
@@ -75,11 +71,17 @@ export default function (sequelize, DataTypes) {
           stopIds.add(stop.id);
         }
       }
+      // archive cover resource if it is only used by this Tour
+      const resource = await this.getCoverResource({ transaction });
+      if (resource) {
+        await archiveResource(resource);
+      }
+      // archive intro stop if it is only used by this Tour
       const intro = await this.getIntroStop({ transaction });
       if (intro) {
         await archiveStop(intro);
       }
-      // archive stops if they are only used by this Tour
+      // archive stops/transitions if they are only used by this Tour
       const tourStops = await this.getTourStops({
         include: [sequelize.models.Stop, { model: sequelize.models.Stop, as: 'TransitionStop' }],
         transaction,
@@ -94,12 +96,64 @@ export default function (sequelize, DataTypes) {
           }
         })
       );
-      // mark collected resources and stops as archived
-      const archivedAt = new Date();
+      if (isPermanent) {
+        // delete this tour's associations to stops
+        await sequelize.models.TourStop.destroy({ where: { TourId: this.id }, transaction });
+        // delete any published versions
+        await sequelize.models.Version.destroy({ where: { TourId: this.id }, individualHooks: true, transaction });
+        // delete this tour to release its references to cover resource and intro stop
+        await this.destroy({ transaction });
+        // delete collected resources
+        await sequelize.models.StopResource.destroy({ where: { ResourceId: Array.from(resourceIds) }, transaction });
+        await Promise.all(
+          (
+            await sequelize.models.Resource.findAll({ where: { id: Array.from(resourceIds) }, transaction })
+          ).map(async (r) => {
+            const files = await r.getFiles({ transaction });
+            await Promise.all(files.map((f) => f.destroy({ transaction })));
+            return r.destroy({ transaction });
+          })
+        );
+        // delete collected stops
+        await sequelize.models.StopResource.destroy({ where: { StopId: Array.from(stopIds) }, transaction });
+        return Promise.all(
+          (await sequelize.models.Stop.findAll({ where: { id: Array.from(stopIds) }, transaction })).map(async (s) =>
+            s.destroy({ transaction })
+          )
+        );
+      } else {
+        // mark collected resources and stops as archived
+        const archivedAt = new Date();
+        await Promise.all(
+          Array.from(resourceIds).map((id) => sequelize.models.Resource.update({ archivedAt }, { where: { id }, transaction }))
+        );
+        await Promise.all(Array.from(stopIds).map((id) => sequelize.models.Stop.update({ archivedAt }, { where: { id }, transaction })));
+        // mark this tour as archived
+        return this.update({ archivedAt }, { transaction });
+      }
+    }
+
+    async restore(options) {
+      const { transaction } = options ?? {};
+      const archivedAt = null;
+      // restore cover resource if it was archived
+      const resource = await this.getCoverResource({ transaction });
+      await resource?.restore({ transaction });
+      // restore intro stop if it was archived
+      const intro = await this.getIntroStop({ transaction });
+      await intro?.restore({ transaction });
+      // restore all stops/transitions if they were archived
+      const tourStops = await this.getTourStops({
+        include: [sequelize.models.Stop, { model: sequelize.models.Stop, as: 'TransitionStop' }],
+        transaction,
+      });
       await Promise.all(
-        Array.from(resourceIds).map((id) => sequelize.models.Resource.update({ archivedAt }, { where: { id }, transaction }))
+        tourStops.map(async (ts) => {
+          await ts.Stop?.restore({ transaction });
+          await ts.TransitionStop?.restore({ transaction });
+        })
       );
-      await Promise.all(Array.from(stopIds).map((id) => sequelize.models.Stop.update({ archivedAt }, { where: { id }, transaction })));
+      // mark this stop as unarchived
       return this.update({ archivedAt }, { transaction });
     }
   }
