@@ -52,7 +52,7 @@ function ToursList() {
 
   function onChangeShow(newShow) {
     if (newShow !== show) {
-      setSearchParams({ view, page, show: newShow });
+      setSearchParams({ view, show: newShow });
     }
   }
 

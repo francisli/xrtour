@@ -108,8 +108,8 @@ const Api = {
     },
   },
   resources: {
-    index(TeamId, type, search, page) {
-      return instance.get(`/api/resources`, { params: { TeamId, type, search, page } });
+    index(TeamId, type, show, search, page) {
+      return instance.get(`/api/resources`, { params: { TeamId, type, show, search, page } });
     },
     create(data) {
       return instance.post('/api/resources', data);

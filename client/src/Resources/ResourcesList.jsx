@@ -15,6 +15,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
   const { membership } = useAuthContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const show = searchParams.get('show') ?? 'active';
   const view = searchParams.get('view') ?? 'list';
   const type = searchParams.get('type') ?? (types ? types[0] : initialType);
   const searchDebounced = searchParams.get('q') ?? '';
@@ -30,7 +31,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
     let isCancelled = false;
     if (membership) {
       setResources(undefined);
-      Api.resources.index(membership.TeamId, type, searchDebounced, page).then((response) => {
+      Api.resources.index(membership.TeamId, type, show, searchDebounced, page).then((response) => {
         if (isCancelled) return;
         setResources(response.data);
         const linkHeader = Api.parseLinkHeader(response);
@@ -45,11 +46,17 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
       });
     }
     return () => (isCancelled = true);
-  }, [membership, type, refreshToken, searchDebounced, page]);
+  }, [membership, type, show, searchDebounced, page, refreshToken]);
 
   function onClickType(newType) {
     if (type !== newType) {
-      setSearchParams({ q: searchDebounced, view, type: newType });
+      setSearchParams({ q: searchDebounced, view, type: newType, show });
+    }
+  }
+
+  function onChangeShow(newShow) {
+    if (newShow !== show) {
+      setSearchParams({ q: searchDebounced, view, type, show: newShow });
     }
   }
 
@@ -67,7 +74,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
 
   function setView(newView) {
     if (newView !== view) {
-      setSearchParams({ q: searchDebounced, view: newView, type });
+      setSearchParams({ q: searchDebounced, view: newView, type, show });
     }
   }
 
@@ -137,6 +144,11 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
             <input onChange={onSearchChange} value={search} type="search" className="form-control" placeholder="Search..." />
           </div>
           <div className="d-flex align-items-center">
+            <span className="me-2">Show:</span>
+            <select className="form-select me-3" value={show} onChange={(event) => onChangeShow(event.target.value)}>
+              <option value="active">Active</option>
+              <option value="archived">Archived</option>
+            </select>
             <span className="me-2">View:</span>
             <div className="btn-group" role="group" aria-label="View options button group">
               <button
@@ -170,25 +182,22 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
                 <thead>
                   <tr>
                     <th className="w-50">Name</th>
+                    <th className="w-25"></th>
                     <th className="w-25">Uploaded At</th>
-                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {resources.map((r) => (
                     <tr key={r.id}>
-                      <td>{r.name}</td>
-                      <td>{DateTime.fromISO(r.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}</td>
-                      <td>
+                      <td onClick={() => onEdit(r)}>{r.name}</td>
+                      <td onClick={onSelect ? undefined : () => onEdit(r)}>
                         {onSelect && (
                           <button onClick={() => onSelect(r)} type="button" className="btn btn-link">
                             Select
                           </button>
                         )}
-                        <button onClick={() => onEdit(r)} type="button" className="btn btn-link border-0 p-0">
-                          Edit
-                        </button>
                       </td>
+                      <td onClick={() => onEdit(r)}>{DateTime.fromISO(r.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}</td>
                     </tr>
                   ))}
                 </tbody>
