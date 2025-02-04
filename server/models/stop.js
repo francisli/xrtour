@@ -1,4 +1,4 @@
-import { Model, Op } from 'sequelize';
+import { Model, Op, Sequelize } from 'sequelize';
 import _ from 'lodash';
 
 export default function (sequelize, DataTypes) {
@@ -6,6 +6,31 @@ export default function (sequelize, DataTypes) {
     static associate(models) {
       Stop.belongsTo(models.Team);
       Stop.hasMany(models.StopResource, { as: 'Resources' });
+      Stop.hasMany(models.Tour, { as: 'IntroducedTours', foreignKey: 'IntroStopId' });
+      Stop.hasMany(models.TourStop);
+      Stop.hasMany(models.TourStop, { as: 'TransitionedTourStops', foreignKey: 'TransitionStopId' });
+    }
+
+    async getReferencingTourIds(options) {
+      const { transaction } = options ?? {};
+      const introducedTourIds = (
+        await this.getIntroducedTours({ attributes: [Sequelize.fn('DISTINCT', Sequelize.col('id'))], raw: true, transaction })
+      ).map((row) => row.id);
+      const tourIds = (
+        await sequelize.models.TourStop.findAll({
+          attributes: [Sequelize.fn('DISTINCT', Sequelize.col('TourId'))],
+          where: { [Op.or]: { StopId: this.id, TransitionStopId: this.id } },
+          raw: true,
+          transaction,
+        })
+      ).map((row) => row.TourId);
+      const tourIdSet = new Set([...introducedTourIds, ...tourIds]);
+      return Array.from(tourIdSet);
+    }
+
+    async archive(options) {
+      const { transaction } = options ?? {};
+      return this.update({ archivedAt: new Date() }, { transaction });
     }
 
     toJSON() {
@@ -90,8 +115,10 @@ export default function (sequelize, DataTypes) {
   );
 
   Stop.beforeValidate((record) => {
-    const [variant] = record.variants;
-    record.name = record.names[variant.code] ?? '';
+    const [variant] = record.variants ?? [];
+    if (variant) {
+      record.name = record.names[variant.code] ?? '';
+    }
   });
 
   return Stop;

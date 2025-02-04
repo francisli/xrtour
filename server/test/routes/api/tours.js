@@ -14,7 +14,19 @@ describe('/api/tours', () => {
       ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
       ['00-04.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
     ]);
-    await helper.loadFixtures(['users', 'invites', 'teams', 'memberships', 'tours', 'resources', 'files']);
+    await helper.loadFixtures([
+      'users',
+      'invites',
+      'invites',
+      'teams',
+      'memberships',
+      'resources',
+      'files',
+      'tours',
+      'stops',
+      'tourStops',
+      'stopResources',
+    ]);
     testSession = session(app);
     await testSession
       .post('/api/auth/login')
@@ -183,6 +195,27 @@ describe('/api/tours', () => {
           ],
         },
       });
+    });
+  });
+
+  describe('DELETE /:id', () => {
+    it('archives a Tour and orphaned Stops and Resources', async () => {
+      await testSession.delete('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352').expect(StatusCodes.NO_CONTENT);
+
+      let record = await models.Tour.findByPk('495b18a8-ae05-4f44-a06d-c1809add0352');
+      assert.ok(record.archivedAt);
+
+      record = await models.Stop.findByPk('e39b97ad-a5e9-422c-b256-d50fec355285');
+      assert.ok(record.archivedAt);
+
+      record = await models.Stop.findByPk('bba84716-633e-4593-85a0-9da4010eb99b');
+      assert.ok(record.archivedAt);
+
+      record = await models.Resource.findByPk('0cb2ce76-c5ca-454f-9fb1-47051b0f21ab');
+      assert.ok(record.archivedAt);
+
+      record = await models.Resource.findByPk('6ebacda9-8d33-4c3e-beb5-18dffb119046');
+      assert.ok(record.archivedAt);
     });
   });
 });

@@ -8,6 +8,7 @@ import { pluralize } from 'inflection';
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
 import { useStaticContext } from '../StaticContext';
+import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
 import VariantTabs from '../Components/VariantTabs';
 import ResourcesModal from '../Resources/ResourcesModal';
@@ -40,6 +41,14 @@ function Tour() {
       });
     return () => (isCancelled = true);
   }, [TourId]);
+
+  const [isConfirmArchiveShowing, setConfirmArchiveShowing] = useState(false);
+
+  async function archiveTour() {
+    await Api.tours.archive(tour.id);
+    setConfirmArchiveShowing(false);
+    navigate('/');
+  }
 
   const [isShowingResourcesModal, setShowingResourcesModal] = useState(false);
 
@@ -164,9 +173,14 @@ function Tour() {
                       </OverlayTrigger>
                     </div>
                     {membership.role !== 'VIEWER' && (
-                      <Link className="btn btn-outline-primary" to="publish">
-                        Publish
-                      </Link>
+                      <div>
+                        <button onClick={() => setConfirmArchiveShowing(true)} type="button" className="btn btn-outline-primary me-2">
+                          Archive
+                        </button>
+                        <Link className="btn btn-primary" to="publish">
+                          Publish
+                        </Link>
+                      </div>
                     )}
                   </div>
                 </form>
@@ -235,6 +249,11 @@ function Tour() {
         )}
         <ResourcesModal isShowing={isShowingResourcesModal} onHide={onHideResourcesModal} onSelect={onSelectResource} types={['IMAGE']} />
         <StopsModal type={stopType} isShowing={isShowingStopsModal} onHide={onHideStopsModal} onSelect={onSelectStop} />
+        {isConfirmArchiveShowing && (
+          <ConfirmModal isShowing={true} title="Archive Tour" onCancel={() => setConfirmArchiveShowing(false)} onOK={() => archiveTour()}>
+            Are you sure you wish to archive the tour <b>{tour?.names[tour.variants[0].code]}</b>?
+          </ConfirmModal>
+        )}
       </main>
     </>
   );

@@ -166,8 +166,8 @@ const Api = {
     },
   },
   tours: {
-    index(TeamId, page) {
-      return instance.get(`/api/tours`, { params: { TeamId, page } });
+    index(TeamId, show, page) {
+      return instance.get(`/api/tours`, { params: { TeamId, show, page } });
     },
     create(data) {
       return instance.post('/api/tours', data);
@@ -177,6 +177,9 @@ const Api = {
     },
     update(id, data) {
       return instance.patch(`/api/tours/${id}`, data);
+    },
+    archive(id) {
+      return instance.delete(`/api/tours/${id}`);
     },
     stops(TourId) {
       return {

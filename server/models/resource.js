@@ -1,4 +1,4 @@
-import { Model } from 'sequelize';
+import { Model, Sequelize } from 'sequelize';
 import _ from 'lodash';
 
 export default function (sequelize, DataTypes) {
@@ -7,6 +7,7 @@ export default function (sequelize, DataTypes) {
       Resource.belongsTo(models.Team);
       Resource.hasMany(models.File);
       Resource.hasMany(models.StopResource);
+      Resource.hasMany(models.Tour, { as: 'CoveredTours', foreignKey: 'CoverResourceId' });
     }
 
     toJSON() {
@@ -16,7 +17,41 @@ export default function (sequelize, DataTypes) {
       }
       return json;
     }
+
+    async getReferencingTourIds(options) {
+      const { transaction } = options ?? {};
+      const coveredTourIds = (
+        await this.getCoveredTours({ attributes: [Sequelize.fn('DISTINCT', Sequelize.col('id'))], raw: true, transaction })
+      ).map((row) => row.id);
+      const stopIds = (
+        await this.getStopResources({ attributes: [Sequelize.fn('DISTINCT', Sequelize.col('StopId'))], raw: true, transaction })
+      ).map((row) => row.StopId);
+      const tourIds = (
+        await sequelize.models.TourStop.findAll({
+          attributes: [Sequelize.fn('DISTINCT', Sequelize.col('TourId'))],
+          where: { [Sequelize.Op.or]: { StopId: stopIds, TransitionStopId: stopIds } },
+          raw: true,
+          transaction,
+        })
+      ).map((row) => row.TourId);
+      const introTourIds = (
+        await sequelize.models.Tour.findAll({
+          attributes: [Sequelize.fn('DISTINCT', Sequelize.col('id'))],
+          where: { IntroStopId: stopIds },
+          raw: true,
+          transaction,
+        })
+      ).map((row) => row.id);
+      const tourIdSet = new Set([...coveredTourIds, ...tourIds, ...introTourIds]);
+      return Array.from(tourIdSet);
+    }
+
+    async archive(options) {
+      const { transaction } = options ?? {};
+      return this.update({ archivedAt: new Date() }, { transaction });
+    }
   }
+
   Resource.init(
     {
       name: {

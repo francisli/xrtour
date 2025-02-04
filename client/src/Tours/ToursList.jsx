@@ -19,6 +19,7 @@ function ToursList() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const show = searchParams.get('show') ?? 'active';
   const view = searchParams.get('view') ?? 'list';
   const page = parseInt(searchParams.get('page') ?? '1', 10);
   const [lastPage, setLastPage] = useState(page);
@@ -27,7 +28,7 @@ function ToursList() {
   useEffect(() => {
     if (!membership) return;
     let isCancelled = false;
-    Api.tours.index(membership.TeamId).then((response) => {
+    Api.tours.index(membership.TeamId, show, page).then((response) => {
       if (isCancelled) return;
       setTours(response.data);
       const linkHeader = Api.parseLinkHeader(response);
@@ -41,11 +42,17 @@ function ToursList() {
       setLastPage(newLastPage);
     });
     return () => (isCancelled = true);
-  }, [membership, page]);
+  }, [membership, show, page]);
 
   function setView(newView) {
     if (newView !== view) {
-      setSearchParams({ view: newView });
+      setSearchParams({ view: newView, page, show });
+    }
+  }
+
+  function onChangeShow(newShow) {
+    if (newShow !== show) {
+      setSearchParams({ view, page, show: newShow });
     }
   }
 
@@ -66,7 +73,12 @@ function ToursList() {
               </Link>
             )}
           </div>
-          <div>
+          <div className="d-flex align-items-center">
+            <span className="me-2">Show:</span>
+            <select className="form-select me-3" value={show} onChange={(event) => onChangeShow(event.target.value)}>
+              <option value="active">Active</option>
+              <option value="archived">Archived</option>
+            </select>
             <span className="me-2">View:</span>
             <div className="btn-group" role="group" aria-label="View options button group">
               <button
@@ -93,20 +105,18 @@ function ToursList() {
                   <tr>
                     <th>Name</th>
                     <th>Created</th>
-                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {tours.map((tour) => (
                     <tr key={tour.id} onClick={() => navigate(tour.id)}>
-                      <td>{tour.names[tour.variants[0].code]}</td>
-                      <td>{DateTime.fromISO(tour.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}</td>
-                      <td></td>
+                      <td className="align-middle">{tour.names[tour.variants[0].code]}</td>
+                      <td className="align-middle">{DateTime.fromISO(tour.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}</td>
                     </tr>
                   ))}
                   {tours.length === 0 && (
                     <tr>
-                      <td colSpan={3}>No tours yet.</td>
+                      <td colSpan={2}>No tours yet.</td>
                     </tr>
                   )}
                 </tbody>

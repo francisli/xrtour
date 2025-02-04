@@ -92,7 +92,7 @@ function StopsTable({ type = 'STOP', stops, onClick, onRemove, onReorderStops })
 }
 
 StopsTable.propTypes = {
-  type: PropTypes,
+  type: PropTypes.string,
   stops: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
