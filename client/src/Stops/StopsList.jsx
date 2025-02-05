@@ -113,7 +113,7 @@ function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', ty
         <div className="mb-3 d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center">
             {membership?.role !== 'VIEWER' && (
-              <button onClick={() => onNewStop()} type="button" className="btn btn-primary flex-shrink-0 me-3">
+              <button onClick={() => onNewStop(type)} type="button" className="btn btn-primary flex-shrink-0 me-3">
                 <FontAwesomeIcon icon={faPlus} />
                 &nbsp;New&nbsp;{capitalize(type)}
               </button>
