@@ -137,6 +137,15 @@ const Api = {
     update(id, data) {
       return instance.patch(`/api/stops/${id}`, data);
     },
+    archive(id) {
+      return instance.delete(`/api/stops/${id}`);
+    },
+    restore(id) {
+      return instance.patch(`/api/stops/${id}/restore`);
+    },
+    delete(id) {
+      return instance.delete(`/api/stops/${id}?isPermanent=true`);
+    },
     resources(StopId) {
       return {
         index() {

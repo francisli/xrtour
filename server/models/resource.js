@@ -18,14 +18,20 @@ export default function (sequelize, DataTypes) {
       return json;
     }
 
+    async getReferencingStopIds(options = {}) {
+      const { transaction } = options;
+      const stopIds = (
+        await this.getStopResources({ attributes: [Sequelize.fn('DISTINCT', Sequelize.col('StopId'))], raw: true, transaction })
+      ).map((row) => row.StopId);
+      return stopIds;
+    }
+
     async getReferencingTourIds(options) {
       const { transaction } = options ?? {};
       const coveredTourIds = (
         await this.getCoveredTours({ attributes: [Sequelize.fn('DISTINCT', Sequelize.col('id'))], raw: true, transaction })
       ).map((row) => row.id);
-      const stopIds = (
-        await this.getStopResources({ attributes: [Sequelize.fn('DISTINCT', Sequelize.col('StopId'))], raw: true, transaction })
-      ).map((row) => row.StopId);
+      const stopIds = await this.getReferencingStopIds({ transaction });
       const tourIds = (
         await sequelize.models.TourStop.findAll({
           attributes: [Sequelize.fn('DISTINCT', Sequelize.col('TourId'))],

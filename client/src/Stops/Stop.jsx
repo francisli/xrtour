@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PropTypes from 'prop-types';
+import { capitalize } from 'inflection';
+import { StatusCodes } from 'http-status-codes';
 
 import PhoneScreen from 'shared/Components/Viewer/PhoneScreen';
 import StopViewer from 'shared/Components/Viewer/StopViewer';
 
 import Api from '../Api';
+import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
 import VariantTabs from '../Components/VariantTabs';
 import Recorder from '../Resources/Recorder';
@@ -29,6 +32,7 @@ function resourceSortComparator(r1, r2) {
 function Stop({ StopId, transition, children }) {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
+  const navigate = useNavigate();
   const { StopId: StopIdParam, TourId } = useParams();
   const [tour, setTour] = useState();
   const [stop, setStop] = useState();
@@ -68,6 +72,49 @@ function Stop({ StopId, transition, children }) {
     }
     return () => (isCancelled = true);
   }, [StopId, StopIdParam]);
+
+  const [isConfirmArchiveShowing, setConfirmArchiveShowing] = useState(false);
+  const [error, setError] = useState();
+
+  async function archiveStop() {
+    try {
+      await Api.stops.archive(stop.id);
+      navigate(`/teams/${membership.TeamId}/stops?type=${stop.type}`);
+    } catch (error) {
+      setConfirmArchiveShowing(false);
+      if (error.response?.status === StatusCodes.CONFLICT) {
+        setError(error);
+      }
+    }
+  }
+
+  const [isConfirmRestoreShowing, setConfirmRestoreShowing] = useState(false);
+
+  async function restoreStop() {
+    await Api.stops.restore(stop.id);
+    let response = await Api.stops.get(stop.id);
+    const { data: newStop } = response;
+    response = await Api.stops.resources(stop.id).index();
+    newStop.Resources = response.data;
+    setStop(newStop);
+    setVariant(newStop.variants[0]);
+    setResources(response.data);
+    setConfirmRestoreShowing(false);
+  }
+
+  const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
+
+  async function deleteStop() {
+    try {
+      await Api.stops.delete(stop.id);
+      navigate(`/teams/${membership.TeamId}/stops?type=${stop.type}`);
+    } catch (error) {
+      setConfirmDeleteShowing(false);
+      if (error.response?.status === StatusCodes.CONFLICT) {
+        setError(error);
+      }
+    }
+  }
 
   const [isRecording, setRecording] = useState(false);
   const [position, setPosition] = useState(0);
@@ -185,21 +232,41 @@ function Stop({ StopId, transition, children }) {
                   <VariantTabs variants={stop.variants} current={variant} setVariant={setVariant} />
                   <FormGroup plaintext name="name" label="Name" value={stop.names[variant.code]} />
                   <FormGroup plaintext type="textarea" name="description" label="Description" value={stop.descriptions[variant.code]} />
-                  <div className="mb-3">
+                  <div className="d-flex justify-content-between mb-3">
                     {isEditable && (
                       <>
-                        {!isRecording && (
-                          <>
-                            <Link className="btn btn-primary" to="edit">
-                              Edit
-                            </Link>
-                            &nbsp;
-                            <button onClick={() => setRecording(true)} className="btn btn-outline-danger" type="button">
-                              Record
-                            </button>
-                          </>
-                        )}
-                        {isRecording && <Recorder onSave={onSaveRecording} onCancel={() => setRecording(false)} />}
+                        <div>
+                          {!isRecording && (
+                            <>
+                              <Link className="btn btn-primary" to="edit">
+                                Edit
+                              </Link>
+                              &nbsp;
+                              <button onClick={() => setRecording(true)} className="btn btn-outline-danger" type="button">
+                                Record
+                              </button>
+                            </>
+                          )}
+                          {isRecording && <Recorder onSave={onSaveRecording} onCancel={() => setRecording(false)} />}
+                        </div>
+                        <div>
+                          <button onClick={() => setConfirmArchiveShowing(true)} type="button" className="btn btn-outline-primary">
+                            Archive
+                          </button>
+                        </div>
+                      </>
+                    )}
+                    {isArchived && (
+                      <>
+                        <div></div>
+                        <div>
+                          <button onClick={() => setConfirmRestoreShowing(true)} type="button" className="btn btn-outline-primary me-2">
+                            Restore
+                          </button>
+                          <button onClick={() => setConfirmDeleteShowing(true)} type="button" className="btn btn-primary">
+                            Delete Permanently
+                          </button>
+                        </div>
                       </>
                     )}
                   </div>
@@ -239,6 +306,48 @@ function Stop({ StopId, transition, children }) {
           </>
         )}
         <ResourcesModal isShowing={isShowingResourcesModal} onHide={onHideResourcesModal} onSelect={onSelectResource} />
+        {isConfirmArchiveShowing && (
+          <ConfirmModal
+            isShowing={true}
+            title={`Archive ${capitalize(stop?.type)}`}
+            onCancel={() => setConfirmArchiveShowing(false)}
+            onOK={() => archiveStop()}>
+            Are you sure you wish to archive <b>{stop?.names[stop.variants[0].code]}</b>?
+          </ConfirmModal>
+        )}
+        {isConfirmRestoreShowing && (
+          <ConfirmModal
+            isShowing={true}
+            title={`Restore ${capitalize(stop?.type)}`}
+            onCancel={() => setConfirmRestoreShowing(false)}
+            onOK={() => restoreStop()}>
+            Are you sure you wish to restore <b>{stop?.names[stop.variants[0].code]}</b>?
+          </ConfirmModal>
+        )}
+        {isConfirmDeleteShowing && (
+          <ConfirmModal
+            isShowing={true}
+            title={`Delete ${capitalize(stop?.type)} Permanently`}
+            onCancel={() => setConfirmDeleteShowing(false)}
+            onOK={() => deleteStop()}>
+            <p>
+              Are you sure you wish to delete <b>{stop?.names[stop.variants[0].code]}</b> permanently?
+            </p>
+            <p>This cannot be undone!</p>
+          </ConfirmModal>
+        )}
+        {!!error && (
+          <ConfirmModal isShowing={true} title={`An error has occurred`} onOK={() => setError()}>
+            <p>This {capitalize(stop?.type)} is still in use by the following tours:</p>
+            <div>
+              {error.response?.data?.map((t) => (
+                <div key={t.id}>
+                  <Link to={`/teams/${t.TeamId}/tours/${t.id}`}>{t.names[t.variants[0].code]}</Link>
+                </div>
+              ))}
+            </div>
+          </ConfirmModal>
+        )}
       </main>
     </>
   );

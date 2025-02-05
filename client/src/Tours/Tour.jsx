@@ -203,7 +203,7 @@ function Tour() {
                     </div>
                     {isEditable && (
                       <div>
-                        <button onClick={() => setConfirmArchiveShowing(true)} type="button" className="btn btn-outline-primary me-2">
+                        <button onClick={() => setConfirmArchiveShowing(true)} type="button" className="btn btn-outline-primary">
                           Archive
                         </button>
                       </div>

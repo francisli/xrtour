@@ -1,8 +1,17 @@
 import { Model, Op, Sequelize } from 'sequelize';
 import _ from 'lodash';
 
+export class StopReferencedError extends Error {
+  constructor(tours) {
+    super('Stop still referenced by Tours');
+    this.tours = tours;
+  }
+}
+
 export default function (sequelize, DataTypes) {
   class Stop extends Model {
+    static ReferencedError = StopReferencedError;
+
     static associate(models) {
       Stop.belongsTo(models.Team);
       Stop.hasMany(models.StopResource, { as: 'Resources' });
@@ -28,9 +37,55 @@ export default function (sequelize, DataTypes) {
       return Array.from(tourIdSet);
     }
 
-    async archive(options) {
-      const { transaction } = options ?? {};
-      return this.update({ archivedAt: new Date() }, { transaction });
+    async delete(options) {
+      const { transaction, isPermanent = false } = options ?? {};
+      const tourIds = await this.getReferencingTourIds({ transaction });
+      if (tourIds.length > 0) {
+        const tours = await sequelize.models.Tour.findAll({ where: { id: tourIds }, transaction });
+        throw new StopReferencedError(tours);
+      }
+      // collect stop resources only used by this stop
+      const resourceIds = new Set();
+      async function archiveResource(resource) {
+        const stopIds = await resource.getReferencingStopIds({ transaction });
+        if (stopIds.length > 1) {
+          return;
+        }
+        const tourIds = await resource.getReferencingTourIds({ transaction });
+        if (tourIds.length === 0) {
+          resourceIds.add(resource.id);
+        }
+      }
+      const stopResources = await this.getResources({
+        include: [sequelize.models.Resource],
+        transaction,
+      });
+      await Promise.all(
+        stopResources.map(async (sr) => {
+          if (sr.Resource) {
+            await archiveResource(sr.Resource);
+          }
+        })
+      );
+      if (isPermanent) {
+        // delete collected resources
+        await Promise.all(
+          (
+            await sequelize.models.Resource.findAll({ where: { id: Array.from(resourceIds) }, transaction })
+          ).map(async (r) => {
+            const files = await r.getFiles({ transaction });
+            await Promise.all(files.map((f) => f.destroy({ transaction })));
+            return r.destroy({ transaction });
+          })
+        );
+        // delete this stop
+        return this.destroy({ transaction });
+      }
+      const archivedAt = new Date();
+      await Promise.all(
+        Array.from(resourceIds).map((id) => sequelize.models.Resource.update({ archivedAt }, { where: { id }, transaction }))
+      );
+      return this.update({ archivedAt }, { transaction });
     }
 
     async restore(options) {
