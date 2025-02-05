@@ -177,7 +177,7 @@ ResourcesTable.propTypes = {
   }).isRequired,
   resources: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
       start: PropTypes.number.isRequired,
       end: PropTypes.number,
       pauseAtEnd: PropTypes.bool,
@@ -187,7 +187,7 @@ ResourcesTable.propTypes = {
         Files: PropTypes.arrayOf(
           PropTypes.shape({
             variant: PropTypes.string.isRequired,
-            duration: PropTypes.number.isRequired,
+            duration: PropTypes.number,
           })
         ).isRequired,
       }).isRequired,

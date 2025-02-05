@@ -93,7 +93,7 @@ StopsTable.propTypes = {
   type: PropTypes.string,
   stops: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
       Stop: PropTypes.shape({
         names: PropTypes.object.isRequired,
         variants: PropTypes.arrayOf(

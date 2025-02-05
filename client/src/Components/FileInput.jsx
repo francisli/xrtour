@@ -46,7 +46,7 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
       className={classNames('file-input', className)}
       accept={accept}
       multiple={false}
-      disabled={value && value !== ''}
+      disabled={!!value && value !== ''}
       onRemoved={onRemoved}
       onUploaded={onUploaded}>
       {({ statuses, onRemove }) => {

@@ -63,7 +63,7 @@ function TeamInviteForm({ TeamId, onCreate }) {
 }
 
 TeamInviteForm.propTypes = {
-  TeamId: PropTypes.number.isRequired,
+  TeamId: PropTypes.string.isRequired,
   onCreate: PropTypes.func,
 };
 

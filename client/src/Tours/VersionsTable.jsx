@@ -50,7 +50,7 @@ function VersionsTable({ versions, onPromote, onPublish, onUnpublish }) {
 VersionsTable.propTypes = {
   versions: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
       isLive: PropTypes.bool.isRequired,
       isStaging: PropTypes.bool.isRequired,
       createdAt: PropTypes.string.isRequired,
