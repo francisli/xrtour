@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import QRCode from 'react-qr-code';
 import { pluralize } from 'inflection';
@@ -19,6 +19,7 @@ import SharePreview from '../Components/SharePreview';
 function Tour() {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
+  const location = useLocation();
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const { TourId } = useParams();
@@ -141,10 +142,7 @@ function Tour() {
   const previewPopover = (
     <Popover>
       <Popover.Body>
-        <QRCode
-          size={244}
-          value={`${window.location.protocol}//${window.location.host}/teams/${membership?.TeamId}/tours/${TourId}/preview`}
-        />
+        <QRCode size={244} value={`${location.protocol}//${location.host}/teams/${membership?.TeamId}/tours/${TourId}/preview`} />
       </Popover.Body>
     </Popover>
   );
