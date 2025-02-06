@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import QRCode from 'react-qr-code';
 import { pluralize } from 'inflection';
@@ -8,6 +8,7 @@ import { pluralize } from 'inflection';
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
 import { useStaticContext } from '../StaticContext';
+import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
 import VariantTabs from '../Components/VariantTabs';
 import ResourcesModal from '../Resources/ResourcesModal';
@@ -19,6 +20,7 @@ function Tour() {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
   const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   const { TourId } = useParams();
   const [tour, setTour] = useState();
   const [variant, setVariant] = useState();
@@ -41,10 +43,39 @@ function Tour() {
     return () => (isCancelled = true);
   }, [TourId]);
 
+  const [isConfirmArchiveShowing, setConfirmArchiveShowing] = useState(false);
+
+  async function archiveTour() {
+    await Api.tours.archive(tour.id);
+    setConfirmArchiveShowing(false);
+    navigate('/');
+  }
+
+  const [isConfirmRestoreShowing, setConfirmRestoreShowing] = useState(false);
+
+  async function restoreTour() {
+    await Api.tours.restore(tour.id);
+    let response = await Api.tours.get(TourId);
+    setTour(response.data);
+    setVariant(response.data.variants[0]);
+    response = await Api.tours.stops(TourId).index();
+    setStops(response.data);
+    setConfirmRestoreShowing(false);
+  }
+
+  const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
+
+  async function deleteTour() {
+    await Api.tours.delete(tour.id);
+    setConfirmDeleteShowing(false);
+    navigate('/');
+  }
+
   const [isShowingResourcesModal, setShowingResourcesModal] = useState(false);
 
   function onHideResourcesModal() {
     setShowingResourcesModal(false);
+    setSearchParams();
   }
 
   async function onSelectResource(resource) {
@@ -52,7 +83,7 @@ function Tour() {
     const newTour = { ...tour };
     newTour.CoverResource = resource;
     setTour(newTour);
-    setShowingResourcesModal(false);
+    onHideResourcesModal();
   }
 
   const [stopType, setStopType] = useState('STOP');
@@ -60,6 +91,7 @@ function Tour() {
 
   function onHideStopsModal() {
     setShowingStopsModal(false);
+    setSearchParams();
   }
 
   async function onSelectStop(stop) {
@@ -77,7 +109,7 @@ function Tour() {
       const newStops = [...stops, response.data];
       setStops(newStops);
     }
-    setShowingStopsModal(false);
+    onHideStopsModal();
   }
 
   function onClickStop(type, stop) {
@@ -117,6 +149,10 @@ function Tour() {
     </Popover>
   );
 
+  const isEditor = membership?.role !== 'VIEWER';
+  const isArchived = !!tour?.archivedAt;
+  const isEditable = isEditor && !isArchived;
+
   return (
     <>
       <Helmet>
@@ -148,7 +184,7 @@ function Tour() {
                   <FormGroup plaintext name="description" label="Description" value={tour.descriptions[variant.code]} />
                   <div className="mb-3 d-flex justify-content-between">
                     <div>
-                      {membership.role !== 'VIEWER' && (
+                      {isEditable && (
                         <Link className="btn btn-primary me-2" to="edit">
                           Edit
                         </Link>
@@ -162,11 +198,28 @@ function Tour() {
                           Preview
                         </a>
                       </OverlayTrigger>
+                      {isEditor && (
+                        <Link className="btn btn-outline-primary" to="publish">
+                          Publish
+                        </Link>
+                      )}
                     </div>
-                    {membership.role !== 'VIEWER' && (
-                      <Link className="btn btn-outline-primary" to="publish">
-                        Publish
-                      </Link>
+                    {isEditable && (
+                      <div>
+                        <button onClick={() => setConfirmArchiveShowing(true)} type="button" className="btn btn-outline-primary">
+                          Archive
+                        </button>
+                      </div>
+                    )}
+                    {isArchived && isEditor && (
+                      <div>
+                        <button onClick={() => setConfirmRestoreShowing(true)} type="button" className="btn btn-outline-primary me-2">
+                          Restore
+                        </button>
+                        <button onClick={() => setConfirmDeleteShowing(true)} type="button" className="btn btn-primary">
+                          Delete Permanently
+                        </button>
+                      </div>
                     )}
                   </div>
                 </form>
@@ -184,7 +237,7 @@ function Tour() {
                         </div>
                       </div>
                     )}
-                    {membership.role !== 'VIEWER' && (
+                    {isEditable && (
                       <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
                         Select Cover
                       </button>
@@ -197,9 +250,10 @@ function Tour() {
                   stops={tour.IntroStop ? [{ id: tour.IntroStopId, Stop: tour.IntroStop }] : []}
                   onClick={onClickStop}
                   onRemove={onRemoveIntro}
+                  isEditable={isEditable}
                 />
                 <div className="mb-5">
-                  {membership.role !== 'VIEWER' && (
+                  {isEditable && (
                     <button
                       onClick={() => {
                         setStopType('INTRO');
@@ -212,9 +266,15 @@ function Tour() {
                   )}
                 </div>
                 <h2>Stops</h2>
-                <StopsTable stops={stops} onClick={onClickStop} onRemove={onRemoveStop} onReorderStops={onReorderStops} />
+                <StopsTable
+                  stops={stops}
+                  onClick={onClickStop}
+                  onRemove={onRemoveStop}
+                  onReorderStops={onReorderStops}
+                  isEditable={isEditable}
+                />
                 <div className="mb-5">
-                  {membership.role !== 'VIEWER' && (
+                  {isEditable && (
                     <button
                       onClick={() => {
                         setStopType('STOP');
@@ -233,8 +293,34 @@ function Tour() {
             </div>
           </>
         )}
-        <ResourcesModal isShowing={isShowingResourcesModal} onHide={onHideResourcesModal} onSelect={onSelectResource} types={['IMAGE']} />
-        <StopsModal type={stopType} isShowing={isShowingStopsModal} onHide={onHideStopsModal} onSelect={onSelectStop} />
+        {isShowingResourcesModal && (
+          <ResourcesModal isShowing={true} onHide={onHideResourcesModal} onSelect={onSelectResource} types={['IMAGE']} />
+        )}
+        {isShowingStopsModal && (
+          <StopsModal type={stopType} types={[stopType]} isShowing={true} onHide={onHideStopsModal} onSelect={onSelectStop} />
+        )}
+        {isConfirmArchiveShowing && (
+          <ConfirmModal isShowing={true} title="Archive Tour" onCancel={() => setConfirmArchiveShowing(false)} onOK={() => archiveTour()}>
+            Are you sure you wish to archive this tour <b>{tour?.names[tour.variants[0].code]}</b>?
+          </ConfirmModal>
+        )}
+        {isConfirmRestoreShowing && (
+          <ConfirmModal isShowing={true} title="Restore Tour" onCancel={() => setConfirmRestoreShowing(false)} onOK={() => restoreTour()}>
+            Are you sure you wish to restore this tour <b>{tour?.names[tour.variants[0].code]}</b>?
+          </ConfirmModal>
+        )}
+        {isConfirmDeleteShowing && (
+          <ConfirmModal
+            isShowing={true}
+            title="Delete Tour Permanently"
+            onCancel={() => setConfirmDeleteShowing(false)}
+            onOK={() => deleteTour()}>
+            <p>
+              Are you sure you wish to delete this tour <b>{tour?.names[tour.variants[0].code]}</b> permanently?
+            </p>
+            <p>This cannot be undone!</p>
+          </ConfirmModal>
+        )}
       </main>
     </>
   );

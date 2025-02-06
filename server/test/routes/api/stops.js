@@ -14,7 +14,18 @@ describe('/api/stops', () => {
       ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
       ['00-04.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
     ]);
-    await helper.loadFixtures(['users', 'invites', 'teams', 'memberships', 'resources', 'files', 'tours', 'stops']);
+    await helper.loadFixtures([
+      'users',
+      'invites',
+      'teams',
+      'memberships',
+      'resources',
+      'files',
+      'tours',
+      'stops',
+      'tourStops',
+      'stopResources',
+    ]);
     testSession = session(app);
     await testSession
       .post('/api/auth/login')
@@ -64,6 +75,9 @@ describe('/api/stops', () => {
         destAddress: null,
         destCoordinate: null,
         destRadius: null,
+        createdAt: response.body.createdAt,
+        updatedAt: response.body.updatedAt,
+        archivedAt: null,
       });
 
       const record = await models.Stop.findByPk(response.body.id);
@@ -188,7 +202,58 @@ describe('/api/stops', () => {
           'en-us': 'CHSA is the oldest organization in the country dedicated to the preservation of Chinese American history.',
         },
         variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        archivedAt: null,
       });
+    });
+  });
+
+  describe('DELETE /:id', () => {
+    it('archives a Stop by id', async () => {
+      await testSession
+        .delete('/api/stops/cd682130-9b7e-4831-b211-bd74330f0e21')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.NO_CONTENT);
+
+      let record = await models.Stop.findByPk('cd682130-9b7e-4831-b211-bd74330f0e21');
+      assert.ok(record.archivedAt);
+    });
+
+    it('returns conflict if Stop is still referenced', async () => {
+      const response = await testSession
+        .delete('/api/stops/bba84716-633e-4593-85a0-9da4010eb99b')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.CONFLICT);
+      assert.deepStrictEqual(response.body.length, 1);
+      assert.deepStrictEqual(response.body[0].id, '495b18a8-ae05-4f44-a06d-c1809add0352');
+    });
+
+    it('deletes permanently a Stop by id', async () => {
+      await testSession
+        .delete('/api/stops/cd682130-9b7e-4831-b211-bd74330f0e21?isPermanent=true')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.NO_CONTENT);
+
+      let record = await models.Stop.findByPk('cd682130-9b7e-4831-b211-bd74330f0e21');
+      assert.deepStrictEqual(record, null);
+    });
+  });
+
+  describe('PATCH /:id/restore', () => {
+    it('restores a previously archived Stop by id', async () => {
+      await testSession
+        .delete('/api/stops/cd682130-9b7e-4831-b211-bd74330f0e21')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.NO_CONTENT);
+
+      await testSession
+        .patch('/api/stops/cd682130-9b7e-4831-b211-bd74330f0e21/restore')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.NO_CONTENT);
+
+      let record = await models.Stop.findByPk('cd682130-9b7e-4831-b211-bd74330f0e21');
+      assert.deepStrictEqual(record.archivedAt, null);
     });
   });
 });

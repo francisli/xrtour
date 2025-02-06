@@ -65,6 +65,9 @@ describe('/api/tours/:TourId/stops', () => {
                 name: 'English (US)',
               },
             ],
+            createdAt: response.body[0].Stop.createdAt,
+            updatedAt: response.body[0].Stop.updatedAt,
+            archivedAt: null,
           },
         },
         {
@@ -98,6 +101,9 @@ describe('/api/tours/:TourId/stops', () => {
                 name: 'English (US)',
               },
             ],
+            createdAt: response.body[1].Stop.createdAt,
+            updatedAt: response.body[1].Stop.updatedAt,
+            archivedAt: null,
           },
         },
       ]);
@@ -138,6 +144,9 @@ describe('/api/tours/:TourId/stops', () => {
           },
           type: 'STOP',
           variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
+          createdAt: response.body.Stop.createdAt,
+          updatedAt: response.body.Stop.updatedAt,
+          archivedAt: null,
         },
       });
     });

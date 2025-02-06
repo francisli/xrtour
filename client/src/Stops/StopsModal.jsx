@@ -7,7 +7,7 @@ import './StopsModal.scss';
 import StopsList from './StopsList';
 import StopForm from './StopForm';
 
-function StopsModal({ type, isShowing, onHide, onSelect, startingAddress }) {
+function StopsModal({ type, types, isShowing, onHide, onSelect, startingAddress }) {
   const [isEditing, setEditing] = useState(false);
   const [StopId, setStopId] = useState();
 
@@ -31,7 +31,7 @@ function StopsModal({ type, isShowing, onHide, onSelect, startingAddress }) {
         <Modal.Title>{transform(type, ['pluralize', 'capitalize'])}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {!isEditing && <StopsList type={type} onNewStop={onNewStop} onSelect={onSelect} />}
+        {!isEditing && <StopsList type={type} types={types} onNewStop={onNewStop} onSelect={onSelect} />}
         {isEditing && (
           <StopForm
             type={type}
@@ -49,6 +49,7 @@ function StopsModal({ type, isShowing, onHide, onSelect, startingAddress }) {
 
 StopsModal.propTypes = {
   type: PropTypes.string,
+  types: PropTypes.arrayOf(PropTypes.string),
   isShowing: PropTypes.bool,
   onHide: PropTypes.func,
   onSelect: PropTypes.func,

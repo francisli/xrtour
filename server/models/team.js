@@ -5,6 +5,8 @@ export default function (sequelize, DataTypes) {
   class Team extends Model {
     static associate(models) {
       Team.hasMany(models.Membership);
+      Team.hasMany(models.Resource);
+      Team.hasMany(models.Stop);
     }
 
     toJSON() {

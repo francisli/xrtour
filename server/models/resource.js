@@ -1,4 +1,4 @@
-import { Model } from 'sequelize';
+import { Model, Sequelize } from 'sequelize';
 import _ from 'lodash';
 
 export default function (sequelize, DataTypes) {
@@ -7,16 +7,62 @@ export default function (sequelize, DataTypes) {
       Resource.belongsTo(models.Team);
       Resource.hasMany(models.File);
       Resource.hasMany(models.StopResource);
+      Resource.hasMany(models.Tour, { as: 'CoveredTours', foreignKey: 'CoverResourceId' });
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'data', 'variants']);
+      const json = _.pick(this.get(), ['id', 'TeamId', 'name', 'type', 'data', 'variants', 'createdAt', 'updatedAt', 'archivedAt']);
       if (this.Files) {
         json.Files = this.Files.map((f) => f.toJSON());
       }
       return json;
     }
+
+    async getReferencingStopIds(options = {}) {
+      const { transaction } = options;
+      const stopIds = (
+        await this.getStopResources({ attributes: [Sequelize.fn('DISTINCT', Sequelize.col('StopId'))], raw: true, transaction })
+      ).map((row) => row.StopId);
+      return stopIds;
+    }
+
+    async getReferencingTourIds(options) {
+      const { transaction } = options ?? {};
+      const coveredTourIds = (
+        await this.getCoveredTours({ attributes: [Sequelize.fn('DISTINCT', Sequelize.col('id'))], raw: true, transaction })
+      ).map((row) => row.id);
+      const stopIds = await this.getReferencingStopIds({ transaction });
+      const tourIds = (
+        await sequelize.models.TourStop.findAll({
+          attributes: [Sequelize.fn('DISTINCT', Sequelize.col('TourId'))],
+          where: { [Sequelize.Op.or]: { StopId: stopIds, TransitionStopId: stopIds } },
+          raw: true,
+          transaction,
+        })
+      ).map((row) => row.TourId);
+      const introTourIds = (
+        await sequelize.models.Tour.findAll({
+          attributes: [Sequelize.fn('DISTINCT', Sequelize.col('id'))],
+          where: { IntroStopId: stopIds },
+          raw: true,
+          transaction,
+        })
+      ).map((row) => row.id);
+      const tourIdSet = new Set([...coveredTourIds, ...tourIds, ...introTourIds]);
+      return Array.from(tourIdSet);
+    }
+
+    async archive(options) {
+      const { transaction } = options ?? {};
+      return this.update({ archivedAt: new Date() }, { transaction });
+    }
+
+    async restore(options) {
+      const { transaction } = options ?? {};
+      return this.update({ archivedAt: null }, { transaction });
+    }
   }
+
   Resource.init(
     {
       name: {
@@ -45,6 +91,7 @@ export default function (sequelize, DataTypes) {
       },
       data: DataTypes.JSONB,
       variants: DataTypes.JSONB,
+      archivedAt: DataTypes.DATE,
     },
     {
       sequelize,

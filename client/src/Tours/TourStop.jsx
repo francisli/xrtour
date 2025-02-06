@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import Api from '../Api';
 import Stop from '../Stops/Stop';
@@ -10,6 +10,7 @@ import { useAuthContext } from '../AuthContext';
 function TourStop() {
   const { membership } = useAuthContext();
   const { TourId, TourStopId } = useParams();
+  const [, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [TourStop, setTourStop] = useState();
   const [isShowingStopsModal, setShowingStopsModal] = useState(false);
@@ -27,7 +28,7 @@ function TourStop() {
   }, [TourId, TourStopId]);
 
   async function onSelectTransition(stop) {
-    setShowingStopsModal(false);
+    onHideStopsModal();
     const newTourStop = { ...TourStop };
     newTourStop.TransitionStopId = stop.id;
     newTourStop.TransitionStop = stop;
@@ -47,6 +48,15 @@ function TourStop() {
     await Api.tours.stops(TourId).update(TourStopId, { TransitionStopId: null });
   }
 
+  function onHideStopsModal() {
+    setShowingStopsModal(false);
+    setSearchParams();
+  }
+
+  const isEditor = membership?.role !== 'VIEWER';
+  const isArchived = !!TourStop?.Tour?.archivedAt;
+  const isEditable = isEditor && !isArchived;
+
   return (
     <>
       <Stop StopId={TourStop?.StopId} transition={TourStop?.TransitionStop}>
@@ -56,9 +66,10 @@ function TourStop() {
           stops={TourStop?.TransitionStop ? [{ id: TourStop.TransitionStopId, Stop: TourStop.TransitionStop }] : []}
           onClick={onClickTransition}
           onRemove={onRemoveTransition}
+          isEditable={isEditable}
         />
         <div className="mb-5">
-          {membership?.role !== 'VIEWER' && (
+          {isEditable && (
             <button
               onClick={() => {
                 setShowingStopsModal(true);
@@ -70,13 +81,16 @@ function TourStop() {
           )}
         </div>
       </Stop>
-      <StopsModal
-        type="TRANSITION"
-        isShowing={isShowingStopsModal}
-        onHide={() => setShowingStopsModal(false)}
-        onSelect={onSelectTransition}
-        startingAddress={TourStop?.Stop?.address}
-      />
+      {isShowingStopsModal && (
+        <StopsModal
+          type="TRANSITION"
+          types={['TRANSITION']}
+          isShowing={true}
+          onHide={onHideStopsModal}
+          onSelect={onSelectTransition}
+          startingAddress={TourStop?.Stop?.address}
+        />
+      )}
     </>
   );
 }

@@ -104,7 +104,7 @@ FormGroup.propTypes = {
   record: PropTypes.object,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   error: PropTypes.object,
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
 };
 
 export default FormGroup;

@@ -5,13 +5,11 @@ import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { pluralize } from 'inflection';
 import PropTypes from 'prop-types';
 
-import { useAuthContext } from '../AuthContext';
 import ConfirmModal from '../Components/ConfirmModal';
 
 import './StopsTable.scss';
 
-function StopsTable({ type = 'STOP', stops, onClick, onRemove, onReorderStops }) {
-  const { membership } = useAuthContext();
+function StopsTable({ type = 'STOP', stops, onClick, onRemove, onReorderStops, isEditable }) {
   const [isConfirmRemoveShowing, setConfirmRemoveShowing] = useState(false);
   const [selectedStop, setSelectedStop] = useState();
 
@@ -70,7 +68,7 @@ function StopsTable({ type = 'STOP', stops, onClick, onRemove, onReorderStops })
                 <td>{s.Stop.names[s.Stop.variants[0].code]}</td>
                 {type === 'STOP' && <td>{s.Stop.address}</td>}
                 <td className="stops-table__col-actions">
-                  {membership.role !== 'VIEWER' && (
+                  {isEditable && (
                     <button onClick={(event) => onClickRemove(event, s)} type="button" className="btn btn-sm btn-outline-danger">
                       <FontAwesomeIcon icon={faTrashCan} />
                     </button>
@@ -92,10 +90,10 @@ function StopsTable({ type = 'STOP', stops, onClick, onRemove, onReorderStops })
 }
 
 StopsTable.propTypes = {
-  type: PropTypes,
+  type: PropTypes.string,
   stops: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
       Stop: PropTypes.shape({
         names: PropTypes.object.isRequired,
         variants: PropTypes.arrayOf(
@@ -110,6 +108,7 @@ StopsTable.propTypes = {
   onClick: PropTypes.func,
   onRemove: PropTypes.func,
   onReorderStops: PropTypes.func,
+  isEditable: PropTypes.bool,
 };
 
 export default StopsTable;

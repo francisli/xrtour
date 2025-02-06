@@ -31,9 +31,11 @@ function ResourceCard({ resource, onSelect, onEdit }) {
             </p>
           )}
           <div className="d-flex justify-content-between">
-            <button onClick={() => onSelect(resource)} type="button" className="btn btn-sm btn-primary">
-              Select
-            </button>
+            {onSelect && (
+              <button onClick={() => onSelect(resource)} type="button" className="btn btn-sm btn-primary">
+                Select
+              </button>
+            )}
             <button onClick={() => onEdit(resource)} type="button" className="btn btn-sm btn-outline-secondary">
               Edit
             </button>
@@ -54,7 +56,7 @@ ResourceCard.propTypes = {
       })
     ).isRequired,
   }).isRequired,
-  onSelect: PropTypes.func.isRequired,
+  onSelect: PropTypes.func,
   onEdit: PropTypes.func.isRequired,
 };
 

@@ -16,7 +16,23 @@ instance.interceptors.response.use(
   }
 );
 
+function parseLinkHeader(response) {
+  const link = response.headers?.link;
+  if (link) {
+    const linkRe = /<([^>]+)>; rel="([^"]+)"/g;
+    const urls = {};
+    let m;
+    while ((m = linkRe.exec(link)) !== null) {
+      const url = m[1];
+      urls[m[2]] = url;
+    }
+    return urls;
+  }
+  return null;
+}
+
 const Api = {
+  parseLinkHeader,
   assets: {
     create(data) {
       return instance.post('/api/assets', data);
@@ -92,8 +108,8 @@ const Api = {
     },
   },
   resources: {
-    index(TeamId, type, search) {
-      return instance.get(`/api/resources`, { params: { TeamId, type, search } });
+    index(TeamId, type, show, search, page) {
+      return instance.get(`/api/resources`, { params: { TeamId, type, show, search, page } });
     },
     create(data) {
       return instance.post('/api/resources', data);
@@ -109,8 +125,8 @@ const Api = {
     },
   },
   stops: {
-    index(TeamId, search, type) {
-      return instance.get(`/api/stops`, { params: { TeamId, search, type } });
+    index(TeamId, type, show, search, page) {
+      return instance.get(`/api/stops`, { params: { TeamId, type, show, search, page } });
     },
     create(data) {
       return instance.post('/api/stops', data);
@@ -120,6 +136,15 @@ const Api = {
     },
     update(id, data) {
       return instance.patch(`/api/stops/${id}`, data);
+    },
+    archive(id) {
+      return instance.delete(`/api/stops/${id}`);
+    },
+    restore(id) {
+      return instance.patch(`/api/stops/${id}/restore`);
+    },
+    delete(id) {
+      return instance.delete(`/api/stops/${id}?isPermanent=true`);
     },
     resources(StopId) {
       return {
@@ -150,8 +175,8 @@ const Api = {
     },
   },
   tours: {
-    index(TeamId) {
-      return instance.get(`/api/tours`, { params: { TeamId } });
+    index(TeamId, show, page) {
+      return instance.get(`/api/tours`, { params: { TeamId, show, page } });
     },
     create(data) {
       return instance.post('/api/tours', data);
@@ -161,6 +186,15 @@ const Api = {
     },
     update(id, data) {
       return instance.patch(`/api/tours/${id}`, data);
+    },
+    archive(id) {
+      return instance.delete(`/api/tours/${id}`);
+    },
+    restore(id) {
+      return instance.patch(`/api/tours/${id}/restore`);
+    },
+    delete(id) {
+      return instance.delete(`/api/tours/${id}?isPermanent=true`);
     },
     stops(TourId) {
       return {

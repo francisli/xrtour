@@ -81,3 +81,9 @@ label {
 .modal-body {
   overflow-y: scroll;
 }
+
+.table-hover {
+  tr {
+    cursor: pointer;
+  }
+}

@@ -219,7 +219,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
 }
 
 ResourceForm.propTypes = {
-  ResourceId: PropTypes.number,
+  ResourceId: PropTypes.string,
   type: PropTypes.string.isRequired,
   onCancel: PropTypes.func,
   onCreate: PropTypes.func,

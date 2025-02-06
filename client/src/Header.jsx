@@ -8,7 +8,7 @@ import { useAuthContext } from './AuthContext';
 
 function Header() {
   const navigate = useNavigate();
-  const { user, setUser } = useAuthContext();
+  const { user, setUser, membership } = useAuthContext();
   const [isNavbarShowing, setNavbarShowing] = useState(false);
 
   useEffect(
@@ -53,14 +53,19 @@ function Header() {
           <ul className="navbar-nav flex-grow-1 mb-2 mb-md-0">
             <li className="nav-item">
               <Link className="nav-link" aria-current="page" to="/" onClick={hideNavbar}>
-                Home
+                {membership ? 'Tours' : 'Home'}
               </Link>
             </li>
-            {user && (
+            {membership && (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" aria-current="page" to="/teams" onClick={hideNavbar}>
-                    Teams
+                  <Link className="nav-link" aria-current="page" to={`/teams/${membership.TeamId}/stops`} onClick={hideNavbar}>
+                    Stops
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" aria-current="page" to={`/teams/${membership.TeamId}/assets`} onClick={hideNavbar}>
+                    Assets
                   </Link>
                 </li>
               </>
@@ -68,6 +73,11 @@ function Header() {
             <div className="flex-grow-1 d-flex justify-content-end">
               {user && (
                 <>
+                  <li className="nav-item">
+                    <Link className="nav-link" aria-current="page" to="/teams" onClick={hideNavbar}>
+                      Teams
+                    </Link>
+                  </li>
                   {user.isAdmin && (
                     <li className="nav-item">
                       <Link className="nav-link" to="/admin" onClick={hideNavbar}>

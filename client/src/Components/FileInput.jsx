@@ -46,7 +46,7 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
       className={classNames('file-input', className)}
       accept={accept}
       multiple={false}
-      disabled={value && value !== ''}
+      disabled={!!value && value !== ''}
       onRemoved={onRemoved}
       onUploaded={onUploaded}>
       {({ statuses, onRemove }) => {
@@ -74,7 +74,9 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
         } else if (statuses.length === 0 && value) {
           return (
             <div className="file-input__file">
-              {valueContentType.startsWith('audio/') && <AudioPlayer className="me-3 my-1 flex-grow-1" src={valueURL} />}
+              {(valueContentType.startsWith('audio/') || valueContentType.startsWith('video/')) && (
+                <AudioPlayer className="me-3 my-1 flex-grow-1" src={valueURL} />
+              )}
               {valueContentType.startsWith('image/') && (
                 <img className="img-fluid me-3 my-1 file-input__image" alt={value} src={valueURL} />
               )}
@@ -95,7 +97,7 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
 }
 
 FileInput.propTypes = {
-  accept: PropTypes.string,
+  accept: PropTypes.object,
   className: PropTypes.string,
   children: PropTypes.node,
   id: PropTypes.string,

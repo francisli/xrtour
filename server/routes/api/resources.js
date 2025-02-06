@@ -10,7 +10,7 @@ import models from '../../models/index.js';
 const router = express.Router();
 
 router.get('/', interceptors.requireLogin, async (req, res) => {
-  const { page = '1', TeamId, type, search } = req.query;
+  const { page = '1', TeamId, type, search, show = 'active' } = req.query;
   const team = await models.Team.findByPk(TeamId);
   const membership = await team.getMembership(req.user);
   if (!membership) {
@@ -23,6 +23,11 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
     order: [['name', 'ASC']],
     where: { TeamId },
   };
+  if (show === 'active') {
+    options.where.archivedAt = null;
+  } else if (show === 'archived') {
+    options.where.archivedAt = { [Op.ne]: null };
+  }
   if (type) {
     options.where.type = type;
   }
@@ -32,7 +37,7 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
     };
   }
   const { records, pages, total } = await models.Resource.paginate(options);
-  helpers.setPaginationHeaders(req, res, options.page, pages, total);
+  helpers.setPaginationHeaders(req, res, page, pages, total);
   res.json(records.map((record) => record.toJSON()));
 });
 

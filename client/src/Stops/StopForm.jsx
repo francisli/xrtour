@@ -170,7 +170,7 @@ StopForm.propTypes = {
   onCreate: PropTypes.func,
   onUpdate: PropTypes.func,
   startingAddress: PropTypes.string,
-  type: PropTypes.oneOf(['STOP', 'TRANSITION']).isRequired,
+  type: PropTypes.oneOf(['INTRO', 'STOP', 'TRANSITION']),
 };
 
 export default StopForm;

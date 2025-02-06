@@ -32,10 +32,10 @@ function ToursRoutes() {
   return (
     <Routes>
       <Route path="new" element={<TourForm />} />
-      <Route path=":TourId/intros/:StopId/edit" element={<StopForm />} />
+      <Route path=":TourId/intros/:StopId/edit" element={<StopForm type="STOP" />} />
       <Route path=":TourId/intros/:StopId" element={<Stop />} />
       <Route path=":TourId/preview/*" element={<TourPreviewRoutes />} />
-      <Route path=":TourId/stops/:TourStopId/transitions/:StopId/edit" element={<StopForm />} />
+      <Route path=":TourId/stops/:TourStopId/transitions/:StopId/edit" element={<StopForm type="TRANSITION" />} />
       <Route path=":TourId/stops/:TourStopId/transitions/:StopId" element={<Stop />} />
       <Route path=":TourId/stops/:TourStopId/edit" element={<TourStopForm />} />
       <Route path=":TourId/stops/:TourStopId" element={<TourStop />} />

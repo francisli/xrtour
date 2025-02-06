@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { StatusCodes } from 'http-status-codes';
 import session from 'supertest-session';
+import path from 'path';
 
 import helper from '../../helper.js';
 import app from '../../../app.js';
@@ -14,7 +15,19 @@ describe('/api/tours', () => {
       ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
       ['00-04.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
     ]);
-    await helper.loadFixtures(['users', 'invites', 'teams', 'memberships', 'tours', 'resources', 'files']);
+    await helper.loadFixtures([
+      'users',
+      'invites',
+      'invites',
+      'teams',
+      'memberships',
+      'resources',
+      'files',
+      'tours',
+      'stops',
+      'tourStops',
+      'stopResources',
+    ]);
     testSession = session(app);
     await testSession
       .post('/api/auth/login')
@@ -57,6 +70,9 @@ describe('/api/tours', () => {
         id: response.body.id,
         IntroStopId: null,
         CoverResourceId: null,
+        createdAt: response.body.createdAt,
+        updatedAt: response.body.updatedAt,
+        archivedAt: null,
       });
 
       const record = await models.Tour.findByPk(response.body.id);
@@ -162,6 +178,9 @@ describe('/api/tours', () => {
         descriptions: { 'en-us': 'Tour 2 description' },
         variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
         visibility: 'PRIVATE',
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        archivedAt: null,
         Team: {
           id: '1a93d46d-89bf-463b-ab23-8f22f5777907',
           link: 'regularuser',
@@ -177,6 +196,125 @@ describe('/api/tours', () => {
           ],
         },
       });
+    });
+  });
+
+  describe('DELETE /:id', () => {
+    it('archives a Tour and orphaned Stops and Resources', async () => {
+      await testSession.delete('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352').expect(StatusCodes.NO_CONTENT);
+
+      let record = await models.Tour.findByPk('495b18a8-ae05-4f44-a06d-c1809add0352');
+      assert.ok(record.archivedAt);
+
+      record = await models.Stop.findByPk('e39b97ad-a5e9-422c-b256-d50fec355285');
+      assert.ok(record.archivedAt);
+
+      record = await models.Stop.findByPk('bba84716-633e-4593-85a0-9da4010eb99b');
+      assert.ok(record.archivedAt);
+
+      record = await models.Resource.findByPk('0cb2ce76-c5ca-454f-9fb1-47051b0f21ab');
+      assert.ok(record.archivedAt);
+
+      record = await models.Resource.findByPk('6ebacda9-8d33-4c3e-beb5-18dffb119046');
+      assert.ok(record.archivedAt);
+    });
+
+    it('permanently deletes a Tour and orphaned Stops and Resources', async () => {
+      // publish first so we can test deletion of version data
+      const data = {
+        TourId: '495b18a8-ae05-4f44-a06d-c1809add0352',
+        isStaging: false,
+      };
+      const { body: version } = await testSession
+        .post('/api/versions')
+        .set('Accept', 'application/json')
+        .send(data)
+        .expect(StatusCodes.CREATED);
+      await testSession.delete('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352?isPermanent=true').expect(StatusCodes.NO_CONTENT);
+
+      let record = await models.Tour.findByPk('495b18a8-ae05-4f44-a06d-c1809add0352');
+      assert.deepStrictEqual(record, null);
+
+      record = await models.Version.findByPk(version.id);
+      assert.deepStrictEqual(record, null);
+      assert.deepStrictEqual(
+        await helper.assetPathExists(
+          path.join(
+            'versions',
+            version.id,
+            'files',
+            'ed2f158a-e44e-432d-971e-e5da1a2e33b4',
+            'key',
+            'cdd8007d-dcaf-4163-b497-92d378679668.png'
+          )
+        ),
+        false
+      );
+      assert.deepStrictEqual(
+        await helper.assetPathExists(
+          path.join(
+            'versions',
+            version.id,
+            'files',
+            '84b62056-05a4-4751-953f-7854ac46bc0f',
+            'key',
+            'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'
+          )
+        ),
+        false
+      );
+
+      record = await models.Stop.findByPk('e39b97ad-a5e9-422c-b256-d50fec355285');
+      assert.deepStrictEqual(record, null);
+
+      record = await models.Stop.findByPk('bba84716-633e-4593-85a0-9da4010eb99b');
+      assert.deepStrictEqual(record, null);
+
+      record = await models.Resource.findByPk('0cb2ce76-c5ca-454f-9fb1-47051b0f21ab');
+      assert.deepStrictEqual(record, null);
+
+      record = await models.Resource.findByPk('6ebacda9-8d33-4c3e-beb5-18dffb119046');
+      assert.deepStrictEqual(record, null);
+
+      record = await models.File.findByPk('ed2f158a-e44e-432d-971e-e5da1a2e33b4');
+      assert.deepStrictEqual(record, null);
+      assert.deepStrictEqual(
+        await helper.assetPathExists(
+          path.join('files', 'ed2f158a-e44e-432d-971e-e5da1a2e33b4', 'key', 'cdd8007d-dcaf-4163-b497-92d378679668.png')
+        ),
+        false
+      );
+
+      record = await models.File.findByPk('84b62056-05a4-4751-953f-7854ac46bc0f');
+      assert.deepStrictEqual(record, null);
+      assert.deepStrictEqual(
+        await helper.assetPathExists(
+          path.join('files', '84b62056-05a4-4751-953f-7854ac46bc0f', 'key', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a')
+        ),
+        false
+      );
+    });
+  });
+
+  describe('PATCH /:id/restore', () => {
+    it('restores an archived a Tour and its Stops and Resources', async () => {
+      await testSession.delete('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352').expect(StatusCodes.NO_CONTENT);
+      await testSession.patch('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352/restore').expect(StatusCodes.NO_CONTENT);
+
+      let record = await models.Tour.findByPk('495b18a8-ae05-4f44-a06d-c1809add0352');
+      assert.deepStrictEqual(record.archivedAt, null);
+
+      record = await models.Stop.findByPk('e39b97ad-a5e9-422c-b256-d50fec355285');
+      assert.deepStrictEqual(record.archivedAt, null);
+
+      record = await models.Stop.findByPk('bba84716-633e-4593-85a0-9da4010eb99b');
+      assert.deepStrictEqual(record.archivedAt, null);
+
+      record = await models.Resource.findByPk('0cb2ce76-c5ca-454f-9fb1-47051b0f21ab');
+      assert.deepStrictEqual(record.archivedAt, null);
+
+      record = await models.Resource.findByPk('6ebacda9-8d33-4c3e-beb5-18dffb119046');
+      assert.deepStrictEqual(record.archivedAt, null);
     });
   });
 });

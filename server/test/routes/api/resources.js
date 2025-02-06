@@ -88,7 +88,13 @@ describe('/api/resources', () => {
         .expect(StatusCodes.CREATED);
 
       assert(response.body?.id);
-      assert.deepStrictEqual(response.body, { ...data, id: response.body.id });
+      assert.deepStrictEqual(response.body, {
+        ...data,
+        id: response.body.id,
+        createdAt: response.body.createdAt,
+        updatedAt: response.body.updatedAt,
+        archivedAt: null,
+      });
 
       const record = await models.Resource.findByPk(response.body.id);
       assert(record);
@@ -181,6 +187,9 @@ describe('/api/resources', () => {
             variant: 'en-us',
           },
         ],
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        archivedAt: null,
       });
     });
   });
