@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
 import QRCode from 'react-qr-code';
 import { pluralize } from 'inflection';
@@ -20,6 +20,7 @@ function Tour() {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
   const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   const { TourId } = useParams();
   const [tour, setTour] = useState();
   const [variant, setVariant] = useState();
@@ -74,6 +75,7 @@ function Tour() {
 
   function onHideResourcesModal() {
     setShowingResourcesModal(false);
+    setSearchParams();
   }
 
   async function onSelectResource(resource) {
@@ -81,7 +83,7 @@ function Tour() {
     const newTour = { ...tour };
     newTour.CoverResource = resource;
     setTour(newTour);
-    setShowingResourcesModal(false);
+    onHideResourcesModal();
   }
 
   const [stopType, setStopType] = useState('STOP');
@@ -89,6 +91,7 @@ function Tour() {
 
   function onHideStopsModal() {
     setShowingStopsModal(false);
+    setSearchParams();
   }
 
   async function onSelectStop(stop) {
@@ -106,7 +109,7 @@ function Tour() {
       const newStops = [...stops, response.data];
       setStops(newStops);
     }
-    setShowingStopsModal(false);
+    onHideStopsModal();
   }
 
   function onClickStop(type, stop) {
@@ -290,8 +293,12 @@ function Tour() {
             </div>
           </>
         )}
-        <ResourcesModal isShowing={isShowingResourcesModal} onHide={onHideResourcesModal} onSelect={onSelectResource} types={['IMAGE']} />
-        <StopsModal type={stopType} isShowing={isShowingStopsModal} onHide={onHideStopsModal} onSelect={onSelectStop} />
+        {isShowingResourcesModal && (
+          <ResourcesModal isShowing={true} onHide={onHideResourcesModal} onSelect={onSelectResource} types={['IMAGE']} />
+        )}
+        {isShowingStopsModal && (
+          <StopsModal type={stopType} types={[stopType]} isShowing={true} onHide={onHideStopsModal} onSelect={onSelectStop} />
+        )}
         {isConfirmArchiveShowing && (
           <ConfirmModal isShowing={true} title="Archive Tour" onCancel={() => setConfirmArchiveShowing(false)} onOK={() => archiveTour()}>
             Are you sure you wish to archive this tour <b>{tour?.names[tour.variants[0].code]}</b>?

@@ -81,35 +81,37 @@ function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', ty
 
   return (
     <div className="row">
-      <div className="col-md-3">
-        <ul className="list-group mb-3">
-          {(!types || types.includes('INTRO')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('INTRO')}
-              className={classNames('list-group-item list-group-item-action', { active: type === 'INTRO' })}>
-              Intros
-            </button>
-          )}
-          {(!types || types.includes('STOP')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('STOP')}
-              className={classNames('list-group-item list-group-item-action', { active: type === 'STOP' })}>
-              Stops
-            </button>
-          )}
-          {(!types || types.includes('TRANSITION')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('TRANSITION')}
-              className={classNames('list-group-item list-group-item-action', { active: type === 'TRANSITION' })}>
-              Transitions
-            </button>
-          )}
-        </ul>
-      </div>
-      <div className="col-md-9">
+      {(!types || types.length > 1) && (
+        <div className="col-md-3">
+          <ul className="list-group mb-3">
+            {(!types || types.includes('INTRO')) && (
+              <button
+                type="button"
+                onClick={() => onClickType('INTRO')}
+                className={classNames('list-group-item list-group-item-action', { active: type === 'INTRO' })}>
+                Intros
+              </button>
+            )}
+            {(!types || types.includes('STOP')) && (
+              <button
+                type="button"
+                onClick={() => onClickType('STOP')}
+                className={classNames('list-group-item list-group-item-action', { active: type === 'STOP' })}>
+                Stops
+              </button>
+            )}
+            {(!types || types.includes('TRANSITION')) && (
+              <button
+                type="button"
+                onClick={() => onClickType('TRANSITION')}
+                className={classNames('list-group-item list-group-item-action', { active: type === 'TRANSITION' })}>
+                Transitions
+              </button>
+            )}
+          </ul>
+        </div>
+      )}
+      <div className={!types || types.length > 1 ? 'col-md-9' : 'col-md-12'}>
         <div className="mb-3 d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center">
             {membership?.role !== 'VIEWER' && (
@@ -159,7 +161,7 @@ function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', ty
                 <tbody>
                   {stops?.map((s) => (
                     <tr key={s.id}>
-                      <td className="w-50" onClick={() => onEdit?.(s)}>
+                      <td className="w-50 align-middle" onClick={() => onEdit?.(s)}>
                         {s.names[s.variants[0].code]}
                         <br />
                         <div className="text-nowrap text-truncate">
@@ -179,14 +181,14 @@ function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', ty
                           </>
                         )}
                       </td>
-                      <td className="w-25" onClick={onSelect ? undefined : () => onEdit?.(s)}>
+                      <td className="w-25 align-middle" onClick={onSelect ? undefined : () => onEdit?.(s)}>
                         {onSelect && (
                           <button onClick={() => onSelect(s)} type="button" className="btn btn-link">
                             Select
                           </button>
                         )}
                       </td>
-                      <td className="w-25" onClick={() => onEdit?.(s)}>
+                      <td className="w-25 align-middle" onClick={() => onEdit?.(s)}>
                         {DateTime.fromISO(s.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}
                       </td>
                     </tr>

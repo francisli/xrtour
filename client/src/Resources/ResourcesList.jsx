@@ -80,59 +80,61 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
 
   return (
     <div className="row">
-      <div className="col-md-3">
-        <ul className="list-group mb-3">
-          {(!types || types.includes('3D_MODEL')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('3D_MODEL')}
-              className={classNames('list-group-item list-group-item-action', { active: type === '3D_MODEL' })}>
-              3D Model
-            </button>
-          )}
-          {(!types || types.includes('AUDIO')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('AUDIO')}
-              className={classNames('list-group-item list-group-item-action', { active: type === 'AUDIO' })}>
-              Audio
-            </button>
-          )}
-          {(!types || types.includes('AR_LINK')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('AR_LINK')}
-              className={classNames('list-group-item list-group-item-action', { active: type === 'AR_LINK' })}>
-              AR Links
-            </button>
-          )}
-          {(!types || types.includes('IMAGE')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('IMAGE')}
-              className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE' })}>
-              Images
-            </button>
-          )}
-          {(!types || types.includes('IMAGE_OVERLAY')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('IMAGE_OVERLAY')}
-              className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE_OVERLAY' })}>
-              Image Overlays
-            </button>
-          )}
-          {(!types || types.includes('IMAGE_SPHERE')) && (
-            <button
-              type="button"
-              onClick={() => onClickType('IMAGE_SPHERE')}
-              className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE_SPHERE' })}>
-              360&deg; Image Spheres
-            </button>
-          )}
-        </ul>
-      </div>
-      <div className="col-md-9">
+      {(!types || types.length > 1) && (
+        <div className="col-md-3">
+          <ul className="list-group mb-3">
+            {(!types || types.includes('3D_MODEL')) && (
+              <button
+                type="button"
+                onClick={() => onClickType('3D_MODEL')}
+                className={classNames('list-group-item list-group-item-action', { active: type === '3D_MODEL' })}>
+                3D Model
+              </button>
+            )}
+            {(!types || types.includes('AUDIO')) && (
+              <button
+                type="button"
+                onClick={() => onClickType('AUDIO')}
+                className={classNames('list-group-item list-group-item-action', { active: type === 'AUDIO' })}>
+                Audio
+              </button>
+            )}
+            {(!types || types.includes('AR_LINK')) && (
+              <button
+                type="button"
+                onClick={() => onClickType('AR_LINK')}
+                className={classNames('list-group-item list-group-item-action', { active: type === 'AR_LINK' })}>
+                AR Links
+              </button>
+            )}
+            {(!types || types.includes('IMAGE')) && (
+              <button
+                type="button"
+                onClick={() => onClickType('IMAGE')}
+                className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE' })}>
+                Images
+              </button>
+            )}
+            {(!types || types.includes('IMAGE_OVERLAY')) && (
+              <button
+                type="button"
+                onClick={() => onClickType('IMAGE_OVERLAY')}
+                className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE_OVERLAY' })}>
+                Image Overlays
+              </button>
+            )}
+            {(!types || types.includes('IMAGE_SPHERE')) && (
+              <button
+                type="button"
+                onClick={() => onClickType('IMAGE_SPHERE')}
+                className={classNames('list-group-item list-group-item-action', { active: type === 'IMAGE_SPHERE' })}>
+                360&deg; Image Spheres
+              </button>
+            )}
+          </ul>
+        </div>
+      )}
+      <div className={!types || types.length > 1 ? 'col-md-9' : 'col-md-12'}>
         <div className="mb-3 d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center">
             {membership?.role !== 'VIEWER' && (
@@ -189,15 +191,19 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
                 <tbody>
                   {resources.map((r) => (
                     <tr key={r.id}>
-                      <td onClick={() => onEdit(r)}>{r.name}</td>
-                      <td onClick={onSelect ? undefined : () => onEdit(r)}>
+                      <td className="align-middle" onClick={() => onEdit(r)}>
+                        {r.name}
+                      </td>
+                      <td className="align-middle" onClick={onSelect ? undefined : () => onEdit(r)}>
                         {onSelect && (
                           <button onClick={() => onSelect(r)} type="button" className="btn btn-link">
                             Select
                           </button>
                         )}
                       </td>
-                      <td onClick={() => onEdit(r)}>{DateTime.fromISO(r.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}</td>
+                      <td className="align-middle" onClick={() => onEdit(r)}>
+                        {DateTime.fromISO(r.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import PropTypes from 'prop-types';
 import { capitalize } from 'inflection';
@@ -33,6 +33,7 @@ function Stop({ StopId, transition, children }) {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
   const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   const { StopId: StopIdParam, TourId } = useParams();
   const [tour, setTour] = useState();
   const [stop, setStop] = useState();
@@ -122,6 +123,7 @@ function Stop({ StopId, transition, children }) {
 
   function onHideResourcesModal() {
     setShowingResourcesModal(false);
+    setSearchParams();
   }
 
   async function onSelectResource(resource) {
@@ -132,7 +134,7 @@ function Stop({ StopId, transition, children }) {
     newResources.sort(resourceSortComparator);
     setResources(newResources);
     setStop({ ...stop, Resources: newResources });
-    setShowingResourcesModal(false);
+    onHideResourcesModal();
   }
 
   function onClickResource(resource) {
@@ -305,7 +307,7 @@ function Stop({ StopId, transition, children }) {
             </div>
           </>
         )}
-        <ResourcesModal isShowing={isShowingResourcesModal} onHide={onHideResourcesModal} onSelect={onSelectResource} />
+        {isShowingResourcesModal && <ResourcesModal isShowing={true} onHide={onHideResourcesModal} onSelect={onSelectResource} />}
         {isConfirmArchiveShowing && (
           <ConfirmModal
             isShowing={true}
