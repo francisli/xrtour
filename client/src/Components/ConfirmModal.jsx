@@ -6,7 +6,7 @@ import Spinner from './Spinner';
 import './ConfirmModal.scss';
 
 function ConfirmModal({ nested, isShowing, onCancel, onOK, title, children }) {
-  const [isEnabled, setEnabled] = useState();
+  const [isEnabled, setEnabled] = useState(true);
 
   useEffect(() => {
     return () => setEnabled(true);
