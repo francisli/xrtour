@@ -1,12 +1,13 @@
+import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 import './StopCard.scss';
 
-function StopCard({ stop, onSelect }) {
+function StopCard({ stop, onEdit, onSelect }) {
   const sr = stop.Resources.find((sr) => sr.Resource.type === 'IMAGE');
   return (
     <div className="stop-card col-md-4">
-      <div className="card">
+      <div className={classNames('card', { clickable: onEdit })} onClick={() => onEdit?.(stop)}>
         <div className="stop-card__img card-img-top" style={{ backgroundImage: `url(${sr?.Resource?.Files?.[0].URL})` }}></div>
         <div className="card-body">
           <h3 className="card-title h6">{stop.names[stop.variants[0].code]}</h3>
@@ -21,9 +22,11 @@ function StopCard({ stop, onSelect }) {
             </>
           )}
           {stop.type !== 'TRANSITION' && <p className="small">{stop.address}</p>}
-          <button onClick={() => onSelect(stop)} type="button" className="btn btn-sm btn-primary">
-            Select
-          </button>
+          {onSelect && (
+            <button onClick={() => onSelect(stop)} type="button" className="btn btn-sm btn-primary">
+              Select
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -54,7 +57,8 @@ StopCard.propTypes = {
     destAddress: PropTypes.string,
     type: PropTypes.string.isRequired,
   }).isRequired,
-  onSelect: PropTypes.func.isRequired,
+  onEdit: PropTypes.func,
+  onSelect: PropTypes.func,
 };
 
 export default StopCard;
