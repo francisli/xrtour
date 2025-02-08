@@ -183,7 +183,7 @@ function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', ty
                       </td>
                       <td className="w-25 align-middle" onClick={onSelect ? undefined : () => onEdit?.(s)}>
                         {onSelect && (
-                          <button onClick={() => onSelect(s)} type="button" className="btn btn-link">
+                          <button onClick={() => onSelect(s)} type="button" className="btn btn-sm btn-primary">
                             Select
                           </button>
                         )}
@@ -199,7 +199,7 @@ function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', ty
             {view === 'card' && (
               <div className="row mb-3">
                 {stops?.map((s) => (
-                  <StopCard key={s.id} stop={s} onSelect={onSelect} />
+                  <StopCard key={s.id} stop={s} onEdit={onEdit} onSelect={onSelect} />
                 ))}
               </div>
             )}

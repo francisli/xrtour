@@ -196,7 +196,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
                       </td>
                       <td className="align-middle" onClick={onSelect ? undefined : () => onEdit(r)}>
                         {onSelect && (
-                          <button onClick={() => onSelect(r)} type="button" className="btn btn-link">
+                          <button onClick={() => onSelect(r)} type="button" className="btn btn-sm btn-primary">
                             Select
                           </button>
                         )}
