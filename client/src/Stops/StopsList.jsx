@@ -183,7 +183,7 @@ function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', ty
                       </td>
                       <td className="w-25 align-middle" onClick={onSelect ? undefined : () => onEdit?.(s)}>
                         {onSelect && (
-                          <button onClick={() => onSelect(s)} type="button" className="btn btn-link">
+                          <button onClick={() => onSelect(s)} type="button" className="btn btn-sm btn-primary">
                             Select
                           </button>
                         )}
