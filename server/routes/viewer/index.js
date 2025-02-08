@@ -131,7 +131,7 @@ router.get('/*', async (req, res) => {
               staticContext.context.env.BASE_URL = `${req.protocol}://${req.headers.host}`;
               Object.keys(process.env).forEach((key) => {
                 if (key.startsWith('VITE_')) {
-                  staticContext.context.env[key] = process.env[key];
+                  staticContext.context.env[key.substring(5)] = process.env[key];
                 }
               });
               const app = render(req, res, helmetContext, staticContext);
