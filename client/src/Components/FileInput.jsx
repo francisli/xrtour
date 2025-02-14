@@ -59,6 +59,9 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
               {s.file.type.startsWith('image/') && (
                 <img className="img-fluid me-3 my-1 file-input__image" alt={s.file.name} src={s.file.preview} onLoad={onImageLoad} />
               )}
+              {!s.file.type.startsWith('audio/') && !s.file.type.startsWith('image/') && !s.file.type.startsWith('video/') && (
+                <span className="me-3">{s.file.name}</span>
+              )}
               {(s.status === 'pending' || s.status === 'uploading') && (
                 <div className="spinner-border file-input__spinner" role="status">
                   <span className="visually-hidden">Loading...</span>
@@ -79,6 +82,9 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
               )}
               {valueContentType.startsWith('image/') && (
                 <img className="img-fluid me-3 my-1 file-input__image" alt={value} src={valueURL} />
+              )}
+              {!valueContentType.startsWith('audio/') && !valueContentType.startsWith('video/') && !valueContentType.startsWith('image/') && (
+                <span>{value}</span>
               )}
               <button type="button" className="btn btn-sm btn-outline-danger" onClick={onRemoved}>
                 <FontAwesomeIcon icon={faTrashCan} />

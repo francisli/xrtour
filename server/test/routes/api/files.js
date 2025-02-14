@@ -13,7 +13,7 @@ describe('/api/files', () => {
     await helper.loadUploads([
       ['512x512.png', 'b45136f4-54e4-45cd-8851-efc9d733a573.png'],
       ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
-      ['00-04.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
+      ['testing123.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
     ]);
     await helper.loadFixtures(['users', 'invites', 'teams', 'memberships', 'resources', 'files']);
     testSession = session(app);
@@ -58,6 +58,20 @@ describe('/api/files', () => {
           path.join('files', 'ed2f158a-e44e-432d-971e-e5da1a2e33b4', 'key', 'b45136f4-54e4-45cd-8851-efc9d733a573.png')
         )
       );
+    });
+  });
+
+  describe('POST /transcribe', function () {
+    this.timeout(5000);
+
+    it('starts a transcription job for an already uploaded file', async () => {
+      const response = await testSession
+        .post('/api/files/transcribe?id=84b62056-05a4-4751-953f-7854ac46bc0f')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.OK);
+
+      const data = { ...response.body };
+      console.log(data);
     });
   });
 });

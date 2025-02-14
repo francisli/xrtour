@@ -50,18 +50,27 @@ Sequelize.Model.prototype.assetUrl = function assetUrl(attribute) {
   return null;
 };
 
-Sequelize.Model.prototype.getAssetFile = async function getAssetFile(attribute) {
+Sequelize.Model.prototype.getAssetPath = function getAssetPath(attribute) {
   const assetPrefix = process.env.ASSET_PATH_PREFIX || '';
   const pathPrefix = `${inflection.tableize(this.constructor.name)}/${this.id}/${attribute}`;
   let filePath = this.get(attribute);
   if (!filePath) {
     return null;
   }
+  return path.join(assetPrefix, pathPrefix, filePath);
+};
+
+Sequelize.Model.prototype.getAssetBucketUri = function getAssetBucketUri(attribute) {
+  let filePath = this.getAssetPath(attribute);
+  return `s3://${process.env.AWS_S3_BUCKET}/${filePath}`;
+};
+
+Sequelize.Model.prototype.getAssetFile = async function getAssetFile(attribute) {
+  let filePath = this.getAssetPath(attribute);
   if (process.env.AWS_S3_BUCKET) {
-    filePath = path.join(assetPrefix, pathPrefix, filePath);
     filePath = await s3.getObject(filePath);
   } else {
-    filePath = path.resolve(__dirname, '../public/assets', assetPrefix, pathPrefix, filePath);
+    filePath = path.resolve(__dirname, '../public/assets', filePath);
   }
   return filePath;
 };

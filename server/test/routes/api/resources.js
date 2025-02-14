@@ -13,7 +13,7 @@ describe('/api/resources', () => {
   beforeEach(async () => {
     await helper.loadUploads([
       ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
-      ['00-04.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
+      ['testing123.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
     ]);
     await helper.loadFixtures(['users', 'invites', 'teams', 'memberships', 'resources', 'files']);
     testSession = session(app);
@@ -196,7 +196,7 @@ describe('/api/resources', () => {
 
   describe('PATCH /:id', () => {
     it('updates a Resource and its Files', async () => {
-      await helper.loadUploads([['00-04.m4a', '673c0753-f913-474f-9e99-de638fe35de7.m4a']]);
+      await helper.loadUploads([['testing123.m4a', '673c0753-f913-474f-9e99-de638fe35de7.m4a']]);
       const response = await testSession
         .patch('/api/resources/6ebacda9-8d33-4c3e-beb5-18dffb119046')
         .set('Accept', 'application/json')

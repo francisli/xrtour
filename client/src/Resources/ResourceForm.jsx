@@ -18,6 +18,9 @@ const ACCEPTED_FILES = {
   AUDIO: {
     'audio/*': ['.mp3', '.mp4', '.m4a'],
   },
+  AUDIO_SUBTITLES: {
+    'text/*': ['.vtt'],
+  },
   IMAGE: {
     'image/*': ['.jpg', '.jpeg', '.png'],
   },
@@ -94,6 +97,14 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
       setResource({ ...resource });
     }
   }
+  let variantFileSubtitles = resource?.Files?.find((f) => f.variant === `${variant?.code}-vtt`);
+  if (!variantFileSubtitles && resource?.type === 'AUDIO') {
+    variantFileSubtitles = { variant: `${variant?.code}-vtt`, externalURL: '', key: '' };
+    resource?.Files?.push(variantFileSubtitles);
+    if (resource) {
+      setResource({ ...resource });
+    }
+  }
 
   function onChange(event) {
     const newResource = { ...resource };
@@ -114,6 +125,13 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setResource(newResource);
   }
 
+  function onChangeVariantSubtitles(event) {
+    const newResource = { ...resource };
+    const { name, value } = event.target;
+    variantFileSubtitles[name] = value;
+    setResource(newResource);
+  }
+
   function onChangeData(event) {
     const newResource = { ...resource };
     const { name, value } = event.target;
@@ -129,6 +147,10 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     } catch (error) {
       setDeleteError(error);
     }
+  }
+
+  async function onGenerate(event) {
+    event.preventDefault();
   }
 
   return (
@@ -186,6 +208,32 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                       <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
                     </div>
                   </FileInput>
+                  {error?.errorMessagesHTMLFor?.('key')}
+                </div>
+              )}
+              {resource.type === 'AUDIO' && (
+                <div className="mb-3">
+                  <label className="form-label" htmlFor="key">
+                    Upload Subtitle File (.vtt)
+                  </label>
+                  <div className="d-flex align-items-center">
+                    <FileInput
+                      id="key"
+                      name="key"
+                      accept={ACCEPTED_FILES['AUDIO_SUBTITLES']}
+                      value={variantFileSubtitles.key}
+                      valueURL={variantFileSubtitles.keyURL}
+                      onChange={onChangeVariantSubtitles}
+                      onChangeMetadata={onChangeVariantSubtitles}
+                      onUploading={setUploading}>
+                      <div className="card-body">
+                        <div className="card-text text-muted">
+                          Drag-and-drop a file here, or click here to browse and select a file.
+                        </div>
+                      </div>
+                    </FileInput>
+                    <button onClick={onGenerate} type="button" className="btn btn-outline-primary ms-2">Generate</button>
+                  </div>
                   {error?.errorMessagesHTMLFor?.('key')}
                 </div>
               )}
