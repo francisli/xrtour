@@ -70,9 +70,30 @@ router.post('/transcribe', interceptors.requireLogin, async (req, res) => {
   // now trigger transcription
   const jobName = uuid();
   const outputKey = `uploads/${jobName}/${jobName}.json`;
-  console.log('!!!', jobName, mediaFileUri, outputKey);
   try {
     const response = await transcribe.startTranscriptionJob(jobName, mediaFileUri, outputKey);
+    res.json(response);
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
+  }
+});
+
+router.get('/transcribe', interceptors.requireLogin, async (req, res) => {
+  const { jobName } = req.query;
+  if (!jobName) {
+    res.status(StatusCodes.UNPROCESSABLE_ENTITY).end();
+    return;
+  }
+  try {
+    const response = await transcribe.getTranscriptionJob(jobName);
+    if (response.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
+      // if transcription bucket is not the same as assets bucket, copy
+      const jobName = response.TranscriptionJob?.TranscriptionJobName;
+      const vttFileKey = `uploads/${jobName}/${jobName}.vtt`;
+      const vttFilePath = await transcribe.getObject(vttFileKey);
+      await s3.putObject(vttFileKey, vttFilePath);
+      response.TranscriptionJob.Transcript.TranscriptVttFileUri = await s3.getSignedAssetUrl(vttFileKey);
+    }
     res.json(response);
   } catch (error) {
     console.log(error);

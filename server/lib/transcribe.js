@@ -1,5 +1,9 @@
 import { S3Client, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 import { TranscribeClient, StartTranscriptionJobCommand, GetTranscriptionJobCommand } from '@aws-sdk/client-transcribe';
 
@@ -40,8 +44,21 @@ async function getTranscriptionJob(TranscriptionJobName) {
   return client.send(new GetTranscriptionJobCommand(options));
 }
 
+async function getObject(Key) {
+  const response = await s3client.send(
+    new GetObjectCommand({
+      Bucket: process.env.AWS_TRANSCRIBE_BUCKET,
+      Key,
+    })
+  );
+  const filePath = path.resolve(__dirname, '../tmp/downloads', Key);
+  const dirPath = filePath.substring(0, filePath.lastIndexOf('/'));
+  await fs.promises.mkdir(dirPath, { recursive: true });
+  await fs.promises.writeFile(filePath, response.Body);
+  return filePath;
+}
+
 function putObject(Key, filePath) {
-  console.log(process.env.AWS_TRANSCRIBE_BUCKET, Key, filePath);
   return s3client.send(
     new PutObjectCommand({
       Bucket: process.env.AWS_TRANSCRIBE_BUCKET,
@@ -55,4 +72,5 @@ export default {
   startTranscriptionJob,
   getTranscriptionJob,
   putObject,
+  getObject,
 };

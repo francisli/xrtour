@@ -5,6 +5,7 @@ import session from 'supertest-session';
 
 import helper from '../../helper.js';
 import app from '../../../app.js';
+import s3 from '../../../lib/s3.js';
 
 describe('/api/files', () => {
   let testSession;
@@ -62,16 +63,36 @@ describe('/api/files', () => {
   });
 
   describe('POST /transcribe', function () {
-    this.timeout(5000);
+    this.timeout(24000);
 
     it('starts a transcription job for an already uploaded file', async () => {
-      const response = await testSession
+      let response = await testSession
         .post('/api/files/transcribe?id=84b62056-05a4-4751-953f-7854ac46bc0f')
         .set('Accept', 'application/json')
         .expect(StatusCodes.OK);
 
-      const data = { ...response.body };
-      console.log(data);
+      let data = { ...response.body };
+      assert.deepStrictEqual(data['$metadata']?.httpStatusCode, StatusCodes.OK);
+      assert.deepStrictEqual(data.TranscriptionJob?.TranscriptionJobStatus, 'IN_PROGRESS');
+      assert.ok(data.TranscriptionJob?.TranscriptionJobName);
+
+      const jobName = data.TranscriptionJob.TranscriptionJobName;
+      for (;;) {
+        await helper.sleep(1000);
+        response = await testSession
+          .get(`/api/files/transcribe?jobName=${jobName}`)
+          .set('Accept', 'application/json')
+          .expect(StatusCodes.OK);
+        data = { ...response.body };
+        if (data.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
+          break;
+        }
+      }
+      assert.deepStrictEqual(data.TranscriptionJob?.TranscriptionJobStatus, 'COMPLETED');
+      const { TranscriptVttFileUri } = data.TranscriptionJob.Transcript;
+      assert.ok(TranscriptVttFileUri);
+      const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/'), TranscriptVttFileUri.indexOf('?'));
+      assert.ok(s3.objectExists(key));
     });
   });
 });
