@@ -179,7 +179,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
       console.log(isGenerating, data);
       if (data.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
         const { TranscriptVttFileUri } = data.TranscriptionJob.Transcript;
-        const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/'), TranscriptVttFileUri.indexOf('?'));
+        const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/') + 8, TranscriptVttFileUri.indexOf('?'));
         const newResource = { ...resource };
         variantFileSubtitles.key = key;
         variantFileSubtitles.keyURL = TranscriptVttFileUri;

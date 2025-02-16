@@ -67,11 +67,7 @@ Sequelize.Model.prototype.getAssetBucketUri = function getAssetBucketUri(attribu
 
 Sequelize.Model.prototype.getAssetFile = async function getAssetFile(attribute) {
   let filePath = this.getAssetPath(attribute);
-  if (process.env.AWS_S3_BUCKET) {
-    filePath = await s3.getObject(filePath);
-  } else {
-    filePath = path.resolve(__dirname, '../public/assets', filePath);
-  }
+  filePath = await s3.getObject(filePath);
   return filePath;
 };
 
@@ -86,28 +82,14 @@ Sequelize.Model.prototype.handleAssetFile = async function handleAssetFile(attri
   const handle = async () => {
     let prevPath;
     let newPath;
-    if (process.env.AWS_S3_BUCKET) {
-      if (prevFile) {
-        prevPath = path.join(assetPrefix, pathPrefix, prevFile);
-        await s3.deleteObject(prevPath);
-      }
-      if (newFile) {
-        newPath = path.join(assetPrefix, pathPrefix, newFile);
-        await s3.copyObject(path.join(process.env.AWS_S3_BUCKET, 'uploads', newFile), newPath);
-        await s3.deleteObject(path.join('uploads', newFile));
-      }
-    } else {
-      if (prevFile) {
-        prevPath = path.resolve(__dirname, '../public/assets', assetPrefix, pathPrefix, prevFile);
-        fs.removeSync(prevPath);
-      }
-      if (newFile) {
-        fs.ensureDirSync(path.resolve(__dirname, '../public/assets'));
-        newPath = path.resolve(__dirname, '../public/assets', assetPrefix, pathPrefix, newFile);
-        fs.moveSync(path.resolve(__dirname, '../tmp/uploads', newFile), newPath, {
-          overwrite: true,
-        });
-      }
+    if (prevFile) {
+      prevPath = path.join(assetPrefix, pathPrefix, prevFile);
+      await s3.deleteObject(prevPath);
+    }
+    if (newFile) {
+      newPath = path.join(assetPrefix, pathPrefix, newFile);
+      await s3.copyObject(path.join(process.env.AWS_S3_BUCKET, 'uploads', newFile), newPath);
+      await s3.deleteObject(path.join('uploads', newFile));
     }
     if (callback) {
       await callback(this.id, prevPath, newPath);
