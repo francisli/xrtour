@@ -6,6 +6,7 @@ import { useAuthContext } from '../AuthContext';
 import Api from '../Api';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
+import Spinner from '../Components/Spinner';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
@@ -38,6 +39,8 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
   const [isUploading, setUploading] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
+
+  const [isGenerating, setGenerating] = useState(false);
 
   const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
   const [deleteError, setDeleteError] = useState();
@@ -151,6 +154,41 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
 
   async function onGenerate(event) {
     event.preventDefault();
+    setGenerating(true);
+    const params = {};
+    if (variantFile.id) {
+      params.id = variantFile.id;
+    } else if (variantFile.key) {
+      params.key = variantFile.key;
+    }
+    const response = await Api.files.transcribe(params);
+    const { data } = response;
+    console.log(isGenerating, data);
+    if (data['$metadata']?.httpStatusCode === StatusCodes.OK) {
+      const jobName = data.TranscriptionJob?.TranscriptionJobName;
+      pollGenerate(jobName);
+    } else {
+      setGenerating(false);
+    }
+  }
+
+  function pollGenerate(jobName) {
+    setTimeout(async () => {
+      const response = await Api.files.poll(jobName);
+      const { data } = response;
+      console.log(isGenerating, data);
+      if (data.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
+        const { TranscriptVttFileUri } = data.TranscriptionJob.Transcript;
+        const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/'), TranscriptVttFileUri.indexOf('?'));
+        const newResource = { ...resource };
+        variantFileSubtitles.key = key;
+        variantFileSubtitles.keyURL = TranscriptVttFileUri;
+        setResource(newResource);
+        setGenerating(false);
+      } else {
+        pollGenerate(jobName);
+      }
+    }, 1000);
   }
 
   return (
@@ -216,7 +254,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                   <label className="form-label" htmlFor="key">
                     Upload Subtitle File (.vtt)
                   </label>
-                  <div className="d-flex align-items-center">
+                  <fieldset disabled={isGenerating} className="d-flex align-items-center">
                     <FileInput
                       id="key"
                       name="key"
@@ -227,13 +265,24 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                       onChangeMetadata={onChangeVariantSubtitles}
                       onUploading={setUploading}>
                       <div className="card-body">
-                        <div className="card-text text-muted">
-                          Drag-and-drop a file here, or click here to browse and select a file.
-                        </div>
+                        <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
                       </div>
                     </FileInput>
-                    <button onClick={onGenerate} type="button" className="btn btn-outline-primary ms-2">Generate</button>
-                  </div>
+                    {!variantFileSubtitles.key && (
+                      <>
+                        <span>&nbsp;or&nbsp;</span>
+                        <button
+                          disabled={!variantFile?.key || isGenerating}
+                          onClick={onGenerate}
+                          type="button"
+                          className="btn btn-outline-primary">
+                          <span style={{ display: 'inline-block', width: '70px' }}>
+                            {isGenerating ? <Spinner size="sm" /> : 'Generate'}
+                          </span>
+                        </button>
+                      </>
+                    )}
+                  </fieldset>
                   {error?.errorMessagesHTMLFor?.('key')}
                 </div>
               )}

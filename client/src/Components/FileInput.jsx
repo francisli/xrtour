@@ -83,9 +83,9 @@ function FileInput({ accept, className, children, id, name, onChange, onChangeMe
               {valueContentType.startsWith('image/') && (
                 <img className="img-fluid me-3 my-1 file-input__image" alt={value} src={valueURL} />
               )}
-              {!valueContentType.startsWith('audio/') && !valueContentType.startsWith('video/') && !valueContentType.startsWith('image/') && (
-                <span>{value}</span>
-              )}
+              {!valueContentType.startsWith('audio/') &&
+                !valueContentType.startsWith('video/') &&
+                !valueContentType.startsWith('image/') && <span className="me-3">{value.substring(value.lastIndexOf('/') + 1)}</span>}
               <button type="button" className="btn btn-sm btn-outline-danger" onClick={onRemoved}>
                 <FontAwesomeIcon icon={faTrashCan} />
               </button>
