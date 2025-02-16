@@ -163,7 +163,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     }
     const response = await Api.files.transcribe(params);
     const { data } = response;
-    console.log(isGenerating, data);
     if (data['$metadata']?.httpStatusCode === StatusCodes.OK) {
       const jobName = data.TranscriptionJob?.TranscriptionJobName;
       pollGenerate(jobName);
@@ -176,7 +175,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setTimeout(async () => {
       const response = await Api.files.poll(jobName);
       const { data } = response;
-      console.log(isGenerating, data);
       if (data.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
         const { TranscriptVttFileUri } = data.TranscriptionJob.Transcript;
         const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/') + 8, TranscriptVttFileUri.indexOf('?'));

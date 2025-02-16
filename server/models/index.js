@@ -45,7 +45,7 @@ Sequelize.Model.prototype.assetUrl = function assetUrl(attribute) {
   const pathPrefix = `${inflection.tableize(this.constructor.name)}/${this.id}/${attribute}`;
   const file = this.get(attribute);
   if (file) {
-    return path.resolve('/api/assets/', pathPrefix, file);
+    return path.resolve('/api/assets/', pathPrefix, path.basename(file));
   }
   return null;
 };
@@ -57,7 +57,7 @@ Sequelize.Model.prototype.getAssetPath = function getAssetPath(attribute) {
   if (!filePath) {
     return null;
   }
-  return path.join(assetPrefix, pathPrefix, filePath);
+  return path.join(assetPrefix, pathPrefix, path.basename(filePath));
 };
 
 Sequelize.Model.prototype.getAssetBucketUri = function getAssetBucketUri(attribute) {
@@ -87,7 +87,7 @@ Sequelize.Model.prototype.handleAssetFile = async function handleAssetFile(attri
       await s3.deleteObject(prevPath);
     }
     if (newFile) {
-      newPath = path.join(assetPrefix, pathPrefix, newFile);
+      newPath = path.join(assetPrefix, pathPrefix, path.basename(newFile));
       await s3.copyObject(path.join(process.env.AWS_S3_BUCKET, 'uploads', newFile), newPath);
       await s3.deleteObject(path.join('uploads', newFile));
     }
