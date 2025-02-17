@@ -5,7 +5,6 @@ import './vars.js';
 import 'dotenv/config';
 import fixtures from 'sequelize-fixtures';
 import path from 'path';
-import fs from 'fs-extra';
 import nodemailerMock from 'nodemailer-mock';
 import { fileURLToPath } from 'url';
 
@@ -22,31 +21,17 @@ async function loadFixtures(files) {
 }
 
 async function loadUploads(uploads) {
-  if (process.env.AWS_S3_BUCKET) {
-    await Promise.all(
-      uploads.map((upload) => s3.putObject(path.join('uploads', upload[1]), path.resolve(__dirname, `fixtures/files/${upload[0]}`)))
-    );
-  } else {
-    fs.ensureDirSync(path.resolve(__dirname, '../tmp/uploads'));
-    uploads.forEach((upload) => {
-      fs.copySync(path.resolve(__dirname, `fixtures/files/${upload[0]}`), path.resolve(__dirname, `../tmp/uploads/${upload[1]}`));
-    });
-  }
+  await Promise.all(
+    uploads.map((upload) => s3.putObject(path.join('uploads', upload[1]), path.resolve(__dirname, `fixtures/files/${upload[0]}`)))
+  );
 }
 
 function assetPathExists(assetPath) {
-  if (process.env.AWS_S3_BUCKET) {
-    return s3.objectExists(path.join(process.env.ASSET_PATH_PREFIX, assetPath));
-  }
-  return fs.pathExistsSync(path.resolve(__dirname, '../public/assets', process.env.ASSET_PATH_PREFIX, assetPath));
+  return s3.objectExists(path.join(process.env.ASSET_PATH_PREFIX, assetPath));
 }
 
 async function cleanAssets() {
-  if (process.env.AWS_S3_BUCKET) {
-    await s3.deleteObjects(process.env.ASSET_PATH_PREFIX);
-  } else {
-    fs.removeSync(path.resolve(__dirname, '../../../public/assets', process.env.ASSET_PATH_PREFIX));
-  }
+  await s3.deleteObjects(process.env.ASSET_PATH_PREFIX);
 }
 
 async function resetDatabase() {

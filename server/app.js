@@ -6,7 +6,6 @@ import path from 'path';
 import cookieSession from 'cookie-session';
 import logger from 'morgan';
 import passport from 'passport';
-import fileUpload from 'express-fileupload';
 import i18n from 'i18n';
 import { StatusCodes } from 'http-status-codes';
 import { fileURLToPath } from 'url';
@@ -20,12 +19,6 @@ const app = express();
 if (process.env.NODE_ENV !== 'test') {
   app.use(logger('dev'));
 }
-/// multipart file upload support (when not uploading direct to S3)
-app.use(
-  fileUpload({
-    useTempFiles: !process.env.AWS_S3_BUCKET,
-  })
-);
 /// configure allowed file upload types and max file size
 app.use(express.raw({ type: ['image/*'], limit: '10mb' }));
 /// support json content body

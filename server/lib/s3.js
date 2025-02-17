@@ -96,7 +96,8 @@ async function getObject(Key) {
   const filePath = path.resolve(__dirname, '../tmp/downloads', Key);
   const dirPath = filePath.substring(0, filePath.lastIndexOf('/'));
   await fs.promises.mkdir(dirPath, { recursive: true });
-  return fs.promises.writeFile(filePath, response.Body);
+  await fs.promises.writeFile(filePath, response.Body);
+  return filePath;
 }
 
 function getSignedAssetUrl(Key, expiresIn = 60) {

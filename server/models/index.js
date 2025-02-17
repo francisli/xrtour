@@ -45,24 +45,29 @@ Sequelize.Model.prototype.assetUrl = function assetUrl(attribute) {
   const pathPrefix = `${inflection.tableize(this.constructor.name)}/${this.id}/${attribute}`;
   const file = this.get(attribute);
   if (file) {
-    return path.resolve('/api/assets/', pathPrefix, file);
+    return path.resolve('/api/assets/', pathPrefix, path.basename(file));
   }
   return null;
 };
 
-Sequelize.Model.prototype.getAssetFile = async function getAssetFile(attribute) {
+Sequelize.Model.prototype.getAssetPath = function getAssetPath(attribute) {
   const assetPrefix = process.env.ASSET_PATH_PREFIX || '';
   const pathPrefix = `${inflection.tableize(this.constructor.name)}/${this.id}/${attribute}`;
   let filePath = this.get(attribute);
   if (!filePath) {
     return null;
   }
-  if (process.env.AWS_S3_BUCKET) {
-    filePath = path.join(assetPrefix, pathPrefix, filePath);
-    filePath = await s3.getObject(filePath);
-  } else {
-    filePath = path.resolve(__dirname, '../public/assets', assetPrefix, pathPrefix, filePath);
-  }
+  return path.join(assetPrefix, pathPrefix, path.basename(filePath));
+};
+
+Sequelize.Model.prototype.getAssetBucketUri = function getAssetBucketUri(attribute) {
+  let filePath = this.getAssetPath(attribute);
+  return `s3://${process.env.AWS_S3_BUCKET}/${filePath}`;
+};
+
+Sequelize.Model.prototype.getAssetFile = async function getAssetFile(attribute) {
+  let filePath = this.getAssetPath(attribute);
+  filePath = await s3.getObject(filePath);
   return filePath;
 };
 
@@ -77,28 +82,14 @@ Sequelize.Model.prototype.handleAssetFile = async function handleAssetFile(attri
   const handle = async () => {
     let prevPath;
     let newPath;
-    if (process.env.AWS_S3_BUCKET) {
-      if (prevFile) {
-        prevPath = path.join(assetPrefix, pathPrefix, prevFile);
-        await s3.deleteObject(prevPath);
-      }
-      if (newFile) {
-        newPath = path.join(assetPrefix, pathPrefix, newFile);
-        await s3.copyObject(path.join(process.env.AWS_S3_BUCKET, 'uploads', newFile), newPath);
-        await s3.deleteObject(path.join('uploads', newFile));
-      }
-    } else {
-      if (prevFile) {
-        prevPath = path.resolve(__dirname, '../public/assets', assetPrefix, pathPrefix, prevFile);
-        fs.removeSync(prevPath);
-      }
-      if (newFile) {
-        fs.ensureDirSync(path.resolve(__dirname, '../public/assets'));
-        newPath = path.resolve(__dirname, '../public/assets', assetPrefix, pathPrefix, newFile);
-        fs.moveSync(path.resolve(__dirname, '../tmp/uploads', newFile), newPath, {
-          overwrite: true,
-        });
-      }
+    if (prevFile) {
+      prevPath = path.join(assetPrefix, pathPrefix, prevFile);
+      await s3.deleteObject(prevPath);
+    }
+    if (newFile) {
+      newPath = path.join(assetPrefix, pathPrefix, path.basename(newFile));
+      await s3.copyObject(path.join(process.env.AWS_S3_BUCKET, 'uploads', newFile), newPath);
+      await s3.deleteObject(path.join('uploads', newFile));
     }
     if (callback) {
       await callback(this.id, prevPath, newPath);

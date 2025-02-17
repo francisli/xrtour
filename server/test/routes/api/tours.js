@@ -13,7 +13,7 @@ describe('/api/tours', () => {
   beforeEach(async () => {
     await helper.loadUploads([
       ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
-      ['00-04.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
+      ['testing123.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
     ]);
     await helper.loadFixtures([
       'users',

@@ -5,6 +5,7 @@ import session from 'supertest-session';
 
 import helper from '../../helper.js';
 import app from '../../../app.js';
+import s3 from '../../../lib/s3.js';
 
 describe('/api/files', () => {
   let testSession;
@@ -13,7 +14,7 @@ describe('/api/files', () => {
     await helper.loadUploads([
       ['512x512.png', 'b45136f4-54e4-45cd-8851-efc9d733a573.png'],
       ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
-      ['00-04.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
+      ['testing123.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
     ]);
     await helper.loadFixtures(['users', 'invites', 'teams', 'memberships', 'resources', 'files']);
     testSession = session(app);
@@ -58,6 +59,43 @@ describe('/api/files', () => {
           path.join('files', 'ed2f158a-e44e-432d-971e-e5da1a2e33b4', 'key', 'b45136f4-54e4-45cd-8851-efc9d733a573.png')
         )
       );
+    });
+  });
+
+  describe('POST /transcribe', () => {
+    it('starts a transcription job for an already uploaded file', async function () {
+      this.timeout(24000);
+      if (process.env.CI) {
+        return this.skip();
+      }
+
+      let response = await testSession
+        .post('/api/files/transcribe?id=84b62056-05a4-4751-953f-7854ac46bc0f')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.OK);
+
+      let data = { ...response.body };
+      assert.deepStrictEqual(data['$metadata']?.httpStatusCode, StatusCodes.OK);
+      assert.deepStrictEqual(data.TranscriptionJob?.TranscriptionJobStatus, 'IN_PROGRESS');
+      assert.ok(data.TranscriptionJob?.TranscriptionJobName);
+
+      const jobName = data.TranscriptionJob.TranscriptionJobName;
+      for (;;) {
+        await helper.sleep(1000);
+        response = await testSession
+          .get(`/api/files/transcribe?jobName=${jobName}`)
+          .set('Accept', 'application/json')
+          .expect(StatusCodes.OK);
+        data = { ...response.body };
+        if (data.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
+          break;
+        }
+      }
+      assert.deepStrictEqual(data.TranscriptionJob?.TranscriptionJobStatus, 'COMPLETED');
+      const { TranscriptVttFileUri } = data.TranscriptionJob.Transcript;
+      assert.ok(TranscriptVttFileUri);
+      const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/'), TranscriptVttFileUri.indexOf('?'));
+      assert.ok(s3.objectExists(key));
     });
   });
 });

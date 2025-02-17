@@ -6,6 +6,7 @@ import { useAuthContext } from '../AuthContext';
 import Api from '../Api';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
+import Spinner from '../Components/Spinner';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
@@ -17,6 +18,9 @@ const ACCEPTED_FILES = {
   },
   AUDIO: {
     'audio/*': ['.mp3', '.mp4', '.m4a'],
+  },
+  AUDIO_SUBTITLES: {
+    'text/*': ['.vtt'],
   },
   IMAGE: {
     'image/*': ['.jpg', '.jpeg', '.png'],
@@ -35,6 +39,8 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
   const [isUploading, setUploading] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
+
+  const [isGenerating, setGenerating] = useState(false);
 
   const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
   const [deleteError, setDeleteError] = useState();
@@ -94,6 +100,14 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
       setResource({ ...resource });
     }
   }
+  let variantFileSubtitles = resource?.Files?.find((f) => f.variant === `${variant?.code}-vtt`);
+  if (!variantFileSubtitles && resource?.type === 'AUDIO') {
+    variantFileSubtitles = { variant: `${variant?.code}-vtt`, externalURL: '', key: '' };
+    resource?.Files?.push(variantFileSubtitles);
+    if (resource) {
+      setResource({ ...resource });
+    }
+  }
 
   function onChange(event) {
     const newResource = { ...resource };
@@ -114,6 +128,13 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setResource(newResource);
   }
 
+  function onChangeVariantSubtitles(event) {
+    const newResource = { ...resource };
+    const { name, value } = event.target;
+    variantFileSubtitles[name] = value;
+    setResource(newResource);
+  }
+
   function onChangeData(event) {
     const newResource = { ...resource };
     const { name, value } = event.target;
@@ -129,6 +150,43 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     } catch (error) {
       setDeleteError(error);
     }
+  }
+
+  async function onGenerate(event) {
+    event.preventDefault();
+    setGenerating(true);
+    const params = {};
+    if (variantFile.id) {
+      params.id = variantFile.id;
+    } else if (variantFile.key) {
+      params.key = variantFile.key;
+    }
+    const response = await Api.files.transcribe(params);
+    const { data } = response;
+    if (data['$metadata']?.httpStatusCode === StatusCodes.OK) {
+      const jobName = data.TranscriptionJob?.TranscriptionJobName;
+      pollGenerate(jobName);
+    } else {
+      setGenerating(false);
+    }
+  }
+
+  function pollGenerate(jobName) {
+    setTimeout(async () => {
+      const response = await Api.files.poll(jobName);
+      const { data } = response;
+      if (data.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
+        const { TranscriptVttFileUri } = data.TranscriptionJob.Transcript;
+        const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/') + 8, TranscriptVttFileUri.indexOf('?'));
+        const newResource = { ...resource };
+        variantFileSubtitles.key = key;
+        variantFileSubtitles.keyURL = TranscriptVttFileUri;
+        setResource(newResource);
+        setGenerating(false);
+      } else {
+        pollGenerate(jobName);
+      }
+    }, 1000);
   }
 
   return (
@@ -186,6 +244,43 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                       <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
                     </div>
                   </FileInput>
+                  {error?.errorMessagesHTMLFor?.('key')}
+                </div>
+              )}
+              {resource.type === 'AUDIO' && (
+                <div className="mb-3">
+                  <label className="form-label" htmlFor="key">
+                    Upload Subtitle File (.vtt)
+                  </label>
+                  <fieldset disabled={isGenerating} className="d-flex align-items-center">
+                    <FileInput
+                      id="key"
+                      name="key"
+                      accept={ACCEPTED_FILES['AUDIO_SUBTITLES']}
+                      value={variantFileSubtitles.key}
+                      valueURL={variantFileSubtitles.keyURL}
+                      onChange={onChangeVariantSubtitles}
+                      onChangeMetadata={onChangeVariantSubtitles}
+                      onUploading={setUploading}>
+                      <div className="card-body">
+                        <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
+                      </div>
+                    </FileInput>
+                    {!variantFileSubtitles.key && (
+                      <>
+                        <span>&nbsp;or&nbsp;</span>
+                        <button
+                          disabled={!variantFile?.key || isGenerating}
+                          onClick={onGenerate}
+                          type="button"
+                          className="btn btn-outline-primary">
+                          <span style={{ display: 'inline-block', width: '70px' }}>
+                            {isGenerating ? <Spinner size="sm" /> : 'Generate'}
+                          </span>
+                        </button>
+                      </>
+                    )}
+                  </fieldset>
                   {error?.errorMessagesHTMLFor?.('key')}
                 </div>
               )}

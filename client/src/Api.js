@@ -52,6 +52,20 @@ const Api = {
       return instance.post('/api/auth/register', data);
     },
   },
+  files: {
+    transcribe({ id, key }) {
+      if (id) {
+        return instance.post(`/api/files/transcribe?id=${id}`);
+      }
+      if (key) {
+        return instance.post(`/api/files/transcribe?key=${key}`);
+      }
+      throw new Error();
+    },
+    poll(jobName) {
+      return instance.get(`/api/files/transcribe?jobName=${jobName}`);
+    },
+  },
   invites: {
     index() {
       return instance.get(`/api/invites`);

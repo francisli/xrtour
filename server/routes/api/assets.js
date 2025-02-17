@@ -22,23 +22,14 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
   if (!response.signed_id) {
     response.signed_id = `${id}.${mime.extension(response.content_type)}`;
   }
-  if (process.env.AWS_S3_BUCKET) {
-    /// store in S3, in tmp uploads dir
-    const url = await s3.getSignedUploadUrl(response.content_type, `uploads/${response.signed_id}`);
-    response.direct_upload = {
-      url,
-      headers: {
-        'Content-Type': response.content_type,
-      },
-    };
-  } else {
-    response.direct_upload = {
-      url: `/api/assets/${response.signed_id}`,
-      headers: {
-        'Content-Type': response.content_type,
-      },
-    };
-  }
+  // store in S3, in tmp uploads path with lifecycle rule to delete after time
+  const url = await s3.getSignedUploadUrl(response.content_type, `uploads/${response.signed_id}`);
+  response.direct_upload = {
+    url,
+    headers: {
+      'Content-Type': response.content_type,
+    },
+  };
   res.json(response);
 });
 
@@ -60,13 +51,9 @@ router.get('/:path([^?]+)', async (req, res) => {
   if (process.env.ASSET_PATH_PREFIX) {
     assetPath = path.join(process.env.ASSET_PATH_PREFIX, assetPath);
   }
-  if (process.env.AWS_S3_BUCKET) {
-    const url = await s3.getSignedAssetUrl(assetPath, 900);
-    res.set('Cache-Control', 'public, max-age=845');
-    res.redirect(url);
-  } else {
-    res.redirect(`/assets/${assetPath}`);
-  }
+  const url = await s3.getSignedAssetUrl(assetPath, 900);
+  res.set('Cache-Control', 'public, max-age=845');
+  res.redirect(url);
 });
 
 export default router;
