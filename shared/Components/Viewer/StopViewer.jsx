@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClosedCaptioning as faCC } from '@fortawesome/free-regular-svg-icons';
 import { faBars, faClosedCaptioning as faCCFilled, faLocationDot, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
+import classNames from 'classnames';
 
 import ImageOverlay from './ImageOverlay';
 import ImageSphere from './ImageSphere';
@@ -266,6 +267,43 @@ function StopViewer({
     }
   }
 
+  let hasCC = false;
+  const audio = tracks?.map((sr, i) => (
+    <audio
+      autoPlay={autoPlay && i === 0}
+      crossOrigin="anonymous"
+      onPlay={() => !isPlaying && setPlaying(true)}
+      id={sr.id}
+      key={sr.id}
+      ref={(el) => el && (ref.current[el.id] = el)}
+      src={sr.Resource.Files.find((f) => f.variant === variant.code)?.URL}
+      onTimeUpdate={onTimeUpdateInternal}
+      onEnded={onEndedInternal}>
+      {(() => {
+        const subtitles = sr.Resource.Files.find((f) => f.variant === `${variant.code}-vtt`);
+        if (subtitles) {
+          hasCC = true;
+          return (
+            <track
+              ref={(el) => {
+                if (el && subtitlesRef.current[subtitles.id] !== el) {
+                  el.addEventListener('cuechange', function (event) {
+                    const text = event.target?.track?.activeCues?.[0]?.text;
+                    setSubtitleText(text);
+                  });
+                  subtitlesRef.current[subtitles.id] = el;
+                }
+              }}
+              id={subtitles.id}
+              default={true}
+              kind="captions"
+              src={subtitles.URL}></track>
+          );
+        }
+      })()}
+    </audio>
+  ));
+
   return (
     <div className="stop-viewer">
       <>
@@ -296,46 +334,16 @@ function StopViewer({
               {!isPlaying && <FontAwesomeIcon icon={faPlay} />}
               {isPlaying && <FontAwesomeIcon icon={faPause} />}
             </button>
-            <button onClick={() => setCC(!isCC)} type="button" className="btn btn-lg btn-transparent btn-round">
+            <button
+              onClick={() => setCC(!isCC)}
+              type="button"
+              className={classNames('btn btn-lg btn-transparent btn-round', { invisible: !hasCC })}>
               {!isCC && <FontAwesomeIcon icon={faCC} />}
               {isCC && <FontAwesomeIcon icon={faCCFilled} />}
             </button>
           </div>
         </div>
-        {tracks?.map((sr, i) => (
-          <audio
-            autoPlay={autoPlay && i === 0}
-            crossOrigin="anonymous"
-            onPlay={() => !isPlaying && setPlaying(true)}
-            id={sr.id}
-            key={sr.id}
-            ref={(el) => el && (ref.current[el.id] = el)}
-            src={sr.Resource.Files.find((f) => f.variant === variant.code)?.URL}
-            onTimeUpdate={onTimeUpdateInternal}
-            onEnded={onEndedInternal}>
-            {(() => {
-              const subtitles = sr.Resource.Files.find((f) => f.variant === `${variant.code}-vtt`);
-              if (subtitles) {
-                return (
-                  <track
-                    ref={(el) => {
-                      if (el && subtitlesRef.current[subtitles.id] !== el) {
-                        el.addEventListener('cuechange', function (event) {
-                          const text = event.target?.track?.activeCues?.[0]?.text;
-                          setSubtitleText(text);
-                        });
-                        subtitlesRef.current[subtitles.id] = el;
-                      }
-                    }}
-                    id={subtitles.id}
-                    default={true}
-                    kind="captions"
-                    src={subtitles.URL}></track>
-                );
-              }
-            })()}
-          </audio>
-        ))}
+        {audio}
         <Toc
           isOpen={isTocOpen}
           onClose={() => setTocOpen(false)}

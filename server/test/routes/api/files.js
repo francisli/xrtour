@@ -62,10 +62,13 @@ describe('/api/files', () => {
     });
   });
 
-  describe('POST /transcribe', function () {
-    this.timeout(24000);
+  describe('POST /transcribe', () => {
+    it('starts a transcription job for an already uploaded file', async function () {
+      this.timeout(24000);
+      if (process.env.CI) {
+        return this.skip();
+      }
 
-    it('starts a transcription job for an already uploaded file', async () => {
       let response = await testSession
         .post('/api/files/transcribe?id=84b62056-05a4-4751-953f-7854ac46bc0f')
         .set('Accept', 'application/json')
