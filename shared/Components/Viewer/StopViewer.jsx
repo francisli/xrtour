@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faLocationDot, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faClosedCaptioning as faCC } from '@fortawesome/free-regular-svg-icons';
+import { faBars, faClosedCaptioning as faCCFilled, faLocationDot, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 
 import ImageOverlay from './ImageOverlay';
 import ImageSphere from './ImageSphere';
@@ -40,9 +41,13 @@ function StopViewer({
 
   const ref = useRef({});
 
+  const subtitlesRef = useRef({});
+  const [subtitleText, setSubtitleText] = useState();
+
   const [isPlaying, setPlaying] = useState(autoPlay || false);
   const [isTocOpen, setTocOpen] = useState(false);
   const [isMapOpen, setMapOpen] = useState(false);
+  const [isCC, setCC] = useState(false);
 
   useEffect(() => {
     if (stop.Resources) {
@@ -285,22 +290,51 @@ function StopViewer({
         </div>
         <div className="stop-viewer__controls">
           <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber mb-2" />
-          <button onClick={onPlayPause} type="button" className="btn btn-lg btn-warning btn-round">
-            {!isPlaying && <FontAwesomeIcon icon={faPlay} />}
-            {isPlaying && <FontAwesomeIcon icon={faPause} />}
-          </button>
+          <div className="d-flex justify-content-between">
+            <button className="btn btn-round invisible">&nbsp;</button>
+            <button onClick={onPlayPause} type="button" className="btn btn-lg btn-warning btn-round">
+              {!isPlaying && <FontAwesomeIcon icon={faPlay} />}
+              {isPlaying && <FontAwesomeIcon icon={faPause} />}
+            </button>
+            <button onClick={() => setCC(!isCC)} type="button" className="btn btn-lg btn-transparent btn-round">
+              {!isCC && <FontAwesomeIcon icon={faCC} />}
+              {isCC && <FontAwesomeIcon icon={faCCFilled} />}
+            </button>
+          </div>
         </div>
         {tracks?.map((sr, i) => (
           <audio
             autoPlay={autoPlay && i === 0}
+            crossOrigin="anonymous"
             onPlay={() => !isPlaying && setPlaying(true)}
             id={sr.id}
             key={sr.id}
             ref={(el) => el && (ref.current[el.id] = el)}
             src={sr.Resource.Files.find((f) => f.variant === variant.code)?.URL}
             onTimeUpdate={onTimeUpdateInternal}
-            onEnded={onEndedInternal}
-          />
+            onEnded={onEndedInternal}>
+            {(() => {
+              const subtitles = sr.Resource.Files.find((f) => f.variant === `${variant.code}-vtt`);
+              if (subtitles) {
+                return (
+                  <track
+                    ref={(el) => {
+                      if (el && subtitlesRef.current[subtitles.id] !== el) {
+                        el.addEventListener('cuechange', function (event) {
+                          const text = event.target?.track?.activeCues?.[0]?.text;
+                          setSubtitleText(text);
+                        });
+                        subtitlesRef.current[subtitles.id] = el;
+                      }
+                    }}
+                    id={subtitles.id}
+                    default={true}
+                    kind="captions"
+                    src={subtitles.URL}></track>
+                );
+              }
+            })()}
+          </audio>
         ))}
         <Toc
           isOpen={isTocOpen}
@@ -332,6 +366,7 @@ function StopViewer({
           )}
         </>
       )}
+      {isCC && subtitleText && <div className="stop-viewer__subtitles">{subtitleText}</div>}
     </div>
   );
 }
