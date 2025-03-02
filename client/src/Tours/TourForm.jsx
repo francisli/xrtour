@@ -102,8 +102,9 @@ function TourForm() {
                 <fieldset disabled={isLoading}>
                   <FormGroup
                     name="link"
-                    label="Link name"
-                    helpText="Letters, numbers, and hypen only, to be used in URLs."
+                    label="Published Link"
+                    prefix={`https://${membership?.Team?.link}.xrtour.org/`}
+                    helpText="Letters, numbers, and hypen only."
                     onChange={onChange}
                     record={tour}
                     error={error}

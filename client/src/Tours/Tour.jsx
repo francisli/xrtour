@@ -176,10 +176,15 @@ function Tour() {
             <div className="row">
               <div className="col-md-6">
                 <form className="mb-5">
-                  <FormGroup plaintext name="link" label="Link" record={tour} />
+                  <FormGroup
+                    plaintext
+                    name="link"
+                    label="Published Link"
+                    value={`https://${membership?.Team?.link}.xrtour.org/${tour.link}`}
+                  />
                   <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
                   <FormGroup plaintext name="name" label="Name" value={tour.names[variant.code]} />
-                  <FormGroup plaintext name="description" label="Description" value={tour.descriptions[variant.code]} />
+                  <FormGroup type="textarea" plaintext name="description" label="Description" value={tour.descriptions[variant.code]} />
                   <div className="mb-3 d-flex justify-content-between">
                     <div>
                       {isEditable && (
