@@ -4,8 +4,10 @@ import PropTypes from 'prop-types';
 
 import { useAuthContext } from '../AuthContext';
 import Api from '../Api';
+import AudioPlayer from '../Components/AudioPlayer';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
+import FormFileGroup from '../Components/FormFileGroup';
 import Spinner from '../Components/Spinner';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
@@ -44,6 +46,11 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
 
   const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
   const [deleteError, setDeleteError] = useState();
+  const [ReactPhotoSphereViewer, setReactPhotoSphereViewer] = useState();
+
+  useEffect(() => {
+    import('react-photo-sphere-viewer').then((pkg) => setReactPhotoSphereViewer(pkg.ReactPhotoSphereViewer));
+  }, []);
 
   useEffect(() => {
     let isCancelled = false;
@@ -113,11 +120,16 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     const newResource = { ...resource };
     const { name, value } = event.target;
     newResource[name] = value;
-    if (name === 'type') {
-      newResource.data = {};
-      newResource.variants = [...membership.Team.variants];
-      setVariant(membership.Team.variants[0]);
+    setResource(newResource);
+  }
+
+  function onChangeVariantFile(newFile) {
+    const newResource = { ...resource };
+    const index = newResource.Files.indexOf(variantFile);
+    if (index >= 0) {
+      newResource.Files[index] = newFile;
     }
+    console.log('!!!', index, newFile, newResource);
     setResource(newResource);
   }
 
@@ -146,7 +158,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setConfirmDeleteShowing(false);
     try {
       await Api.resources.delete(resource.id);
-      onCancel?.();
+      onUpdate?.();
     } catch (error) {
       setDeleteError(error);
     }
@@ -190,23 +202,13 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
   }
 
   return (
-    <div className="row">
+    <div className="row h-100">
       <div className="col-md-6">
         {variant && resource && (
           <form onSubmit={onSubmit}>
             {error && error.message && <div className="alert alert-danger">{error.message}</div>}
             <fieldset disabled={isLoading || isUploading}>
               <FormGroup name="name" label="Name" onChange={onChange} record={resource} error={error} />
-              {!resource.id && (
-                <FormGroup type="select" name="type" label="Type" onChange={onChange} record={resource} error={error}>
-                  <option value="3D_MODEL">3D Model</option>
-                  <option value="AUDIO">Audio</option>
-                  <option value="AR_LINK">AR Link</option>
-                  <option value="IMAGE">Image</option>
-                  <option value="IMAGE_OVERLAY">Image Overlay</option>
-                  <option value="IMAGE_SPHERE">360&deg; Image Sphere</option>
-                </FormGroup>
-              )}
               {resource.type === 'IMAGE_OVERLAY' && (
                 <>
                   <FormGroup name="address" type="address" label="Address" onChange={onChangeData} record={resource.data} error={error} />
@@ -227,25 +229,14 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                 />
               )}
               {resource.type !== 'AR_LINK' && (
-                <div className="mb-3">
-                  <label className="form-label" htmlFor="key">
-                    Upload File
-                  </label>
-                  <FileInput
-                    id="key"
-                    name="key"
-                    accept={ACCEPTED_FILES[resource.type]}
-                    value={variantFile.key}
-                    valueURL={variantFile.keyURL}
-                    onChange={onChangeVariant}
-                    onChangeMetadata={onChangeVariant}
-                    onUploading={setUploading}>
-                    <div className="card-body">
-                      <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
-                    </div>
-                  </FileInput>
-                  {error?.errorMessagesHTMLFor?.('key')}
-                </div>
+                <FormFileGroup
+                  id="file"
+                  label="File"
+                  accept={ACCEPTED_FILES[resource.type]}
+                  file={variantFile}
+                  onUploading={setUploading}
+                  onChangeFile={onChangeVariantFile}
+                />
               )}
               {resource.type === 'AUDIO' && (
                 <div className="mb-3">
@@ -302,7 +293,28 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
           </form>
         )}
       </div>
-      <div className="col-md-6">{JSON.stringify(resource)}</div>
+      <div className="col-md-6 h-100">
+        <label className="mb-2">Preview</label>
+        <div className="h-75">
+          {type === 'AR_LINK' && variantFile.externalURL && (
+            <a className="btn btn-outline-primary" href={variantFile.externalURL} target="_blank">
+              Open Link in new Tab
+            </a>
+          )}
+          {variantFile?.keyURL && (
+            <>
+              {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={variantFile.keyURL} />}
+              {type === 'AUDIO' && <AudioPlayer className="flex-grow-1" src={variantFile.keyURL} />}
+              {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
+                <img className="img-fluid" alt={variantFile.originalName} src={variantFile.keyURL} />
+              )}
+              {type === 'IMAGE_SPHERE' && ReactPhotoSphereViewer && (
+                <ReactPhotoSphereViewer src={variantFile.keyURL} height="100%" width="100%" />
+              )}
+            </>
+          )}
+        </div>
+      </div>
       <ConfirmModal nested isShowing={isConfirmDeleteShowing} onCancel={() => setConfirmDeleteShowing(false)} onOK={() => onDelete()}>
         Are you sure you wish to delete <b>{resource?.name}</b>?
       </ConfirmModal>
