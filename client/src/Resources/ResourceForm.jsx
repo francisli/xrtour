@@ -9,10 +9,10 @@ import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
 import FormFileGroup from '../Components/FormFileGroup';
 import Spinner from '../Components/Spinner';
+import URLText from '../Components/URLText';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
-import FileInput from '../Components/FileInput';
 
 const ACCEPTED_FILES = {
   '3D_MODEL': {
@@ -47,6 +47,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
   const [error, setError] = useState();
 
   const [isGenerating, setGenerating] = useState(false);
+  const [previewSubtitles, setPreviewSubtitles] = useState();
 
   const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
   const [deleteError, setDeleteError] = useState();
@@ -144,10 +145,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setUploading();
   }
 
-  function onPreviewVariantFile(newPreview) {
-    setPreview(newPreview);
-  }
-
   function onPreviewAudioDurationChange(newDuration) {
     const newVariantFile = { ...variantFile };
     newVariantFile.duration = newDuration;
@@ -172,11 +169,14 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setResource(newResource);
   }
 
-  function onChangeVariantSubtitles(event) {
+  function onChangeVariantFileSubtitles(newFile) {
     const newResource = { ...resource };
-    const { name, value } = event.target;
-    variantFileSubtitles[name] = value;
+    const index = newResource.Files.indexOf(variantFileSubtitles);
+    if (index >= 0) {
+      newResource.Files[index] = newFile;
+    }
     setResource(newResource);
+    setUploading();
   }
 
   async function onDelete() {
@@ -218,8 +218,10 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
         const newResource = { ...resource };
         variantFileSubtitles.key = key;
         variantFileSubtitles.keyURL = TranscriptVttFileUri;
+        variantFileSubtitles.originalName = key.substring(key.lastIndexOf('/') + 1);
         setResource(newResource);
         setGenerating(false);
+        setPreviewSubtitles(TranscriptVttFileUri);
       } else {
         pollGenerate(jobName);
       }
@@ -251,47 +253,34 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                   label="File"
                   accept={ACCEPTED_FILES[resource.type]}
                   file={variantFile}
-                  onPreview={onPreviewVariantFile}
+                  onPreview={setPreview}
                   onUploading={setUploading}
                   onChangeFile={onChangeVariantFile}
                 />
               )}
               {resource.type === 'AUDIO' && (
-                <div className="mb-3">
-                  <label className="form-label" htmlFor="key">
-                    Upload Subtitle File (.vtt)
-                  </label>
-                  <fieldset disabled={isGenerating} className="d-flex align-items-center">
-                    <FileInput
-                      id="key"
-                      name="key"
-                      accept={ACCEPTED_FILES['AUDIO_SUBTITLES']}
-                      value={variantFileSubtitles.key}
-                      valueURL={variantFileSubtitles.keyURL}
-                      onChange={onChangeVariantSubtitles}
-                      onChangeMetadata={onChangeVariantSubtitles}
-                      onUploading={setUploading}>
-                      <div className="card-body">
-                        <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
-                      </div>
-                    </FileInput>
-                    {!variantFileSubtitles.key && (
-                      <>
-                        <span>&nbsp;or&nbsp;</span>
-                        <button
-                          disabled={!variantFile?.key || isGenerating}
-                          onClick={onGenerate}
-                          type="button"
-                          className="btn btn-outline-primary">
-                          <span style={{ display: 'inline-block', width: '70px' }}>
-                            {isGenerating ? <Spinner size="sm" /> : 'Generate'}
-                          </span>
-                        </button>
-                      </>
-                    )}
-                  </fieldset>
-                  {error?.errorMessagesHTMLFor?.('key')}
-                </div>
+                <FormFileGroup
+                  id="vttfile"
+                  label="Subtitle File (.vtt)"
+                  accept={ACCEPTED_FILES['AUDIO_SUBTITLES']}
+                  disabled={isGenerating}
+                  file={variantFileSubtitles}
+                  onPreview={setPreviewSubtitles}
+                  onUploading={setUploading}
+                  onChangeFile={onChangeVariantFileSubtitles}>
+                  {!variantFileSubtitles.key && (
+                    <>
+                      <span>&nbsp;or&nbsp;</span>
+                      <button
+                        disabled={!variantFile?.key || isGenerating}
+                        onClick={onGenerate}
+                        type="button"
+                        className="btn btn-outline-primary">
+                        <span style={{ display: 'inline-block', width: '70px' }}>{isGenerating ? <Spinner size="sm" /> : 'Generate'}</span>
+                      </button>
+                    </>
+                  )}
+                </FormFileGroup>
               )}
               <div className="d-flex justify-content-between mb-3">
                 <div>
@@ -322,7 +311,18 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
           {variantFile?.keyURL && (
             <>
               {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={variantFile.keyURL} />}
-              {type === 'AUDIO' && <AudioPlayer className="flex-grow-1" src={variantFile.keyURL} />}
+              {type === 'AUDIO' && (
+                <>
+                  <AudioPlayer className="flex-grow-1" src={variantFile.keyURL} />
+                  {variantFileSubtitles?.keyURL && (
+                    <>
+                      <label className="mt-3">Subtitles</label>
+                      <br />
+                      <URLText url={variantFileSubtitles.keyURL} />
+                    </>
+                  )}
+                </>
+              )}
               {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
                 <img className="img-fluid" alt={variantFile.originalName} src={variantFile.keyURL} />
               )}
@@ -334,7 +334,18 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
           {preview && (
             <>
               {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={preview} />}
-              {type === 'AUDIO' && <AudioPlayer className="flex-grow-1" src={preview} onDurationChange={onPreviewAudioDurationChange} />}
+              {type === 'AUDIO' && (
+                <>
+                  <AudioPlayer className="flex-grow-1" src={preview} onDurationChange={onPreviewAudioDurationChange} />
+                  {previewSubtitles && (
+                    <>
+                      <label className="mt-3">Subtitles</label>
+                      <br />
+                      <URLText url={previewSubtitles} />
+                    </>
+                  )}
+                </>
+              )}
               {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
                 <img className="img-fluid" alt={variantFile?.originalName} src={preview} onLoad={onPreviewImageLoad} />
               )}
