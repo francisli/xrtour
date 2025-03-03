@@ -25,10 +25,13 @@ const ACCEPTED_FILES = {
     'text/*': ['.vtt'],
   },
   IMAGE: {
-    'image/*': ['.jpg', '.jpeg', '.png'],
+    'image/*': ['.jpg', '.jpeg', '.png', '.webp'],
   },
   IMAGE_OVERLAY: {
-    'image/*': ['.jpg', '.jpeg', '.png'],
+    'image/*': ['.jpg', '.jpeg', '.png', '.webp'],
+  },
+  IMAGE_SPHERE: {
+    'image/*': ['.jpg', '.jpeg', '.png', '.webp'],
   },
 };
 Object.freeze(ACCEPTED_FILES);
@@ -38,6 +41,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
 
   const [resource, setResource] = useState();
   const [variant, setVariant] = useState();
+  const [preview, setPreview] = useState();
   const [isUploading, setUploading] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
@@ -123,16 +127,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setResource(newResource);
   }
 
-  function onChangeVariantFile(newFile) {
-    const newResource = { ...resource };
-    const index = newResource.Files.indexOf(variantFile);
-    if (index >= 0) {
-      newResource.Files[index] = newFile;
-    }
-    console.log('!!!', index, newFile, newResource);
-    setResource(newResource);
-  }
-
   function onChangeVariant(event) {
     const newResource = { ...resource };
     const { name, value } = event.target;
@@ -140,17 +134,48 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setResource(newResource);
   }
 
+  function onChangeVariantFile(newFile) {
+    const newResource = { ...resource };
+    const index = newResource.Files.indexOf(variantFile);
+    if (index >= 0) {
+      newResource.Files[index] = newFile;
+    }
+    setResource(newResource);
+    setUploading();
+  }
+
+  function onPreviewVariantFile(newPreview) {
+    setPreview(newPreview);
+  }
+
+  function onPreviewAudioDurationChange(newDuration) {
+    const newVariantFile = { ...variantFile };
+    newVariantFile.duration = newDuration;
+    const newResource = { ...resource };
+    const index = newResource.Files.indexOf(variantFile);
+    if (index >= 0) {
+      newResource.Files[index] = newVariantFile;
+    }
+    setResource(newResource);
+  }
+
+  function onPreviewImageLoad(event) {
+    const { target: img } = event;
+    const newVariantFile = { ...variantFile };
+    newVariantFile.width = img.naturalWidth;
+    newVariantFile.height = img.naturalHeight;
+    const newResource = { ...resource };
+    const index = newResource.Files.indexOf(variantFile);
+    if (index >= 0) {
+      newResource.Files[index] = newVariantFile;
+    }
+    setResource(newResource);
+  }
+
   function onChangeVariantSubtitles(event) {
     const newResource = { ...resource };
     const { name, value } = event.target;
     variantFileSubtitles[name] = value;
-    setResource(newResource);
-  }
-
-  function onChangeData(event) {
-    const newResource = { ...resource };
-    const { name, value } = event.target;
-    newResource.data[name] = value;
     setResource(newResource);
   }
 
@@ -209,14 +234,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
             {error && error.message && <div className="alert alert-danger">{error.message}</div>}
             <fieldset disabled={isLoading || isUploading}>
               <FormGroup name="name" label="Name" onChange={onChange} record={resource} error={error} />
-              {resource.type === 'IMAGE_OVERLAY' && (
-                <>
-                  <FormGroup name="address" type="address" label="Address" onChange={onChangeData} record={resource.data} error={error} />
-                  <FormGroup name="lat" label="Latitude" onChange={onChangeData} record={resource.data} error={error} />
-                  <FormGroup name="lng" label="Longitude" onChange={onChangeData} record={resource.data} error={error} />
-                  <FormGroup name="degree" label="Degrees" onChange={onChangeData} record={resource.data} error={error} />
-                </>
-              )}
               <VariantTabs variants={resource.variants} current={variant} setVariant={setVariant} />
               {resource.type === 'AR_LINK' && (
                 <FormGroup
@@ -234,6 +251,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                   label="File"
                   accept={ACCEPTED_FILES[resource.type]}
                   file={variantFile}
+                  onPreview={onPreviewVariantFile}
                   onUploading={setUploading}
                   onChangeFile={onChangeVariantFile}
                 />
@@ -311,6 +329,16 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
               {type === 'IMAGE_SPHERE' && ReactPhotoSphereViewer && (
                 <ReactPhotoSphereViewer src={variantFile.keyURL} height="100%" width="100%" />
               )}
+            </>
+          )}
+          {preview && (
+            <>
+              {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={preview} />}
+              {type === 'AUDIO' && <AudioPlayer className="flex-grow-1" src={preview} onDurationChange={onPreviewAudioDurationChange} />}
+              {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
+                <img className="img-fluid" alt={variantFile?.originalName} src={preview} onLoad={onPreviewImageLoad} />
+              )}
+              {type === 'IMAGE_SPHERE' && ReactPhotoSphereViewer && <ReactPhotoSphereViewer src={preview} height="100%" width="100%" />}
             </>
           )}
         </div>
