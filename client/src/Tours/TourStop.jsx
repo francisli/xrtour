@@ -34,6 +34,7 @@ function TourStop() {
     newTourStop.TransitionStop = stop;
     setTourStop(newTourStop);
     await Api.tours.stops(TourId).update(TourStopId, { TransitionStopId: stop.id });
+    onClickTransition(undefined, stop);
   }
 
   function onClickTransition(type, stop) {

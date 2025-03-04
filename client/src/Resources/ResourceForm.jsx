@@ -4,13 +4,15 @@ import PropTypes from 'prop-types';
 
 import { useAuthContext } from '../AuthContext';
 import Api from '../Api';
+import AudioPlayer from '../Components/AudioPlayer';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
+import FormFileGroup from '../Components/FormFileGroup';
 import Spinner from '../Components/Spinner';
+import URLText from '../Components/URLText';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
-import FileInput from '../Components/FileInput';
 
 const ACCEPTED_FILES = {
   '3D_MODEL': {
@@ -23,10 +25,13 @@ const ACCEPTED_FILES = {
     'text/*': ['.vtt'],
   },
   IMAGE: {
-    'image/*': ['.jpg', '.jpeg', '.png'],
+    'image/*': ['.jpg', '.jpeg', '.png', '.webp'],
   },
   IMAGE_OVERLAY: {
-    'image/*': ['.jpg', '.jpeg', '.png'],
+    'image/*': ['.jpg', '.jpeg', '.png', '.webp'],
+  },
+  IMAGE_SPHERE: {
+    'image/*': ['.jpg', '.jpeg', '.png', '.webp'],
   },
 };
 Object.freeze(ACCEPTED_FILES);
@@ -36,14 +41,21 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
 
   const [resource, setResource] = useState();
   const [variant, setVariant] = useState();
+  const [preview, setPreview] = useState();
   const [isUploading, setUploading] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
 
   const [isGenerating, setGenerating] = useState(false);
+  const [previewSubtitles, setPreviewSubtitles] = useState();
 
   const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
   const [deleteError, setDeleteError] = useState();
+  const [ReactPhotoSphereViewer, setReactPhotoSphereViewer] = useState();
+
+  useEffect(() => {
+    import('react-photo-sphere-viewer').then((pkg) => setReactPhotoSphereViewer(pkg.ReactPhotoSphereViewer));
+  }, []);
 
   useEffect(() => {
     let isCancelled = false;
@@ -113,11 +125,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     const newResource = { ...resource };
     const { name, value } = event.target;
     newResource[name] = value;
-    if (name === 'type') {
-      newResource.data = {};
-      newResource.variants = [...membership.Team.variants];
-      setVariant(membership.Team.variants[0]);
-    }
     setResource(newResource);
   }
 
@@ -128,25 +135,55 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     setResource(newResource);
   }
 
-  function onChangeVariantSubtitles(event) {
+  function onChangeVariantFile(newFile) {
     const newResource = { ...resource };
-    const { name, value } = event.target;
-    variantFileSubtitles[name] = value;
+    const index = newResource.Files.indexOf(variantFile);
+    if (index >= 0) {
+      newResource.Files[index] = newFile;
+    }
+    setResource(newResource);
+    setUploading();
+  }
+
+  function onPreviewAudioDurationChange(newDuration) {
+    const newVariantFile = { ...variantFile };
+    newVariantFile.duration = newDuration;
+    const newResource = { ...resource };
+    const index = newResource.Files.indexOf(variantFile);
+    if (index >= 0) {
+      newResource.Files[index] = newVariantFile;
+    }
     setResource(newResource);
   }
 
-  function onChangeData(event) {
+  function onPreviewImageLoad(event) {
+    const { target: img } = event;
+    const newVariantFile = { ...variantFile };
+    newVariantFile.width = img.naturalWidth;
+    newVariantFile.height = img.naturalHeight;
     const newResource = { ...resource };
-    const { name, value } = event.target;
-    newResource.data[name] = value;
+    const index = newResource.Files.indexOf(variantFile);
+    if (index >= 0) {
+      newResource.Files[index] = newVariantFile;
+    }
     setResource(newResource);
+  }
+
+  function onChangeVariantFileSubtitles(newFile) {
+    const newResource = { ...resource };
+    const index = newResource.Files.indexOf(variantFileSubtitles);
+    if (index >= 0) {
+      newResource.Files[index] = newFile;
+    }
+    setResource(newResource);
+    setUploading();
   }
 
   async function onDelete() {
     setConfirmDeleteShowing(false);
     try {
       await Api.resources.delete(resource.id);
-      onCancel?.();
+      onUpdate?.();
     } catch (error) {
       setDeleteError(error);
     }
@@ -181,8 +218,10 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
         const newResource = { ...resource };
         variantFileSubtitles.key = key;
         variantFileSubtitles.keyURL = TranscriptVttFileUri;
+        variantFileSubtitles.originalName = key.substring(key.lastIndexOf('/') + 1);
         setResource(newResource);
         setGenerating(false);
+        setPreviewSubtitles(TranscriptVttFileUri);
       } else {
         pollGenerate(jobName);
       }
@@ -190,31 +229,13 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
   }
 
   return (
-    <div className="row">
+    <div className="row h-100">
       <div className="col-md-6">
         {variant && resource && (
           <form onSubmit={onSubmit}>
             {error && error.message && <div className="alert alert-danger">{error.message}</div>}
             <fieldset disabled={isLoading || isUploading}>
               <FormGroup name="name" label="Name" onChange={onChange} record={resource} error={error} />
-              {!resource.id && (
-                <FormGroup type="select" name="type" label="Type" onChange={onChange} record={resource} error={error}>
-                  <option value="3D_MODEL">3D Model</option>
-                  <option value="AUDIO">Audio</option>
-                  <option value="AR_LINK">AR Link</option>
-                  <option value="IMAGE">Image</option>
-                  <option value="IMAGE_OVERLAY">Image Overlay</option>
-                  <option value="IMAGE_SPHERE">360&deg; Image Sphere</option>
-                </FormGroup>
-              )}
-              {resource.type === 'IMAGE_OVERLAY' && (
-                <>
-                  <FormGroup name="address" type="address" label="Address" onChange={onChangeData} record={resource.data} error={error} />
-                  <FormGroup name="lat" label="Latitude" onChange={onChangeData} record={resource.data} error={error} />
-                  <FormGroup name="lng" label="Longitude" onChange={onChangeData} record={resource.data} error={error} />
-                  <FormGroup name="degree" label="Degrees" onChange={onChangeData} record={resource.data} error={error} />
-                </>
-              )}
               <VariantTabs variants={resource.variants} current={variant} setVariant={setVariant} />
               {resource.type === 'AR_LINK' && (
                 <FormGroup
@@ -227,62 +248,39 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                 />
               )}
               {resource.type !== 'AR_LINK' && (
-                <div className="mb-3">
-                  <label className="form-label" htmlFor="key">
-                    Upload File
-                  </label>
-                  <FileInput
-                    id="key"
-                    name="key"
-                    accept={ACCEPTED_FILES[resource.type]}
-                    value={variantFile.key}
-                    valueURL={variantFile.keyURL}
-                    onChange={onChangeVariant}
-                    onChangeMetadata={onChangeVariant}
-                    onUploading={setUploading}>
-                    <div className="card-body">
-                      <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
-                    </div>
-                  </FileInput>
-                  {error?.errorMessagesHTMLFor?.('key')}
-                </div>
+                <FormFileGroup
+                  id="file"
+                  label="File"
+                  accept={ACCEPTED_FILES[resource.type]}
+                  file={variantFile}
+                  onPreview={setPreview}
+                  onUploading={setUploading}
+                  onChangeFile={onChangeVariantFile}
+                />
               )}
               {resource.type === 'AUDIO' && (
-                <div className="mb-3">
-                  <label className="form-label" htmlFor="key">
-                    Upload Subtitle File (.vtt)
-                  </label>
-                  <fieldset disabled={isGenerating} className="d-flex align-items-center">
-                    <FileInput
-                      id="key"
-                      name="key"
-                      accept={ACCEPTED_FILES['AUDIO_SUBTITLES']}
-                      value={variantFileSubtitles.key}
-                      valueURL={variantFileSubtitles.keyURL}
-                      onChange={onChangeVariantSubtitles}
-                      onChangeMetadata={onChangeVariantSubtitles}
-                      onUploading={setUploading}>
-                      <div className="card-body">
-                        <div className="card-text text-muted">Drag-and-drop a file here, or click here to browse and select a file.</div>
-                      </div>
-                    </FileInput>
-                    {!variantFileSubtitles.key && (
-                      <>
-                        <span>&nbsp;or&nbsp;</span>
-                        <button
-                          disabled={!variantFile?.key || isGenerating}
-                          onClick={onGenerate}
-                          type="button"
-                          className="btn btn-outline-primary">
-                          <span style={{ display: 'inline-block', width: '70px' }}>
-                            {isGenerating ? <Spinner size="sm" /> : 'Generate'}
-                          </span>
-                        </button>
-                      </>
-                    )}
-                  </fieldset>
-                  {error?.errorMessagesHTMLFor?.('key')}
-                </div>
+                <FormFileGroup
+                  id="vttfile"
+                  label="Subtitle File (.vtt)"
+                  accept={ACCEPTED_FILES['AUDIO_SUBTITLES']}
+                  disabled={isGenerating}
+                  file={variantFileSubtitles}
+                  onPreview={setPreviewSubtitles}
+                  onUploading={setUploading}
+                  onChangeFile={onChangeVariantFileSubtitles}>
+                  {!variantFileSubtitles.key && (
+                    <>
+                      <span>&nbsp;or&nbsp;</span>
+                      <button
+                        disabled={!variantFile?.key || isGenerating}
+                        onClick={onGenerate}
+                        type="button"
+                        className="btn btn-outline-primary">
+                        <span style={{ display: 'inline-block', width: '70px' }}>{isGenerating ? <Spinner size="sm" /> : 'Generate'}</span>
+                      </button>
+                    </>
+                  )}
+                </FormFileGroup>
               )}
               <div className="d-flex justify-content-between mb-3">
                 <div>
@@ -302,7 +300,60 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
           </form>
         )}
       </div>
-      <div className="col-md-6">{JSON.stringify(resource)}</div>
+      <div className="col-md-6 h-100">
+        <label className="mb-2">Preview</label>
+        <div className="h-75">
+          {type === 'AR_LINK' && variantFile.externalURL && (
+            <a className="btn btn-outline-primary" href={variantFile.externalURL} target="_blank">
+              Open Link in new Tab
+            </a>
+          )}
+          {variantFile?.keyURL && (
+            <>
+              {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={variantFile.keyURL} />}
+              {type === 'AUDIO' && (
+                <>
+                  <AudioPlayer className="flex-grow-1" src={variantFile.keyURL} />
+                  {variantFileSubtitles?.keyURL && (
+                    <>
+                      <label className="mt-3">Subtitles</label>
+                      <br />
+                      <URLText url={variantFileSubtitles.keyURL} />
+                    </>
+                  )}
+                </>
+              )}
+              {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
+                <img className="img-fluid" alt={variantFile.originalName} src={variantFile.keyURL} />
+              )}
+              {type === 'IMAGE_SPHERE' && ReactPhotoSphereViewer && (
+                <ReactPhotoSphereViewer src={variantFile.keyURL} height="100%" width="100%" />
+              )}
+            </>
+          )}
+          {preview && (
+            <>
+              {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={preview} />}
+              {type === 'AUDIO' && (
+                <>
+                  <AudioPlayer className="flex-grow-1" src={preview} onDurationChange={onPreviewAudioDurationChange} />
+                  {previewSubtitles && (
+                    <>
+                      <label className="mt-3">Subtitles</label>
+                      <br />
+                      <URLText url={previewSubtitles} />
+                    </>
+                  )}
+                </>
+              )}
+              {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
+                <img className="img-fluid" alt={variantFile?.originalName} src={preview} onLoad={onPreviewImageLoad} />
+              )}
+              {type === 'IMAGE_SPHERE' && ReactPhotoSphereViewer && <ReactPhotoSphereViewer src={preview} height="100%" width="100%" />}
+            </>
+          )}
+        </div>
+      </div>
       <ConfirmModal nested isShowing={isConfirmDeleteShowing} onCancel={() => setConfirmDeleteShowing(false)} onOK={() => onDelete()}>
         Are you sure you wish to delete <b>{resource?.name}</b>?
       </ConfirmModal>

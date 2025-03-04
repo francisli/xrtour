@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
-import QRCode from 'react-qr-code';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { pluralize } from 'inflection';
 
 import Api from '../Api';
@@ -10,6 +8,7 @@ import { useAuthContext } from '../AuthContext';
 import { useStaticContext } from '../StaticContext';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
+import PreviewButton from '../Components/PreviewButton';
 import VariantTabs from '../Components/VariantTabs';
 import ResourcesModal from '../Resources/ResourcesModal';
 import StopsModal from '../Stops/StopsModal';
@@ -19,7 +18,6 @@ import SharePreview from '../Components/SharePreview';
 function Tour() {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
-  const location = useLocation();
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const { TourId } = useParams();
@@ -96,12 +94,14 @@ function Tour() {
   }
 
   async function onSelectStop(stop) {
+    onHideStopsModal();
     if (stop.type === 'INTRO') {
       await Api.tours.update(tour.id, { IntroStopId: stop.id });
       const newTour = { ...tour };
       newTour.IntroStop = stop;
       newTour.IntroStopId = stop.id;
       setTour(newTour);
+      onClickStop('INTRO', stop);
     } else if (stop.type === 'STOP') {
       const response = await Api.tours.stops(TourId).create({
         StopId: stop.id,
@@ -109,8 +109,8 @@ function Tour() {
       });
       const newStops = [...stops, response.data];
       setStops(newStops);
+      onClickStop('STOP', response.data);
     }
-    onHideStopsModal();
   }
 
   function onClickStop(type, stop) {
@@ -138,14 +138,6 @@ function Tour() {
       await Api.tours.stops(tour.id).reorder({ TourStops: newStops.map((ts, i) => ({ id: ts.id, position: i + 1 })) });
     }
   }
-
-  const previewPopover = (
-    <Popover>
-      <Popover.Body>
-        <QRCode size={244} value={`${location.protocol}//${location.host}/teams/${membership?.TeamId}/tours/${TourId}/preview`} />
-      </Popover.Body>
-    </Popover>
-  );
 
   const isEditor = membership?.role !== 'VIEWER';
   const isArchived = !!tour?.archivedAt;
@@ -176,10 +168,15 @@ function Tour() {
             <div className="row">
               <div className="col-md-6">
                 <form className="mb-5">
-                  <FormGroup plaintext name="link" label="Link" record={tour} />
+                  <FormGroup
+                    plaintext
+                    name="link"
+                    label="Published Link"
+                    value={`https://${membership?.Team?.link}.xrtour.org/${tour.link}`}
+                  />
                   <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
                   <FormGroup plaintext name="name" label="Name" value={tour.names[variant.code]} />
-                  <FormGroup plaintext name="description" label="Description" value={tour.descriptions[variant.code]} />
+                  <FormGroup type="textarea" plaintext name="description" label="Description" value={tour.descriptions[variant.code]} />
                   <div className="mb-3 d-flex justify-content-between">
                     <div>
                       {isEditable && (
@@ -187,15 +184,7 @@ function Tour() {
                           Edit
                         </Link>
                       )}
-                      <OverlayTrigger trigger={['hover', 'focus']} placement="right" overlay={previewPopover}>
-                        <a
-                          className="btn btn-secondary me-2"
-                          href={`/teams/${membership?.TeamId}/tours/${TourId}/preview`}
-                          rel="noreferrer"
-                          target="_blank">
-                          Preview
-                        </a>
-                      </OverlayTrigger>
+                      <PreviewButton href={`/teams/${membership?.TeamId}/tours/${TourId}/preview`} />
                       {isEditor && (
                         <Link className="btn btn-outline-primary" to="publish">
                           Publish

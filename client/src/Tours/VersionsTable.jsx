@@ -8,8 +8,8 @@ function VersionsTable({ versions, onPromote, onPublish, onUnpublish }) {
     <table className="table table-hover table-striped">
       <thead>
         <tr>
-          <th>Live?</th>
-          <th>Date</th>
+          <th className="w-5">Live?</th>
+          <th className="w-45">Date</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -21,21 +21,21 @@ function VersionsTable({ versions, onPromote, onPublish, onUnpublish }) {
         )}
         {versions?.map((v) => (
           <tr key={v.id}>
-            <td>{v.isLive && <FontAwesomeIcon icon={faCheck} />}</td>
-            <td>{DateTime.fromISO(v.createdAt).toLocaleString(DateTime.DATETIME_FULL)}</td>
-            <td>
+            <td className="align-middle text-center">{v.isLive && <FontAwesomeIcon icon={faCheck} />}</td>
+            <td className="align-middle">{DateTime.fromISO(v.createdAt).toLocaleString(DateTime.DATETIME_FULL)}</td>
+            <td className="align-middle">
               {v.isStaging && v.isLive && (
-                <button onClick={() => onPromote?.(v)} type="button" className="btn btn-sm btn-outline-primary">
+                <button onClick={() => onPromote?.(v)} type="button" className="btn btn-sm btn-outline-primary me-2">
                   Promote to Production
                 </button>
               )}
               {v.isLive && (
-                <button onClick={() => onUnpublish?.(v)} type="button" className="btn btn-sm btn-outline-secondary ms-2">
+                <button onClick={() => onUnpublish?.(v)} type="button" className="btn btn-sm btn-outline-secondary">
                   Unpublish
                 </button>
               )}
               {!v.isLive && (
-                <button onClick={() => onPublish?.(v)} type="button" className="btn btn-sm btn-outline-secondary ms-2">
+                <button onClick={() => onPublish?.(v)} type="button" className="btn btn-sm btn-outline-secondary">
                   Publish
                 </button>
               )}
