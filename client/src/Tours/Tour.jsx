@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { OverlayTrigger, Popover } from 'react-bootstrap';
-import QRCode from 'react-qr-code';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { pluralize } from 'inflection';
 
 import Api from '../Api';
@@ -10,6 +8,7 @@ import { useAuthContext } from '../AuthContext';
 import { useStaticContext } from '../StaticContext';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
+import PreviewButton from '../Components/PreviewButton';
 import VariantTabs from '../Components/VariantTabs';
 import ResourcesModal from '../Resources/ResourcesModal';
 import StopsModal from '../Stops/StopsModal';
@@ -19,7 +18,6 @@ import SharePreview from '../Components/SharePreview';
 function Tour() {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
-  const location = useLocation();
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
   const { TourId } = useParams();
@@ -141,14 +139,6 @@ function Tour() {
     }
   }
 
-  const previewPopover = (
-    <Popover>
-      <Popover.Body>
-        <QRCode size={244} value={`${location.protocol}//${location.host}/teams/${membership?.TeamId}/tours/${TourId}/preview`} />
-      </Popover.Body>
-    </Popover>
-  );
-
   const isEditor = membership?.role !== 'VIEWER';
   const isArchived = !!tour?.archivedAt;
   const isEditable = isEditor && !isArchived;
@@ -194,15 +184,7 @@ function Tour() {
                           Edit
                         </Link>
                       )}
-                      <OverlayTrigger trigger={['hover', 'focus']} placement="right" overlay={previewPopover}>
-                        <a
-                          className="btn btn-secondary me-2"
-                          href={`/teams/${membership?.TeamId}/tours/${TourId}/preview`}
-                          rel="noreferrer"
-                          target="_blank">
-                          Preview
-                        </a>
-                      </OverlayTrigger>
+                      <PreviewButton href={`/teams/${membership?.TeamId}/tours/${TourId}/preview`} />
                       {isEditor && (
                         <Link className="btn btn-outline-primary" to="publish">
                           Publish

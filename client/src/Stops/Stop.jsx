@@ -11,6 +11,7 @@ import StopViewer from 'shared/Components/Viewer/StopViewer';
 import Api from '../Api';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
+import PreviewButton from '../Components/PreviewButton';
 import VariantTabs from '../Components/VariantTabs';
 import Recorder from '../Resources/Recorder';
 import ResourcesModal from '../Resources/ResourcesModal';
@@ -34,7 +35,7 @@ function Stop({ StopId, transition, children }) {
   const staticContext = useStaticContext();
   const navigate = useNavigate();
   const [, setSearchParams] = useSearchParams();
-  const { StopId: StopIdParam, TourId } = useParams();
+  const { StopId: StopIdParam, TourId, TourStopId } = useParams();
   const [tour, setTour] = useState();
   const [stop, setStop] = useState();
   const [variant, setVariant] = useState();
@@ -247,6 +248,12 @@ function Stop({ StopId, transition, children }) {
                               <button onClick={() => setRecording(true)} className="btn btn-outline-danger" type="button">
                                 Record
                               </button>
+                              {tour && (
+                                <>
+                                  &nbsp;
+                                  <PreviewButton href={`/teams/${tour.TeamId}/tours/${tour.id}/preview/stops/${TourStopId}`} />
+                                </>
+                              )}
                             </>
                           )}
                           {isRecording && <Recorder onSave={onSaveRecording} onCancel={() => setRecording(false)} />}
