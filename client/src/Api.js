@@ -95,7 +95,7 @@ const Api = {
     },
     geocode(query, access_token) {
       return instance.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json`, {
-        params: { access_token, type: 'address' },
+        params: { access_token, type: 'address', proximity: 'ip' },
       });
     },
   },
