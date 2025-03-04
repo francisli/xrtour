@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
 function URLText({ url }) {
   const [text, setText] = useState();
@@ -18,5 +19,9 @@ function URLText({ url }) {
     </div>
   );
 }
+
+URLText.propTypes = {
+  url: PropTypes.string.isRequired,
+};
 
 export default URLText;

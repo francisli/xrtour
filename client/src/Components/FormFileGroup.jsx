@@ -1,9 +1,10 @@
 import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import Spinner from './Spinner';
+import PropTypes from 'prop-types';
 
 import DropzoneUploader from './DropzoneUploader';
+import Spinner from './Spinner';
 
 function FormFileGroup({ accept, children, className, disabled, file, id, label, onChangeFile, onPreview, onUploading }) {
   function onRemoved() {
@@ -90,4 +91,25 @@ function FormFileGroup({ accept, children, className, disabled, file, id, label,
     </>
   );
 }
+
+FormFileGroup.propTypes = {
+  accept: PropTypes.object,
+  children: PropTypes.node,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  file: PropTypes.shape({
+    key: PropTypes.string,
+    keyURL: PropTypes.string,
+    originalName: PropTypes.string,
+    duration: PropTypes.number,
+    width: PropTypes.number,
+    height: PropTypes.number,
+  }),
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  onChangeFile: PropTypes.func.isRequired,
+  onPreview: PropTypes.func.isRequired,
+  onUploading: PropTypes.func.isRequired,
+};
+
 export default FormFileGroup;
