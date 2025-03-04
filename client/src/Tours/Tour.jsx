@@ -96,12 +96,14 @@ function Tour() {
   }
 
   async function onSelectStop(stop) {
+    onHideStopsModal();
     if (stop.type === 'INTRO') {
       await Api.tours.update(tour.id, { IntroStopId: stop.id });
       const newTour = { ...tour };
       newTour.IntroStop = stop;
       newTour.IntroStopId = stop.id;
       setTour(newTour);
+      onClickStop('INTRO', stop);
     } else if (stop.type === 'STOP') {
       const response = await Api.tours.stops(TourId).create({
         StopId: stop.id,
@@ -109,8 +111,8 @@ function Tour() {
       });
       const newStops = [...stops, response.data];
       setStops(newStops);
+      onClickStop('STOP', response.data);
     }
-    onHideStopsModal();
   }
 
   function onClickStop(type, stop) {

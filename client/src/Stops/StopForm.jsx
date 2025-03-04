@@ -147,7 +147,6 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
           </form>
         )}
       </div>
-      <div className="col-md-6">{JSON.stringify(Stop)}</div>
     </div>
   );
   if (StopIdParam) {
