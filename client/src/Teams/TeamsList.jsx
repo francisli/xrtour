@@ -25,13 +25,13 @@ function TeamsList() {
       </Helmet>
       <main className="container">
         <div className="row justify-content-center">
-          <div className="col col-sm-10 col-md-8 col-lg-6 col-xl-4">
+          <div className="col col-sm-10 col-md-8 col-lg-6">
             <h1 className="mb-3">My Teams</h1>
             <ul className="list-group">
               {user.Memberships?.map((m) => (
-                <div key={m.TeamId} className="list-group-item d-flex justify-content-between">
+                <div key={m.TeamId} className="list-group-item d-flex justify-content-between align-items-start">
                   {m.Team.name}
-                  <span>
+                  <div className="d-flex flex-nowrap">
                     {m.TeamId !== membership?.TeamId && (
                       <Link to={m.TeamId} className="btn btn-sm btn-primary me-2">
                         Switch
@@ -42,7 +42,7 @@ function TeamsList() {
                         Manage
                       </Link>
                     )}
-                  </span>
+                  </div>
                 </div>
               ))}
               <Link to="new" className="list-group-item">
