@@ -10,8 +10,10 @@ read -p "MapBox API Access Token: " MAPBOX_ACCESS_TOKEN
 read -p "Mixpanel Analytics Token: " MIXPANEL_TOKEN
 read -p "Human readable name of app (browser title, footers, etc): " SITE_TITLE
 read -p "Enable user registration? [y/n]: " FEATURE_REGISTRATION
+read -p "Enable transitions? [y/n]: " FEATURE_TRANSITIONS
 read -p "Dry run (staging SSL certs)? [y/n]: " DRY_RUN
 [[ $FEATURE_REGISTRATION = "y" ]] && FEATURE_REGISTRATION="true" || FEATURE_REGISTRATION="false"
+[[ $FEATURE_TRANSITIONS = "y" ]] && FEATURE_TRANSITIONS="true" || FEATURE_TRANSITIONS="false"
 [[ $DRY_RUN = "n" ]] && LETSENCRYPT_OPTS="" || LETSENCRYPT_OPTS="--test-cert"
 
 DB_PASSWORD=`echo $RANDOM | md5sum | head -c 20`
@@ -25,7 +27,7 @@ PRIVATE_KEY=`cat private_key.pem`
 PRIVATE_KEY=${PRIVATE_KEY//
 /"\\n"}
 
-aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name ${APP_NAME}-${ENV_NAME} --template-body file://./create.cfn.json --parameters ParameterKey=ApplicationName,ParameterValue=$APP_NAME ParameterKey=EnvironmentName,ParameterValue=$ENV_NAME ParameterKey=Version,ParameterValue=$VERSION ParameterKey=DBPassword,ParameterValue=$DB_PASSWORD ParameterKey=LetsEncryptEmail,ParameterValue=$LETSENCRYPT_EMAIL ParameterKey=SessionSecret,ParameterValue=$SESSION_SECRET ParameterKey=SiteTitle,ParameterValue="$SITE_TITLE" ParameterKey=FeatureRegistration,ParameterValue=$FEATURE_REGISTRATION ParameterKey=CDNSigningPrivateKey,ParameterValue="$PRIVATE_KEY" ParameterKey=CDNSigningPublicKey,ParameterValue="$PUBLIC_KEY" ParameterKey=DomainName,ParameterValue="$DOMAIN" ParameterKey=EmailAddress,ParameterValue="$FROM_EMAIL" ParameterKey=LetsEncryptOpts,ParameterValue="$LETSENCRYPT_OPTS" ParameterKey=MapboxAccessToken,ParameterValue="$MAPBOX_ACCESS_TOKEN" ParameterKey=MixpanelToken,ParameterValue="$MIXPANEL_TOKEN"
+aws cloudformation create-stack --capabilities CAPABILITY_NAMED_IAM --stack-name ${APP_NAME}-${ENV_NAME} --template-body file://./create.cfn.json --parameters ParameterKey=ApplicationName,ParameterValue=$APP_NAME ParameterKey=EnvironmentName,ParameterValue=$ENV_NAME ParameterKey=Version,ParameterValue=$VERSION ParameterKey=DBPassword,ParameterValue=$DB_PASSWORD ParameterKey=LetsEncryptEmail,ParameterValue=$LETSENCRYPT_EMAIL ParameterKey=SessionSecret,ParameterValue=$SESSION_SECRET ParameterKey=SiteTitle,ParameterValue="$SITE_TITLE" ParameterKey=FeatureRegistration,ParameterValue=$FEATURE_REGISTRATION ParameterKey=FeatureTransitions,ParameterValue=$FEATURE_TRANSITIONS ParameterKey=CDNSigningPrivateKey,ParameterValue="$PRIVATE_KEY" ParameterKey=CDNSigningPublicKey,ParameterValue="$PUBLIC_KEY" ParameterKey=DomainName,ParameterValue="$DOMAIN" ParameterKey=EmailAddress,ParameterValue="$FROM_EMAIL" ParameterKey=LetsEncryptOpts,ParameterValue="$LETSENCRYPT_OPTS" ParameterKey=MapboxAccessToken,ParameterValue="$MAPBOX_ACCESS_TOKEN" ParameterKey=MixpanelToken,ParameterValue="$MIXPANEL_TOKEN"
 
 # wait for key pair to become available
 while : ; do

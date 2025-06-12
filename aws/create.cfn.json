@@ -574,17 +574,22 @@
           },
           {
             "Namespace": "aws:elasticbeanstalk:application:environment",
-            "OptionName": "REACT_APP_SITE_TITLE",
+            "OptionName": "VITE_SITE_TITLE",
             "Value": { "Ref": "SiteTitle" }
           },
           {
             "Namespace": "aws:elasticbeanstalk:application:environment",
-            "OptionName": "REACT_APP_FEATURE_REGISTRATION",
+            "OptionName": "VITE_FEATURE_REGISTRATION",
             "Value": { "Ref": "FeatureRegistration" }
           },
           {
             "Namespace": "aws:elasticbeanstalk:application:environment",
-            "OptionName": "REACT_APP_MAPBOX_ACCESS_TOKEN",
+            "OptionName": "VITE_FEATURE_TRANSITIONS",
+            "Value": { "Ref": "FeatureTransitions" }
+          },
+          {
+            "Namespace": "aws:elasticbeanstalk:application:environment",
+            "OptionName": "VITE_MAPBOX_ACCESS_TOKEN",
             "Value": { "Ref": "MapboxAccessToken" }
           },
           {
