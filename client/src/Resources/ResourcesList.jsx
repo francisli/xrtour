@@ -8,16 +8,20 @@ import PropTypes from 'prop-types';
 
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
+import { useStaticContext } from '../StaticContext';
 import Pagination from '../Components/Pagination';
 import ResourceCard from './ResourceCard';
 
 function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initialType = 'IMAGE', types }) {
   const { membership } = useAuthContext();
+  const { env } = useStaticContext();
+
+  const configuredTypes = types ?? env.FEATURE_ASSET_TYPES?.split(',');
 
   const [searchParams, setSearchParams] = useSearchParams();
   const show = searchParams.get('show') ?? 'active';
   const view = searchParams.get('view') ?? 'list';
-  const type = searchParams.get('type') ?? (types ? types[0] : initialType);
+  const type = searchParams.get('type') ?? (configuredTypes ? configuredTypes[0] : initialType);
   const searchDebounced = searchParams.get('q') ?? '';
   const page = parseInt(searchParams.get('page') ?? '1', 10);
 
@@ -80,10 +84,10 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
 
   return (
     <div className="row">
-      {(!types || types.length > 1) && (
+      {(!configuredTypes || configuredTypes.length > 1) && (
         <div className="col-md-3">
           <ul className="list-group mb-3">
-            {(!types || types.includes('3D_MODEL')) && (
+            {(!configuredTypes || configuredTypes.includes('3D_MODEL')) && (
               <button
                 type="button"
                 onClick={() => onClickType('3D_MODEL')}
@@ -91,7 +95,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
                 3D Model
               </button>
             )}
-            {(!types || types.includes('AUDIO')) && (
+            {(!configuredTypes || configuredTypes.includes('AUDIO')) && (
               <button
                 type="button"
                 onClick={() => onClickType('AUDIO')}
@@ -99,7 +103,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
                 Audio
               </button>
             )}
-            {(!types || types.includes('AR_LINK')) && (
+            {(!configuredTypes || configuredTypes.includes('AR_LINK')) && (
               <button
                 type="button"
                 onClick={() => onClickType('AR_LINK')}
@@ -107,7 +111,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
                 AR Links
               </button>
             )}
-            {(!types || types.includes('IMAGE')) && (
+            {(!configuredTypes || configuredTypes.includes('IMAGE')) && (
               <button
                 type="button"
                 onClick={() => onClickType('IMAGE')}
@@ -115,7 +119,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
                 Images
               </button>
             )}
-            {(!types || types.includes('IMAGE_OVERLAY')) && (
+            {(!configuredTypes || configuredTypes.includes('IMAGE_OVERLAY')) && (
               <button
                 type="button"
                 onClick={() => onClickType('IMAGE_OVERLAY')}
@@ -123,7 +127,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
                 Image Overlays
               </button>
             )}
-            {(!types || types.includes('IMAGE_SPHERE')) && (
+            {(!configuredTypes || configuredTypes.includes('IMAGE_SPHERE')) && (
               <button
                 type="button"
                 onClick={() => onClickType('IMAGE_SPHERE')}
@@ -134,7 +138,7 @@ function ResourcesList({ onNew, onSelect, onEdit, refreshToken = 0, type: initia
           </ul>
         </div>
       )}
-      <div className={!types || types.length > 1 ? 'col-md-9' : 'col-md-12'}>
+      <div className={!configuredTypes || configuredTypes.length > 1 ? 'col-md-9' : 'col-md-12'}>
         <div className="mb-3 d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center">
             {membership?.role !== 'VIEWER' && (

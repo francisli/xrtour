@@ -7,6 +7,7 @@ export const defaultValue = {
     user: null,
   },
   env: {
+    FEATURE_ASSET_TYPES: import.meta.env.VITE_FEATURE_ASSET_TYPES,
     FEATURE_REGISTRATION: import.meta.env.VITE_FEATURE_REGISTRATION,
     FEATURE_TRANSITIONS: import.meta.env.VITE_FEATURE_TRANSITIONS,
     MAPBOX_ACCESS_TOKEN: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
