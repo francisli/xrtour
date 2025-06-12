@@ -8,6 +8,7 @@ export const defaultValue = {
   },
   env: {
     FEATURE_REGISTRATION: import.meta.env.VITE_FEATURE_REGISTRATION,
+    FEATURE_TRANSITIONS: import.meta.env.VITE_FEATURE_TRANSITIONS,
     MAPBOX_ACCESS_TOKEN: import.meta.env.VITE_MAPBOX_ACCESS_TOKEN,
     SITE_TITLE: import.meta.env.VITE_SITE_TITLE,
   },

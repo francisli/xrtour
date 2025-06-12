@@ -6,9 +6,11 @@ import Stop from '../Stops/Stop';
 import StopsModal from '../Stops/StopsModal';
 import StopsTable from '../Stops/StopsTable';
 import { useAuthContext } from '../AuthContext';
+import { useStaticContext } from '../StaticContext';
 
 function TourStop() {
   const { membership } = useAuthContext();
+  const { env } = useStaticContext();
   const { TourId, TourStopId } = useParams();
   const [, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -61,26 +63,30 @@ function TourStop() {
   return (
     <>
       <Stop StopId={TourStop?.StopId} transition={TourStop?.TransitionStop}>
-        <h2>Transition</h2>
-        <StopsTable
-          type="TRANSITION"
-          stops={TourStop?.TransitionStop ? [{ id: TourStop.TransitionStopId, Stop: TourStop.TransitionStop }] : []}
-          onClick={onClickTransition}
-          onRemove={onRemoveTransition}
-          isEditable={isEditable}
-        />
-        <div className="mb-5">
-          {isEditable && (
-            <button
-              onClick={() => {
-                setShowingStopsModal(true);
-              }}
-              type="button"
-              className="btn btn-primary">
-              Set Transition
-            </button>
-          )}
-        </div>
+        {(TourStop?.TransitionStop || env.FEATURE_TRANSITIONS === 'true') && (
+          <>
+            <h2>Transition</h2>
+            <StopsTable
+              type="TRANSITION"
+              stops={TourStop?.TransitionStop ? [{ id: TourStop.TransitionStopId, Stop: TourStop.TransitionStop }] : []}
+              onClick={onClickTransition}
+              onRemove={onRemoveTransition}
+              isEditable={isEditable}
+            />
+            <div className="mb-5">
+              {isEditable && (
+                <button
+                  onClick={() => {
+                    setShowingStopsModal(true);
+                  }}
+                  type="button"
+                  className="btn btn-primary">
+                  Set Transition
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </Stop>
       {isShowingStopsModal && (
         <StopsModal

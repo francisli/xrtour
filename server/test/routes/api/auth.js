@@ -10,7 +10,6 @@ describe('/api/auth', () => {
   let testSession;
 
   before(() => {
-    process.env.REACT_APP_FEATURE_REGISTRATION = 'true';
     process.env.VITE_FEATURE_REGISTRATION = 'true';
   });
 
