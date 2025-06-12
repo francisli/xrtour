@@ -9,11 +9,13 @@ import { DateTime } from 'luxon';
 
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
+import { useStaticContext } from '../StaticContext';
 import Pagination from '../Components/Pagination';
 import StopCard from './StopCard';
 
 function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', types, refreshToken = 0 }) {
   const { membership } = useAuthContext();
+  const { env } = useStaticContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const type = searchParams.get('type') ?? (types ? types[0] : initialType);
@@ -100,7 +102,7 @@ function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', ty
                 Stops
               </button>
             )}
-            {(!types || types.includes('TRANSITION')) && (
+            {((!types && env.FEATURE_TRANSITIONS === 'true') || types?.includes('TRANSITION')) && (
               <button
                 type="button"
                 onClick={() => onClickType('TRANSITION')}
