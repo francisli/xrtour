@@ -34,7 +34,7 @@ function TeamsList() {
                   <div className="d-flex flex-nowrap">
                     {m.TeamId !== membership?.TeamId && (
                       <Link to={m.TeamId} className="btn btn-sm btn-primary me-2">
-                        Switch
+                        Select
                       </Link>
                     )}
                     {m.role !== 'VIEWER' && (
