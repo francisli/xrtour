@@ -210,26 +210,24 @@ function Tour() {
                     )}
                   </div>
                 </form>
-                <div className="row mb-5">
-                  <div className="col-md-6">
-                    <h2>Cover</h2>
-                    {tour.CoverResource && (
-                      <div className="row">
-                        <div className="col-6">
-                          <img
-                            className="img-thumbnail mb-3"
-                            src={tour.CoverResource.Files.find((f) => f.variant === variant.code)?.URL}
-                            alt="Cover"
-                          />
-                        </div>
+                <div className="mb-5">
+                  <h2>Social Media Share Image</h2>
+                  {tour.CoverResource && (
+                    <div className="row">
+                      <div className="col-6">
+                        <img
+                          className="img-thumbnail mb-3"
+                          src={tour.CoverResource.Files.find((f) => f.variant === variant.code)?.URL}
+                          alt="Cover"
+                        />
                       </div>
-                    )}
-                    {isEditable && (
-                      <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
-                        Select Cover
-                      </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                  {isEditable && (
+                    <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
+                      Select Cover
+                    </button>
+                  )}
                 </div>
                 <h2>Intro</h2>
                 <StopsTable
