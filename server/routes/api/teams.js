@@ -13,7 +13,7 @@ router.get('/', interceptors.requireLogin, async (req, res) => {
 });
 
 router.post('/', interceptors.requireLogin, async (req, res) => {
-  let record = models.Team.build(_.pick(req.body, ['name', 'link', 'favicon', 'variants']));
+  let record = models.Team.build(_.pick(req.body, ['name', 'link', 'favicon', 'variants', 'font']));
   try {
     await models.sequelize.transaction(async (transaction) => {
       await record.save({ transaction });
@@ -75,7 +75,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
       });
       membership = await record.getMembership(req.user, { transaction });
       if (membership?.isOwner) {
-        await record.update(_.pick(req.body, ['name', 'link', 'favicon', 'variants']), { transaction });
+        await record.update(_.pick(req.body, ['name', 'link', 'favicon', 'variants', 'font']), { transaction });
       }
     });
     if (record) {

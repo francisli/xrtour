@@ -147,6 +147,7 @@ describe('/api/teams', () => {
             name: 'English (US)',
           },
         ],
+        font: null,
         Memberships: [
           {
             InviteId: null,
@@ -213,16 +214,28 @@ describe('/api/teams', () => {
         .send({
           name: 'Updated name',
           link: 'updated-link',
+          font: {
+            family: 'Noto Sans TC',
+            subsets: ['chinese-traditional', 'latin'],
+          },
         })
         .set('Accept', 'application/json')
         .expect(StatusCodes.OK);
 
       assert.deepStrictEqual(response.body?.name, 'Updated name');
       assert.deepStrictEqual(response.body?.link, 'updated-link');
+      assert.deepStrictEqual(response.body?.font, {
+        family: 'Noto Sans TC',
+        subsets: ['chinese-traditional', 'latin'],
+      });
 
       const record = await models.Team.findByPk('1a93d46d-89bf-463b-ab23-8f22f5777907');
       assert.deepStrictEqual(record.name, 'Updated name');
       assert.deepStrictEqual(record.link, 'updated-link');
+      assert.deepStrictEqual(record.font, {
+        family: 'Noto Sans TC',
+        subsets: ['chinese-traditional', 'latin'],
+      });
     });
   });
 });
