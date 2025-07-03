@@ -11,6 +11,7 @@ import { useStaticContext } from '../StaticContext';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
 import FileInput from '../Components/FileInput';
+import FontInput from '../Components/FontInput';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 
@@ -29,6 +30,7 @@ function TeamForm() {
     name: isFirstTeam ? `${user.firstName}'s Personal Team` : '',
     link: isFirstTeam ? `${user.firstName}${user.lastName}`.toLocaleLowerCase() : '',
     favicon: null,
+    font: null,
   });
   const [isUploading, setUploading] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -158,6 +160,12 @@ function TeamForm() {
                         </div>
                       </FileInput>
                       {error?.errorMessagesHTMLFor?.('key')}
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label" htmlFor="font">
+                        Font
+                      </label>
+                      <FontInput id="font" name="font" onChange={onChange} record={team} />
                     </div>
                     <div className="mb-3 d-grid">
                       <button className="btn btn-primary" type="submit">

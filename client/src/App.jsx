@@ -1,6 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
+import 'react-bootstrap-typeahead/css/Typeahead.bs5.css';
 import './App.scss';
 
 import AuthContextProvider from './AuthContextProvider';
