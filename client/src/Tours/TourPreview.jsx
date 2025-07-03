@@ -6,10 +6,12 @@ import StopViewer from 'shared/Components/Viewer/StopViewer';
 
 import Api from '../Api';
 import { useStaticContext } from '../StaticContext';
+import { useAuthContext } from '../AuthContext';
 
 import './TourPreview.scss';
 
 function TourPreview() {
+  const { membership } = useAuthContext();
   const staticContext = useStaticContext();
   const navigate = useNavigate();
   const { TourId, TourStopId } = useParams();
@@ -125,6 +127,7 @@ function TourPreview() {
               autoPlay={!!TourStop && isPlaying}
               controls={true}
               mapboxAccessToken={staticContext?.env?.MAPBOX_ACCESS_TOKEN}
+              team={membership?.Team}
               tour={Tour}
               tourStops={TourStops}
               stop={TourStop ? TourStop.Stop : Tour.IntroStop}

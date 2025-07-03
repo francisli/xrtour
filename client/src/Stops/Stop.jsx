@@ -303,6 +303,7 @@ function Stop({ StopId, transition, children }) {
                   <PhoneScreen className="position-fixed">
                     <StopViewer
                       position={position}
+                      team={membership?.Team}
                       stop={stop}
                       transition={transition}
                       variant={variant}

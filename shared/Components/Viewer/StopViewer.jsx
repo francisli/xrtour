@@ -18,6 +18,7 @@ function StopViewer({
   controls,
   mapboxAccessToken,
   position,
+  team,
   tour,
   tourStops,
   stop,
@@ -304,8 +305,13 @@ function StopViewer({
     </audio>
   ));
 
+  const style = {};
+  if (team?.font) {
+    style.fontFamily = team.font.family;
+  }
+
   return (
-    <div className="stop-viewer">
+    <div className="stop-viewer" style={style}>
       <>
         <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
         {currentOverlay && <a tabIndex={0} onClick={onClickOverlay} className="stop-viewer__ar-link"></a>}
