@@ -86,7 +86,10 @@ router.get('/tours/:tour', async (req, res) => {
           },
         });
         if (version) {
-          res.json(version.data);
+          res.json({
+            ...version.data,
+            Team: team.toJSON(),
+          });
           return;
         }
       }
@@ -123,11 +126,15 @@ router.get('/*', async (req, res) => {
           },
         });
         if (version) {
+          const data = {
+            ...version.data,
+            Team: team.toJSON(),
+          };
           if (req.accepts('html')) {
             try {
               const { render } = await import('../../../viewer/dist/server/main-server.js');
               const helmetContext = {};
-              const staticContext = { context: { env: {}, tour: version.data } };
+              const staticContext = { context: { env: {}, tour: data } };
               staticContext.context.env.BASE_URL = `${req.protocol}://${req.headers.host}`;
               Object.keys(process.env).forEach((key) => {
                 if (key.startsWith('VITE_')) {
@@ -139,8 +146,8 @@ router.get('/*', async (req, res) => {
                 const { helmet } = helmetContext;
                 res.send(
                   HTML.replace(/<title\b[^>]*>(.*?)<\/title>/i, helmet.title.toString())
-                    .replace('<link rel="icon" href="" data-rh="true"/>', helmet.link.toString())
-                    .replace('<meta property="og:image" content="" data-rh="true"/>', helmet.meta.toString())
+                    .replace('<link rel="icon" href="" data-rh="true" />', helmet.link.toString())
+                    .replace('<meta property="og:image" content="" data-rh="true" />', helmet.meta.toString())
                     .replace('window.STATIC_CONTEXT = {}', `window.STATIC_CONTEXT=${JSON.stringify(staticContext.context)}`)
                     .replace('<div id="root"></div>', `<div id="root">${app}</div>`)
                 );
@@ -150,7 +157,7 @@ router.get('/*', async (req, res) => {
               res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
             }
           } else {
-            res.json(version.data);
+            res.json(data);
           }
           return;
         }
