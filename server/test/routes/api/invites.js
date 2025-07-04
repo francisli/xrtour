@@ -130,6 +130,8 @@ describe('/api/invites', () => {
                 },
               ],
               font: null,
+              colorPrimary: null,
+              colorSecondary: null,
             },
             TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
             UserId: id,

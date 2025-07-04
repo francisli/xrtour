@@ -195,6 +195,8 @@ describe('/api/tours', () => {
             },
           ],
           font: null,
+          colorPrimary: null,
+          colorSecondary: null,
         },
       });
     });

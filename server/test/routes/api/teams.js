@@ -148,6 +148,8 @@ describe('/api/teams', () => {
           },
         ],
         font: null,
+        colorPrimary: null,
+        colorSecondary: null,
         Memberships: [
           {
             InviteId: null,

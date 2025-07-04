@@ -10,7 +10,17 @@ export default function (sequelize, DataTypes) {
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'name', 'link', 'favicon', 'faviconURL', 'variants', 'font']);
+      const json = _.pick(this.get(), [
+        'id',
+        'name',
+        'link',
+        'favicon',
+        'faviconURL',
+        'variants',
+        'font',
+        'colorPrimary',
+        'colorSecondary',
+      ]);
       if (this.Memberships) {
         json.Memberships = this.Memberships.map((m) => m.toJSON());
       }
@@ -74,6 +84,8 @@ export default function (sequelize, DataTypes) {
       },
       variants: DataTypes.JSONB,
       font: DataTypes.JSONB,
+      colorPrimary: DataTypes.STRING,
+      colorSecondary: DataTypes.STRING,
     },
     {
       sequelize,
