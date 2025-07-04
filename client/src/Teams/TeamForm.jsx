@@ -8,6 +8,7 @@ import { StatusCodes } from 'http-status-codes';
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
 import { useStaticContext } from '../StaticContext';
+import ColorInput from '../Components/ColorInput';
 import ConfirmModal from '../Components/ConfirmModal';
 import FormGroup from '../Components/FormGroup';
 import FileInput from '../Components/FileInput';
@@ -166,6 +167,20 @@ function TeamForm() {
                         Font
                       </label>
                       <FontInput id="font" name="font" onChange={onChange} record={team} />
+                    </div>
+                    <div className="row mb-3">
+                      <div className="col-6">
+                        <label className="form-label" htmlFor="colorPrimary">
+                          Primary Color
+                        </label>
+                        <ColorInput name="colorPrimary" value={team.colorPrimary ?? '#951330'} onChange={onChange} />
+                      </div>
+                      <div className="col-6">
+                        <label className="form-label" htmlFor="colorSecondary">
+                          Secondary Color
+                        </label>
+                        <ColorInput name="colorSecondary" value={team.colorSecondary ?? '#ffdd55'} onChange={onChange} />
+                      </div>
                     </div>
                     <div className="mb-3 d-grid">
                       <button className="btn btn-primary" type="submit">
