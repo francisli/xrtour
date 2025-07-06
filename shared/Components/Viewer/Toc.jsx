@@ -8,7 +8,7 @@ function Toc({ isOpen, onClose, onSelect, tour, tourStops, variant }) {
   return (
     <div className={classNames('toc', { 'toc--open': isOpen })}>
       <div className="toc__close">
-        <button onClick={() => onClose()} className="btn btn-lg btn-primary btn-round">
+        <button onClick={() => onClose()} className="btn btn-lg btn-custom-primary btn-round">
           <FontAwesomeIcon icon={faXmark} />
         </button>
       </div>

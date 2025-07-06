@@ -30,14 +30,14 @@
 
 .scrubber__progress {
   height: 100%;
-  background-color: $chsa-yellow;
+  background-color: var(--bs-btn-bg-custom-secondary);
   border-radius: 4px;
   pointer-events: none;
   min-width: 8px;
 }
 
 .scrubber__thumb {
-  background-color: $chsa-red;
+  background-color: var(--bs-btn-bg-custom-primary);
   border-radius: 0.5rem;
   height: 1rem;
   pointer-events: none;
