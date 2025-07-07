@@ -66,6 +66,16 @@ const Api = {
       return instance.get(`/api/files/transcribe?jobName=${jobName}`);
     },
   },
+  google: {
+    webfonts(key) {
+      return instance.get(`https://www.googleapis.com/webfonts/v1/webfonts`, {
+        params: {
+          fields: 'items.family,items.subsets',
+          key,
+        },
+      });
+    },
+  },
   invites: {
     index() {
       return instance.get(`/api/invites`);

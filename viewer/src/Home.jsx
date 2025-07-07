@@ -108,10 +108,21 @@ function Home() {
   const description = Tour?.descriptions?.[Tour?.variants?.[0].code] ?? '';
   const baseURL = env.BASE_URL ?? `${window.location.protocol}//${window.location.host}`;
   const imageURL = `${baseURL}${Tour?.CoverResource?.Files?.find((f) => f.variant === Tour?.CoverResource?.variants?.[0]?.code)?.URL}`;
+  const font = Tour?.Team?.font ?? {
+    family: 'Montserrat',
+    subsets: ['latin'],
+  };
+
   return (
     <>
       <Helmet>
         <title>{title}</title>
+        <link
+          href={`https://fonts.googleapis.com/css2?family=${encodeURIComponent(font.family)}:wght@400;600;700&subset=${font.subsets.join(
+            ','
+          )}&display=swap`}
+          rel="stylesheet"
+        />
         <link rel="icon" href={faviconURL} />
         <meta property="og:image" content={imageURL} />
         <meta property="og:title" content={title} />
@@ -124,6 +135,7 @@ function Home() {
               autoPlay={!!TourStop && isPlaying}
               controls={true}
               mapboxAccessToken={env?.MAPBOX_ACCESS_TOKEN}
+              team={Tour?.Team}
               tour={Tour}
               tourStops={Tour.TourStops}
               stop={TourStop ? TourStop.Stop : Tour.IntroStop}

@@ -194,6 +194,9 @@ describe('/api/tours', () => {
               name: 'English (US)',
             },
           ],
+          font: null,
+          colorPrimary: null,
+          colorSecondary: null,
         },
       });
     });

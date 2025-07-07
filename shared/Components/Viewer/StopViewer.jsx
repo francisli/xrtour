@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClosedCaptioning as faCC } from '@fortawesome/free-regular-svg-icons';
 import { faBars, faClosedCaptioning as faCCFilled, faLocationDot, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
+import colors from 'simple-color-functions';
 
 import ImageOverlay from './ImageOverlay';
 import ImageSphere from './ImageSphere';
@@ -18,6 +19,7 @@ function StopViewer({
   controls,
   mapboxAccessToken,
   position,
+  team,
   tour,
   tourStops,
   stop,
@@ -304,21 +306,32 @@ function StopViewer({
     </audio>
   ));
 
+  const style = {};
+  if (team?.font) {
+    style.fontFamily = team.font.family;
+  }
+  style['--bs-btn-bg-custom-primary'] = team.colorPrimary ?? '#951330';
+  style['--bs-btn-bg-custom-primary-hover'] = colors(style['--bs-btn-bg-custom-primary']).darken(0.15);
+  style['--bs-btn-bg-custom-primary-active'] = colors(style['--bs-btn-bg-custom-primary']).darken(0.25);
+  style['--bs-btn-bg-custom-secondary'] = team.colorSecondary ?? '#ffdd55';
+  style['--bs-btn-bg-custom-secondary-hover'] = colors(style['--bs-btn-bg-custom-secondary']).darken(0.15);
+  style['--bs-btn-bg-custom-secondary-active'] = colors(style['--bs-btn-bg-custom-secondary']).darken(0.25);
+
   return (
-    <div className="stop-viewer">
+    <div className="stop-viewer" style={style}>
       <>
         <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
         {currentOverlay && <a tabIndex={0} onClick={onClickOverlay} className="stop-viewer__ar-link"></a>}
         {!!controls && (
           <div className="stop-viewer__toc">
-            <button onClick={() => setTocOpen(true)} className="btn btn-lg btn-primary btn-round">
+            <button onClick={() => setTocOpen(true)} className="btn btn-custom-primary btn-lg btn-round">
               <FontAwesomeIcon icon={faBars} />
             </button>
           </div>
         )}
         {!!controls && (
           <div className="stop-viewer__map">
-            <button onClick={() => setMapOpen(true)} className="btn btn-lg btn-primary btn-round">
+            <button onClick={() => setMapOpen(true)} className="btn btn-custom-primary btn-lg btn-round">
               <FontAwesomeIcon icon={faLocationDot} />
             </button>
           </div>
@@ -330,7 +343,7 @@ function StopViewer({
           <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber mb-2" />
           <div className="d-flex justify-content-between">
             <button className="btn btn-round invisible">&nbsp;</button>
-            <button onClick={onPlayPause} type="button" className="btn btn-lg btn-warning btn-round">
+            <button onClick={onPlayPause} type="button" className="btn btn-custom-secondary btn-lg btn-round">
               {!isPlaying && <FontAwesomeIcon icon={faPlay} />}
               {isPlaying && <FontAwesomeIcon icon={faPause} />}
             </button>

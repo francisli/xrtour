@@ -33,7 +33,7 @@
 
 .map__marker {
   align-items: center;
-  background: $chsa-red;
+  background: var(--bs-btn-bg-custom-primary);
   border-radius: 1rem;
   color: white;
   display: flex;
@@ -45,7 +45,7 @@
 }
 
 .map__marker--current {
-  background: $chsa-yellow;
+  background: var(--bs-btn-bg-custom-secondary);
   color: black;
 }
 

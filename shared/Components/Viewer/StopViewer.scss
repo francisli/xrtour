@@ -1,5 +1,39 @@
 @import '../../Assets/Variables';
 
+.btn-custom-primary {
+  background-color: var(--bs-btn-bg-custom-primary);
+  border-color: var(--bs-btn-bg-custom-primary);
+  color: white;
+
+  &:hover {
+    background-color: var(--bs-btn-bg-custom-primary-hover);
+    border-color: var(--bs-btn-bg-custom-primary-hover);
+    color: white;
+  }
+  &:active {
+    background-color: var(--bs-btn-bg-custom-primary-active) !important;
+    border-color: var(--bs-btn-bg-custom-primary-active) !important;
+    color: white !important;
+  }
+}
+
+.btn-custom-secondary {
+  background-color: var(--bs-btn-bg-custom-secondary);
+  border-color: var(--bs-btn-bg-custom-secondary);
+  color: white;
+
+  &:hover {
+    background-color: var(--bs-btn-bg-custom-secondary-hover);
+    border-color: var(--bs-btn-bg-custom-secondary-hover);
+    color: white;
+  }
+  &:active {
+    background-color: var(--bs-btn-bg-custom-secondary-active) !important;
+    border-color: var(--bs-btn-bg-custom-secondary-active) !important;
+    color: white !important;
+  }
+}
+
 .stop-viewer {
   position: relative;
   width: 100%;

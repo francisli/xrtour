@@ -39,11 +39,11 @@ function Map({ isOpen, mapboxAccessToken, onClose, stop, tourStops, variant }) {
           const popup = new mapboxgl.Popup({ closeButton: false, offset: 25 }).setHTML(
             `<div class="map__popup-title">${i + 1}. ${ts.Stop?.names[variant?.code]}</div><div class="map__popup-body mb-2">${
               ts.Stop?.address
-            }</div><div class="map__popup-body"><a class="btn btn-sm btn-primary" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+            }</div><div class="map__popup-body"><a class="btn btn-sm btn-custom-primary" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
               ts.Stop?.address
             )}">Get directions in Google Maps</a></div>${
               isIOS
-                ? `<div class="map__popup-body mt-2"><a class="btn btn-sm btn-primary" target="_blank" href="http://maps.apple.com/?daddr=${encodeURIComponent(
+                ? `<div class="map__popup-body mt-2"><a class="btn btn-sm btn-custom-primary" target="_blank" href="http://maps.apple.com/?daddr=${encodeURIComponent(
                     ts.Stop?.address
                   )}">Get directions in Apple Maps</a></div>`
                 : ''
@@ -128,7 +128,7 @@ function Map({ isOpen, mapboxAccessToken, onClose, stop, tourStops, variant }) {
     <div className={classNames('map', { 'map--open': isOpen })}>
       <div ref={containerRef} className="map__container"></div>
       <div className="map__close">
-        <button onClick={() => onClose()} className="btn btn-lg btn-primary btn-round">
+        <button onClick={() => onClose()} className="btn btn-lg btn-custom-primary btn-round">
           <FontAwesomeIcon icon={faXmark} />
         </button>
       </div>
