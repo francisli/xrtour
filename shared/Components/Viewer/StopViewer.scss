@@ -53,7 +53,7 @@
 
 .stop-viewer__ar-link {
   aspect-ratio: 1;
-  background-color: $chsa-red;
+  background-color: var(--bs-btn-bg-custom-primary);
   background-image: url('../../Assets/ArIcon.svg');
   background-position: center;
   background-repeat: no-repeat;
@@ -62,7 +62,7 @@
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
   display: block;
   left: 20%;
-  opacity: 0.8;
+  opacity: 0.95;
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
