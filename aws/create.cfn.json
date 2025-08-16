@@ -51,10 +51,21 @@
       "Type": "String",
       "Default": ""
     },
+    "FeatureAssetTypes": {
+      "Description": "A feature flag to configure supported asset types",
+      "Type": "String",
+      "Default": "3D_MODEL,AR_LINK,AUDIO,IMAGE,IMAGE_OVERLAY,IMAGE_SPHERE"
+    },
     "FeatureRegistration": {
       "Description": "A feature flag to enable/disable user registration",
       "Type": "String",
       "Default": "false",
+      "AllowedValues": ["true", "false"]
+    },
+    "FeatureTransitions": {
+      "Description": "A feature flag to enable/disable transitions",
+      "Type": "String",
+      "Default": "true",
       "AllowedValues": ["true", "false"]
     },
     "LetsEncryptOpts": {
@@ -576,6 +587,11 @@
             "Namespace": "aws:elasticbeanstalk:application:environment",
             "OptionName": "VITE_SITE_TITLE",
             "Value": { "Ref": "SiteTitle" }
+          },
+          {
+            "Namespace": "aws:elasticbeanstalk:application:environment",
+            "OptionName": "VITE_FEATURE_ASSET_TYPES",
+            "Value": { "Ref": "FeatureAssetTypes" }
           },
           {
             "Namespace": "aws:elasticbeanstalk:application:environment",
