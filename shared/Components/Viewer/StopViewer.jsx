@@ -283,7 +283,7 @@ function StopViewer({
       onEnded={onEndedInternal}>
       {(() => {
         const subtitles = sr.Resource.Files.find((f) => f.variant === `${variant.code}-vtt`);
-        if (subtitles) {
+        if (subtitles?.URL) {
           hasCC = true;
           return (
             <track
