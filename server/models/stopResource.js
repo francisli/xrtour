@@ -9,7 +9,7 @@ export default function (sequelize, DataTypes) {
     }
 
     toJSON() {
-      const json = _.pick(this.get(), ['id', 'StopId', 'ResourceId', 'start', 'end', 'pauseAtEnd']);
+      const json = _.pick(this.get(), ['id', 'StopId', 'ResourceId', 'start', 'end', 'pauseAtEnd', 'options']);
       if (this.Resource) {
         json.Resource = this.Resource.toJSON();
       }
@@ -21,6 +21,7 @@ export default function (sequelize, DataTypes) {
       start: DataTypes.INTEGER,
       end: DataTypes.INTEGER,
       pauseAtEnd: DataTypes.BOOLEAN,
+      options: DataTypes.JSONB,
     },
     {
       sequelize,

@@ -94,7 +94,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
       if (record && updatedRecord) {
         membership = await record.Team.getMembership(req.user, { transaction });
         if (membership && membership.isEditor) {
-          await updatedRecord.update(_.pick(req.body, ['start', 'end', 'pauseAtEnd']));
+          await updatedRecord.update(_.pick(req.body, ['start', 'end', 'pauseAtEnd', 'options']));
         } else {
           membership = null;
         }

@@ -54,6 +54,7 @@ describe('/api/stops/:StopId/resources', () => {
           start: 0,
           end: null,
           pauseAtEnd: false,
+          options: {},
           Resource: {
             TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
             id: '6ebacda9-8d33-4c3e-beb5-18dffb119046',
@@ -94,6 +95,7 @@ describe('/api/stops/:StopId/resources', () => {
           start: 0,
           end: null,
           pauseAtEnd: false,
+          options: {},
           Resource: {
             TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
             id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
@@ -148,6 +150,7 @@ describe('/api/stops/:StopId/resources', () => {
         start: 0,
         end: null,
         pauseAtEnd: false,
+        options: {},
         Resource: {
           id: '0cb2ce76-c5ca-454f-9fb1-47051b0f21ab',
           TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
@@ -192,6 +195,9 @@ describe('/api/stops/:StopId/resources', () => {
         .send({
           start: 0,
           end: 30,
+          options: {
+            fit: 'cover',
+          },
         })
         .expect(StatusCodes.OK);
 
@@ -202,6 +208,9 @@ describe('/api/stops/:StopId/resources', () => {
         start: 0,
         end: 30,
         pauseAtEnd: false,
+        options: {
+          fit: 'cover',
+        },
         Resource: {
           Files: [
             {

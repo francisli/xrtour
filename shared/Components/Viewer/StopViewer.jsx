@@ -39,6 +39,7 @@ function StopViewer({
 
   const [currentTrack, setCurrentTrack] = useState();
   const [imageURL, setImageURL] = useState();
+  const [imageOptions, setImageOptions] = useState();
   const [currentOverlay, setCurrentOverlay] = useState();
   const [selectedOverlay, setSelectedOverlay] = useState();
 
@@ -128,14 +129,17 @@ function StopViewer({
   useEffect(() => {
     if (images && overlays && tracks && Number.isInteger(position)) {
       let newImageURL;
+      let newImageOptions;
       for (const sr of images) {
         if (((position === 0 && sr.start <= position) || sr.start < position) && (sr.end ?? Number.MAX_SAFE_INTEGER) >= position) {
           newImageURL = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
+          newImageOptions = sr.options;
           break;
         }
       }
       if (newImageURL !== imageURL) {
         setImageURL(newImageURL);
+        setImageOptions(newImageOptions);
       }
       let newOverlay;
       for (const sr of overlays) {
@@ -320,7 +324,9 @@ function StopViewer({
   return (
     <div className="stop-viewer" style={style}>
       <>
-        <div className="stop-viewer__image" style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none' }}></div>
+        <div
+          className="stop-viewer__image"
+          style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none', backgroundSize: imageOptions?.fit ?? 'cover' }}></div>
         {currentOverlay && <a tabIndex={0} onClick={onClickOverlay} className="stop-viewer__ar-link"></a>}
         {!!controls && (
           <div className="stop-viewer__toc">
