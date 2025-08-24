@@ -26,6 +26,11 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
     selectedResource[name] = newValue;
   }
 
+  function onChangeImageFit(resource, newValue) {
+    resource.options.fit = newValue;
+    onChange(resource);
+  }
+
   function onTogglePause(resource, newValue) {
     resource.pauseAtEnd = newValue;
     onChange(resource);
@@ -65,7 +70,7 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
             <th className="resources-table__col-timeline">
               <div className="d-flex justify-content-between">
                 <span>Timeline</span>
-                <span>Pause?</span>
+                <span>Options</span>
               </div>
             </th>
             <th className="resources-table__col-actions">Actions</th>
@@ -114,14 +119,30 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
                   </span>
                   {r.Resource.type === 'AUDIO' && !(isEditing && selectedResource === r) && (
                     <span>
-                      <input
-                        onChange={(event) => onTogglePause(r, event.target.checked)}
-                        type="checkbox"
-                        name="pauseAtEnd"
-                        checked={r.pauseAtEnd}
-                        className="form-check-input"
-                        disabled={!isEditable}
-                      />
+                      <div className="form-check">
+                        <input
+                          onChange={(event) => onTogglePause(r, event.target.checked)}
+                          type="checkbox"
+                          name="pauseAtEnd"
+                          checked={r.pauseAtEnd}
+                          className="form-check-input"
+                          disabled={!isEditable}
+                        />
+                        <label className="form-check-label" htmlFor="pauseAtEnd">
+                          Pause?
+                        </label>
+                      </div>
+                    </span>
+                  )}
+                  {r.Resource.type === 'IMAGE' && !(isEditing && selectedResource === r) && (
+                    <span>
+                      <select
+                        className="form-select"
+                        onChange={(event) => onChangeImageFit(r, event.target.value)}
+                        value={r.options.fit ?? 'cover'}>
+                        <option value="cover">Cover</option>
+                        <option value="contain">Contain</option>
+                      </select>
                     </span>
                   )}
                 </div>
