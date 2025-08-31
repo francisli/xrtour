@@ -38,6 +38,9 @@ function StopViewer({
   const [overlays, setOverlays] = useState();
 
   const [currentTrack, setCurrentTrack] = useState();
+  const [prevImageURL, setPrevImageURL] = useState();
+  const [prevImageOptions, setPrevImageOptions] = useState();
+  const [imageStart, setImageStart] = useState();
   const [imageURL, setImageURL] = useState();
   const [imageOptions, setImageOptions] = useState();
   const [currentOverlay, setCurrentOverlay] = useState();
@@ -70,6 +73,9 @@ function StopViewer({
           newTracks.push(sr);
         } else if (sr.Resource.type === 'IMAGE') {
           newImages.push({ ...sr });
+          // preload image
+          const img = new Image();
+          img.src = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
         } else if (
           sr.Resource.type === '3D_MODEL' ||
           sr.Resource.type === 'AR_LINK' ||
@@ -105,6 +111,9 @@ function StopViewer({
             newTracks.push({ ...sr, start: offset + sr.start });
           } else if (sr.Resource.type === 'IMAGE') {
             newImages.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
+            // preload image
+            const img = new Image();
+            img.src = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
           } else if (
             sr.Resource.type === '3D_MODEL' ||
             sr.Resource.type === 'AR_LINK' ||
@@ -138,6 +147,9 @@ function StopViewer({
         }
       }
       if (newImageURL !== imageURL) {
+        setPrevImageURL(imageURL);
+        setPrevImageOptions(imageOptions);
+        setImageStart(position);
         setImageURL(newImageURL);
         setImageOptions(newImageOptions);
       }
@@ -324,8 +336,15 @@ function StopViewer({
   return (
     <div className="stop-viewer" style={style}>
       <>
+        {prevImageURL && (
+          <div
+            className={classNames('stop-viewer__image stop-viewer__image--hidden', {
+              'stop-viewer__image--fade-out': position <= imageStart + 1,
+            })}
+            style={{ backgroundImage: `url(${prevImageURL})`, backgroundSize: prevImageOptions?.fit ?? 'cover' }}></div>
+        )}
         <div
-          className="stop-viewer__image"
+          className={classNames('stop-viewer__image', { 'stop-viewer__image--fade-in': position <= imageStart + 1 })}
           style={{ backgroundImage: imageURL ? `url(${imageURL})` : 'none', backgroundSize: imageOptions?.fit ?? 'cover' }}></div>
         {currentOverlay && <a tabIndex={0} onClick={onClickOverlay} className="stop-viewer__ar-link"></a>}
         {!!controls && (
@@ -363,6 +382,22 @@ function StopViewer({
           </div>
         </div>
         {audio}
+      </>
+      {selectedOverlay && (
+        <>
+          {selectedOverlay.Resource?.type === '3D_MODEL' && (
+            <ModelOverlay onClose={() => setSelectedOverlay()} resource={selectedOverlay.Resource} variant={variant} />
+          )}
+          {selectedOverlay.Resource?.type === 'IMAGE_OVERLAY' && (
+            <ImageOverlay onClose={() => setSelectedOverlay()} resource={selectedOverlay.Resource} variant={variant} />
+          )}
+          {selectedOverlay.Resource?.type === 'IMAGE_SPHERE' && (
+            <ImageSphere onClose={() => setSelectedOverlay()} resource={selectedOverlay.Resource} variant={variant} />
+          )}
+        </>
+      )}
+      {isCC && subtitleText && <div className="stop-viewer__subtitles">{subtitleText}</div>}
+      <>
         <Toc
           isOpen={isTocOpen}
           onClose={() => setTocOpen(false)}
@@ -380,20 +415,6 @@ function StopViewer({
           variant={variant}
         />
       </>
-      {selectedOverlay && (
-        <>
-          {selectedOverlay.Resource?.type === '3D_MODEL' && (
-            <ModelOverlay onClose={() => setSelectedOverlay()} resource={selectedOverlay.Resource} variant={variant} />
-          )}
-          {selectedOverlay.Resource?.type === 'IMAGE_OVERLAY' && (
-            <ImageOverlay onClose={() => setSelectedOverlay()} resource={selectedOverlay.Resource} variant={variant} />
-          )}
-          {selectedOverlay.Resource?.type === 'IMAGE_SPHERE' && (
-            <ImageSphere onClose={() => setSelectedOverlay()} resource={selectedOverlay.Resource} variant={variant} />
-          )}
-        </>
-      )}
-      {isCC && subtitleText && <div className="stop-viewer__subtitles">{subtitleText}</div>}
     </div>
   );
 }

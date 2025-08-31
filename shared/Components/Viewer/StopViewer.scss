@@ -42,6 +42,24 @@
   overflow: hidden;
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .stop-viewer__image {
   position: absolute;
   top: 0;
@@ -51,6 +69,18 @@
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+.stop-viewer__image--hidden {
+  opacity: 0;
+}
+
+.stop-viewer__image--fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.stop-viewer__image--fade-out {
+  animation: fadeOut 0.5s ease-in-out;
 }
 
 .stop-viewer__ar-link {
