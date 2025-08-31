@@ -73,6 +73,9 @@ function StopViewer({
           newTracks.push(sr);
         } else if (sr.Resource.type === 'IMAGE') {
           newImages.push({ ...sr });
+          // preload image
+          const img = new Image();
+          img.src = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
         } else if (
           sr.Resource.type === '3D_MODEL' ||
           sr.Resource.type === 'AR_LINK' ||
@@ -108,6 +111,9 @@ function StopViewer({
             newTracks.push({ ...sr, start: offset + sr.start });
           } else if (sr.Resource.type === 'IMAGE') {
             newImages.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
+            // preload image
+            const img = new Image();
+            img.src = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
           } else if (
             sr.Resource.type === '3D_MODEL' ||
             sr.Resource.type === 'AR_LINK' ||
