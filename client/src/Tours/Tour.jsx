@@ -225,7 +225,7 @@ function Tour() {
                   )}
                   {isEditable && (
                     <button onClick={() => setShowingResourcesModal(true)} type="button" className="btn btn-primary">
-                      Select Cover
+                      Select Image
                     </button>
                   )}
                 </div>
