@@ -57,7 +57,7 @@ function StopViewer({
   const [isCC, setCC] = useState(false);
 
   useEffect(() => {
-    if (stop.Resources) {
+    if (stop?.Resources) {
       let newDuration = 0;
       let newImages = [];
       let newTracks = [];
