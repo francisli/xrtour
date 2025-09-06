@@ -1,4 +1,4 @@
 .phone-screen {
-  width: 390px;
-  height: 844px;
+  width: min(390px, calc(0.46 * 85vh));
+  height: min(844px, 85vh);
 }
