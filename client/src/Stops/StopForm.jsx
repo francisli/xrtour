@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { capitalize, pluralize } from 'inflection';
+import { capitalize } from 'inflection';
 import { StatusCodes } from 'http-status-codes';
 import { v4 as uuid } from 'uuid';
 import PropTypes from 'prop-types';
@@ -51,8 +51,8 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
   function onChange(event) {
     const newStop = { ...Stop };
     const { name, value } = event.target;
-    if (name === 'name' || name === 'description') {
-      newStop[pluralize(name)][variant?.code] = value;
+    if (name === 'names' || name === 'descriptions') {
+      newStop[name][variant?.code] = value;
     } else if (name === 'address' || name === 'destAddress') {
       const coordinateKey = name.startsWith('dest') ? 'destCoordinate' : 'coordinate';
       newStop[name] = value?.place_name;
@@ -105,6 +105,14 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
           <form autoComplete="off" onSubmit={onSubmit}>
             {error && error.message && <div className="alert alert-danger">{error.message}</div>}
             <fieldset disabled={isLoading}>
+              <FormGroup
+                name="name"
+                label="Name"
+                helpText="The name of this Stop as it appears in the Editor"
+                onChange={onChange}
+                record={Stop}
+                error={error}
+              />
               {Stop.type === 'STOP' && (
                 <>
                   <FormGroup name="link" label="Link" onChange={onChange} record={Stop} error={error} />
@@ -125,10 +133,17 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
                 </>
               )}
               <VariantTabs variants={Stop.variants} current={variant} setVariant={setVariant} />
-              <FormGroup name="name" label="Name" onChange={onChange} value={Stop.names[variant?.code]} error={error} />
+              <FormGroup
+                name="names"
+                label="Display Name"
+                helpText="The name of this Stop as it appears in the Tour"
+                onChange={onChange}
+                value={Stop.names[variant?.code]}
+                error={error}
+              />
               <FormGroup
                 type="textarea"
-                name="description"
+                name="descriptions"
                 label="Description"
                 onChange={onChange}
                 value={Stop.descriptions[variant?.code]}

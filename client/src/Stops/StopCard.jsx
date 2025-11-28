@@ -10,7 +10,7 @@ function StopCard({ stop, onEdit, onSelect }) {
       <div className={classNames('card', { clickable: onEdit })} onClick={() => onEdit?.(stop)}>
         <div className="stop-card__img card-img-top" style={{ backgroundImage: `url(${sr?.Resource?.Files?.[0].URL})` }}></div>
         <div className="card-body">
-          <h3 className="card-title h6">{stop.names[stop.variants[0].code]}</h3>
+          <h3 className="card-title h6">{stop.name}</h3>
           {stop.type === 'TRANSITION' && (
             <>
               <div className="small">
@@ -47,12 +47,7 @@ StopCard.propTypes = {
         }),
       })
     ).isRequired,
-    names: PropTypes.object.isRequired,
-    variants: PropTypes.arrayOf(
-      PropTypes.shape({
-        code: PropTypes.string.isRequired,
-      })
-    ).isRequired,
+    name: PropTypes.string.isRequired,
     address: PropTypes.string,
     destAddress: PropTypes.string,
     type: PropTypes.string.isRequired,

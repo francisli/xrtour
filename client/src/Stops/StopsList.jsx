@@ -164,7 +164,7 @@ function StopsList({ onNewStop, onSelect, onEdit, type: initialType = 'STOP', ty
                   {stops?.map((s) => (
                     <tr key={s.id}>
                       <td className="w-50 align-middle" onClick={() => onEdit?.(s)}>
-                        {s.names[s.variants[0].code]}
+                        {s.name}
                         <br />
                         <div className="text-nowrap text-truncate">
                           <small>
