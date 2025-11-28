@@ -56,6 +56,7 @@ describe('/api/tours', () => {
     it('creates a new Tour', async () => {
       const data = {
         TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+        name: 'Internal New Tour Name',
         link: 'newtour',
         names: { 'en-us': 'New Tour' },
         descriptions: { 'en-us': 'New Tour description' },
@@ -77,7 +78,7 @@ describe('/api/tours', () => {
 
       const record = await models.Tour.findByPk(response.body.id);
       assert(record);
-      assert.deepStrictEqual(record.name, 'New Tour');
+      assert.deepStrictEqual(record.name, 'Internal New Tour Name');
       assert.deepStrictEqual(record.link, 'newtour');
     });
 
@@ -173,6 +174,7 @@ describe('/api/tours', () => {
         TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
         CoverResourceId: null,
         IntroStopId: null,
+        name: 'Tour 2',
         link: 'tour2',
         names: { 'en-us': 'Tour 2' },
         descriptions: { 'en-us': 'Tour 2 description' },

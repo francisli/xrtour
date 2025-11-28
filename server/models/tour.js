@@ -17,6 +17,7 @@ export default function (sequelize, DataTypes) {
         'TeamId',
         'CoverResourceId',
         'IntroStopId',
+        'name',
         'link',
         'names',
         'descriptions',
@@ -209,8 +210,10 @@ export default function (sequelize, DataTypes) {
   );
 
   Tour.beforeValidate((record) => {
-    const [variant] = record.variants;
-    record.name = record.names[variant.code] ?? '';
+    if (!record.name) {
+      const [variant] = record.variants;
+      record.name = record.names[variant.code] ?? '';
+    }
   });
 
   return Tour;
