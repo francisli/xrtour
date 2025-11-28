@@ -176,6 +176,7 @@ function Tour() {
                     value={`https://${membership?.Team?.link}.xrtour.org/${tour.link}`}
                   />
                   <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
+                  <FormGroup plaintext name="variant.displayName" label="Language Name" value={variant.displayName} />
                   <FormGroup plaintext name="names" label="Display Name" value={tour.names[variant.code]} />
                   <FormGroup type="textarea" plaintext name="descriptions" label="Description" value={tour.descriptions[variant.code]} />
                   <div className="mb-3 d-flex justify-content-between">

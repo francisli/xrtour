@@ -6,6 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
 import FormGroup from '../Components/FormGroup';
+import LanguageModal from '../Components/LanguageModal';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
@@ -56,6 +57,8 @@ function TourForm() {
     const { name, value } = event.target;
     if (name === 'names' || name === 'descriptions') {
       newTour[name][variant?.code] = value;
+    } else if (name === 'variant.displayName') {
+      newTour.variants.find((v) => v.code === variant?.code).displayName = value;
     } else {
       newTour[name] = value;
     }
@@ -83,6 +86,17 @@ function TourForm() {
     } finally {
       setLoading(false);
     }
+  }
+
+  const [isShowingLanguageModal, setShowingLanguageModal] = useState(false);
+  function onAddVariant(variant) {
+    const newTour = { ...tour };
+    newTour.variants.push(variant);
+    newTour.names[variant.code] = '';
+    newTour.descriptions[variant.code] = '';
+    setTour(newTour);
+    setShowingLanguageModal(false);
+    setVariant(variant);
   }
 
   return (
@@ -117,7 +131,20 @@ function TourForm() {
                     record={tour}
                     error={error}
                   />
-                  <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
+                  <VariantTabs
+                    variants={tour.variants}
+                    current={variant}
+                    setVariant={setVariant}
+                    onAdd={() => setShowingLanguageModal(true)}
+                  />
+                  <FormGroup
+                    name="variant.displayName"
+                    label="Language Name"
+                    helpText="The name of the Language as it appears to the public"
+                    onChange={onChange}
+                    value={variant.displayName}
+                    error={error}
+                  />
                   <FormGroup
                     name="names"
                     label="Display Name"
@@ -144,6 +171,9 @@ function TourForm() {
             )}
           </div>
         </div>
+        {isShowingLanguageModal && (
+          <LanguageModal onCancel={() => setShowingLanguageModal(false)} onOK={onAddVariant} variants={tour.variants} />
+        )}
       </main>
     </>
   );
