@@ -147,7 +147,7 @@ function Tour() {
     <>
       <Helmet>
         <title>
-          {tour?.names[tour.variants[0].code] ?? ''} - {staticContext?.env?.SITE_TITLE}
+          {tour?.name ?? ''} - {staticContext?.env?.SITE_TITLE}
         </title>
       </Helmet>
       <main className="container">
@@ -160,14 +160,15 @@ function Tour() {
                   <Link to="/">Home</Link>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
-                  {tour.names[tour.variants[0].code]}
+                  {tour.name}
                 </li>
               </ol>
             </nav>
-            <h1 className="mb-3">{tour.names[tour.variants[0].code]}</h1>
+            <h1 className="mb-3">{tour.name}</h1>
             <div className="row">
               <div className="col-md-6">
                 <form className="mb-5">
+                  <FormGroup plaintext name="name" label="Name" value={tour.name} />
                   <FormGroup
                     plaintext
                     name="link"
@@ -175,8 +176,8 @@ function Tour() {
                     value={`https://${membership?.Team?.link}.xrtour.org/${tour.link}`}
                   />
                   <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
-                  <FormGroup plaintext name="name" label="Name" value={tour.names[variant.code]} />
-                  <FormGroup type="textarea" plaintext name="description" label="Description" value={tour.descriptions[variant.code]} />
+                  <FormGroup plaintext name="names" label="Display Name" value={tour.names[variant.code]} />
+                  <FormGroup type="textarea" plaintext name="descriptions" label="Description" value={tour.descriptions[variant.code]} />
                   <div className="mb-3 d-flex justify-content-between">
                     <div>
                       {isEditable && (
@@ -286,12 +287,12 @@ function Tour() {
         )}
         {isConfirmArchiveShowing && (
           <ConfirmModal isShowing={true} title="Archive Tour" onCancel={() => setConfirmArchiveShowing(false)} onOK={() => archiveTour()}>
-            Are you sure you wish to archive this tour <b>{tour?.names[tour.variants[0].code]}</b>?
+            Are you sure you wish to archive this tour <b>{tour?.name}</b>?
           </ConfirmModal>
         )}
         {isConfirmRestoreShowing && (
           <ConfirmModal isShowing={true} title="Restore Tour" onCancel={() => setConfirmRestoreShowing(false)} onOK={() => restoreTour()}>
-            Are you sure you wish to restore this tour <b>{tour?.names[tour.variants[0].code]}</b>?
+            Are you sure you wish to restore this tour <b>{tour?.name}</b>?
           </ConfirmModal>
         )}
         {isConfirmDeleteShowing && (
@@ -301,7 +302,7 @@ function Tour() {
             onCancel={() => setConfirmDeleteShowing(false)}
             onOK={() => deleteTour()}>
             <p>
-              Are you sure you wish to delete this tour <b>{tour?.names[tour.variants[0].code]}</b> permanently?
+              Are you sure you wish to delete this tour <b>{tour?.name}</b> permanently?
             </p>
             <p>This cannot be undone!</p>
           </ConfirmModal>

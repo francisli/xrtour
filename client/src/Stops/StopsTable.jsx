@@ -65,7 +65,7 @@ function StopsTable({ type = 'STOP', stops, onClick, onRemove, onReorderStops, i
             {stops?.map((s, i) => (
               <tr key={s.id} onClick={() => onClick(type, s)} className="clickable">
                 <td>{i + 1}</td>
-                <td>{s.Stop.names[s.Stop.variants[0].code]}</td>
+                <td>{s.Stop.name}</td>
                 {type === 'STOP' && <td>{s.Stop.address}</td>}
                 <td className="stops-table__col-actions">
                   {isEditable && (
@@ -83,7 +83,7 @@ function StopsTable({ type = 'STOP', stops, onClick, onRemove, onReorderStops, i
         isShowing={isConfirmRemoveShowing}
         onCancel={() => setConfirmRemoveShowing(false)}
         onOK={() => onConfirmRemove(selectedStop)}>
-        Are you sure you wish to remove <b>{selectedStop?.Stop.names[selectedStop?.Stop.variants[0].code]}</b>?
+        Are you sure you wish to remove <b>{selectedStop?.Stop.name}</b>?
       </ConfirmModal>
     </>
   );

@@ -59,6 +59,7 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
       'destAddress',
       'destCoordinate',
       'destRadius',
+      'name',
       'names',
       'descriptions',
       'variants',
@@ -107,6 +108,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
       try {
         await record.update(
           _.pick(req.body, [
+            'name',
             'link',
             'address',
             'coordinate',

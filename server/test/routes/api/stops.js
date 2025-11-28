@@ -58,6 +58,7 @@ describe('/api/stops', () => {
         TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
         link: 'telephone-exchange',
         address: '743 Washington St, San Francisco, CA 94108',
+        name: 'Internal Name for Chinese Telephone Exchange',
         names: { 'en-us': 'Chinese Telephone Exchange' },
         descriptions: {
           'en-us': 'The Bank of Canton at 743 Washington Street was once the original Telephone Exchange in Chinatown in 1887.',
@@ -82,7 +83,7 @@ describe('/api/stops', () => {
 
       const record = await models.Stop.findByPk(response.body.id);
       assert(record);
-      assert.deepStrictEqual(record.name, 'Chinese Telephone Exchange');
+      assert.deepStrictEqual(record.name, 'Internal Name for Chinese Telephone Exchange');
       assert.deepStrictEqual(record.link, 'telephone-exchange');
       assert.deepStrictEqual(record.address, '743 Washington St, San Francisco, CA 94108');
     });
@@ -190,6 +191,7 @@ describe('/api/stops', () => {
         id: 'e39b97ad-a5e9-422c-b256-d50fec355285',
         TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
         type: 'STOP',
+        name: 'CHSA',
         link: 'chsa',
         address: '965 Clay St, San Francisco, CA 94108',
         coordinate: null,

@@ -91,7 +91,7 @@ function TourPublish() {
                   <Link to="/">Home</Link>
                 </li>
                 <li className="breadcrumb-item">
-                  <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.names[tour?.variants[0].code]}</Link>
+                  <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.name}</Link>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
                   Publish Tour

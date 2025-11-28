@@ -42,7 +42,7 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
     res.status(StatusCodes.UNAUTHORIZED).end();
     return;
   }
-  const record = models.Tour.build(_.pick(req.body, ['TeamId', 'link', 'names', 'descriptions', 'variants', 'visibility']));
+  const record = models.Tour.build(_.pick(req.body, ['TeamId', 'name', 'link', 'names', 'descriptions', 'variants', 'visibility']));
   try {
     await record.save();
     res.status(StatusCodes.CREATED).json(record.toJSON());
@@ -117,7 +117,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
           }
         }
         await record.update(
-          _.pick(req.body, ['link', 'names', 'descriptions', 'variants', 'visibility', 'CoverResourceId', 'IntroStopId'])
+          _.pick(req.body, ['name', 'link', 'names', 'descriptions', 'variants', 'visibility', 'CoverResourceId', 'IntroStopId'])
         );
         res.json(record.toJSON());
       } catch (error) {

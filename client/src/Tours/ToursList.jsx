@@ -110,7 +110,7 @@ function ToursList() {
                 <tbody>
                   {tours.map((tour) => (
                     <tr key={tour.id} onClick={() => navigate(tour.id)}>
-                      <td className="align-middle">{tour.names[tour.variants[0].code]}</td>
+                      <td className="align-middle">{tour.name}</td>
                       <td className="align-middle">{DateTime.fromISO(tour.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}</td>
                     </tr>
                   ))}

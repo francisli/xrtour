@@ -117,7 +117,7 @@ function TourPreview() {
     <>
       <Helmet>
         <title>
-          {Tour?.names[Tour?.variants[0].code] ?? ''} Preview - {staticContext?.env?.SITE_TITLE}
+          {Tour?.name ?? ''} Preview - {staticContext?.env?.SITE_TITLE}
         </title>
       </Helmet>
       <div className="tour-preview">

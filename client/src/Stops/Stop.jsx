@@ -162,7 +162,7 @@ function Stop({ StopId, transition, children }) {
   async function onSaveRecording(blob) {
     const resource = {
       TeamId: stop.TeamId,
-      name: stop.names[stop.variants[0].code],
+      name: stop.name,
       type: 'AUDIO',
       variants: stop.variants,
       Files: [
@@ -183,7 +183,7 @@ function Stop({ StopId, transition, children }) {
   const isArchived = !!stop?.archivedAt;
   const isEditable = isEditor && !isArchived;
 
-  const title = stop?.names[stop.variants[0].code] ?? '';
+  const title = stop?.name ?? '';
 
   return (
     <>
@@ -205,7 +205,7 @@ function Stop({ StopId, transition, children }) {
                     </li>
                     {tour && (
                       <li className="breadcrumb-item">
-                        <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.names[tour?.variants[0].code]}</Link>
+                        <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.name}</Link>
                       </li>
                     )}
                     {!tour && (
@@ -220,6 +220,7 @@ function Stop({ StopId, transition, children }) {
                 </nav>
                 <h1 className="mb-3">{title}</h1>
                 <form className="mb-5">
+                  <FormGroup plaintext name="name" label="Name" record={stop} />
                   {stop.type === 'STOP' && (
                     <>
                       <FormGroup plaintext name="link" label="Link" record={stop} />
@@ -233,7 +234,7 @@ function Stop({ StopId, transition, children }) {
                     </>
                   )}
                   <VariantTabs variants={stop.variants} current={variant} setVariant={setVariant} />
-                  <FormGroup plaintext name="name" label="Name" value={stop.names[variant.code]} />
+                  <FormGroup plaintext name="name" label="Display Name" value={stop.names[variant.code]} />
                   <FormGroup plaintext type="textarea" name="description" label="Description" value={stop.descriptions[variant.code]} />
                   <div className="d-flex justify-content-between mb-3">
                     {isEditable && (
@@ -322,7 +323,7 @@ function Stop({ StopId, transition, children }) {
             title={`Archive ${capitalize(stop?.type)}`}
             onCancel={() => setConfirmArchiveShowing(false)}
             onOK={() => archiveStop()}>
-            Are you sure you wish to archive <b>{stop?.names[stop.variants[0].code]}</b>?
+            Are you sure you wish to archive <b>{stop?.name}</b>?
           </ConfirmModal>
         )}
         {isConfirmRestoreShowing && (
@@ -331,7 +332,7 @@ function Stop({ StopId, transition, children }) {
             title={`Restore ${capitalize(stop?.type)}`}
             onCancel={() => setConfirmRestoreShowing(false)}
             onOK={() => restoreStop()}>
-            Are you sure you wish to restore <b>{stop?.names[stop.variants[0].code]}</b>?
+            Are you sure you wish to restore <b>{stop?.name}</b>?
           </ConfirmModal>
         )}
         {isConfirmDeleteShowing && (
@@ -341,7 +342,7 @@ function Stop({ StopId, transition, children }) {
             onCancel={() => setConfirmDeleteShowing(false)}
             onOK={() => deleteStop()}>
             <p>
-              Are you sure you wish to delete <b>{stop?.names[stop.variants[0].code]}</b> permanently?
+              Are you sure you wish to delete <b>{stop?.name}</b> permanently?
             </p>
             <p>This cannot be undone!</p>
           </ConfirmModal>
