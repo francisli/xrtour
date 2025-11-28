@@ -99,6 +99,15 @@ function TourForm() {
     setVariant(variant);
   }
 
+  function onRemoveVariant(variant) {
+    const newTour = { ...tour };
+    newTour.variants = tour.variants.filter((v) => v.code !== variant.code);
+    delete newTour.names[variant.code];
+    delete newTour.descriptions[variant.code];
+    setTour(newTour);
+    setVariant(tour.variants[0]);
+  }
+
   return (
     <>
       <Helmet>
@@ -161,10 +170,25 @@ function TourForm() {
                     value={tour.descriptions[variant?.code]}
                     error={error}
                   />
-                  <div className="mb-3">
-                    <button className="btn btn-primary" type="submit">
-                      Submit
-                    </button>
+                  <div className="mb-3 d-flex justify-content-between">
+                    <div className="d-flex gap-2">
+                      <button className="btn btn-primary" type="submit">
+                        Submit
+                      </button>
+                      {tour.id && (
+                        <button
+                          className="btn btn-outline-secondary"
+                          type="button"
+                          onClick={() => navigate(`/teams/${membership.TeamId}/tours/${tour.id}`)}>
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                    {variant.code !== tour.variants[0].code && (
+                      <button className="btn btn-outline-danger" type="button" onClick={() => onRemoveVariant(variant)}>
+                        Remove
+                      </button>
+                    )}
                   </div>
                 </fieldset>
               </form>
