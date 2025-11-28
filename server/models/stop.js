@@ -102,6 +102,7 @@ export default function (sequelize, DataTypes) {
         'id',
         'TeamId',
         'type',
+        'name',
         'link',
         'address',
         'coordinate',
@@ -179,9 +180,11 @@ export default function (sequelize, DataTypes) {
   );
 
   Stop.beforeValidate((record) => {
-    const [variant] = record.variants ?? [];
-    if (variant) {
-      record.name = record.names[variant.code] ?? '';
+    if (!record.name) {
+      const [variant] = record.variants ?? [];
+      if (variant) {
+        record.name = record.names[variant.code] ?? '';
+      }
     }
   });
 

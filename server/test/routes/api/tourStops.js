@@ -52,6 +52,7 @@ describe('/api/tours/:TourId/stops', () => {
               'en-us': 'CHSA is the oldest organization in the country dedicated to the preservation of Chinese American history.',
             },
             id: 'e39b97ad-a5e9-422c-b256-d50fec355285',
+            name: 'CHSA',
             link: 'chsa',
             names: {
               'en-us': 'CHSA',
@@ -88,6 +89,7 @@ describe('/api/tours/:TourId/stops', () => {
                 "Kan's was the first restaurant in Chinatown to win the Holiday (magazine) Award for fine dining; that award was given to Kan's for 14 consecutive years. Its name was frequently on top ten lists of San Francisco restaurants. World-famous celebrities, movie stars, the rich and the powerful came to Kan's, and their appearances were written up by San Francisco columnist Herb Caen.",
             },
             id: 'bba84716-633e-4593-85a0-9da4010eb99b',
+            name: "Kan's Restaurant",
             link: 'kans-restaurant',
             names: {
               'en-us': "Kan's Restaurant",
@@ -130,6 +132,7 @@ describe('/api/tours/:TourId/stops', () => {
         Stop: {
           id: 'bba84716-633e-4593-85a0-9da4010eb99b',
           TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+          name: "Kan's Restaurant",
           link: 'kans-restaurant',
           address: '708 Grant Ave, San Francisco, CA 94108',
           coordinate: null,
