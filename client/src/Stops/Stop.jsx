@@ -205,7 +205,7 @@ function Stop({ StopId, transition, children }) {
                     </li>
                     {tour && (
                       <li className="breadcrumb-item">
-                        <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.names[tour?.variants[0].code]}</Link>
+                        <Link to={`/teams/${tour?.TeamId}/tours/${tour?.id}`}>{tour?.name}</Link>
                       </li>
                     )}
                     {!tour && (

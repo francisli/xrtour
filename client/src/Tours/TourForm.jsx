@@ -54,8 +54,8 @@ function TourForm() {
   function onChange(event) {
     const newTour = { ...tour };
     const { name, value } = event.target;
-    if (name === 'name' || name === 'description') {
-      newTour[`${name}s`][variant?.code] = value;
+    if (name === 'names' || name === 'descriptions') {
+      newTour[name][variant?.code] = value;
     } else {
       newTour[name] = value;
     }
@@ -101,6 +101,14 @@ function TourForm() {
                 {error && error.message && <div className="alert alert-danger">{error.message}</div>}
                 <fieldset disabled={isLoading}>
                   <FormGroup
+                    name="name"
+                    label="Name"
+                    helpText="The name of the Tour as it appears in this Editor"
+                    onChange={onChange}
+                    value={tour.name}
+                    error={error}
+                  />
+                  <FormGroup
                     name="link"
                     label="Published Link"
                     prefix={`https://${membership?.Team?.link}.xrtour.org/`}
@@ -110,10 +118,17 @@ function TourForm() {
                     error={error}
                   />
                   <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
-                  <FormGroup name="name" label="Name" onChange={onChange} value={tour.names[variant?.code]} error={error} />
+                  <FormGroup
+                    name="names"
+                    label="Display Name"
+                    helpText="The name of the Tour as it appears to the public"
+                    onChange={onChange}
+                    value={tour.names[variant?.code]}
+                    error={error}
+                  />
                   <FormGroup
                     type="textarea"
-                    name="description"
+                    name="descriptions"
                     label="Description"
                     onChange={onChange}
                     value={tour.descriptions[variant?.code]}

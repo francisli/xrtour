@@ -108,7 +108,7 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
               <FormGroup
                 name="name"
                 label="Name"
-                helpText="The name of this Stop as it appears in the Editor"
+                helpText="The name of this Stop as it appears in this Editor"
                 onChange={onChange}
                 record={Stop}
                 error={error}
@@ -136,7 +136,7 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
               <FormGroup
                 name="names"
                 label="Display Name"
-                helpText="The name of this Stop as it appears in the Tour"
+                helpText="The name of this Stop as it appears to the public"
                 onChange={onChange}
                 value={Stop.names[variant?.code]}
                 error={error}

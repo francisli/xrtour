@@ -11,7 +11,7 @@ function TourCard({ tour, href }) {
   let title;
   let imageURL;
   if (tour) {
-    title = tour.names[tour.variants[0].code];
+    title = tour.name;
     imageURL = tour.CoverResource?.Files[0].URL;
   }
   return (
@@ -37,12 +37,7 @@ function TourCard({ tour, href }) {
 
 TourCard.propTypes = {
   tour: PropTypes.shape({
-    names: PropTypes.object.isRequired,
-    variants: PropTypes.arrayOf(
-      PropTypes.shape({
-        code: PropTypes.string.isRequired,
-      })
-    ).isRequired,
+    name: PropTypes.string.isRequired,
     CoverResource: PropTypes.shape({
       Files: PropTypes.arrayOf(
         PropTypes.shape({
