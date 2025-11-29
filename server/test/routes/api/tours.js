@@ -309,15 +309,10 @@ describe('/api/tours', () => {
       for (const ts of record.TourStops) {
         assert.deepStrictEqual(ts.Stop.variants, data.variants);
         for (const sr of ts.Stop.Resources) {
+          assert.deepStrictEqual(sr.Resource.variants, data.variants);
           const Files = [...sr.Resource.Files];
           for (const variant of data.variants) {
             assert.ok(Files.find((file) => file.variant === variant.code));
-          }
-        }
-        if (ts.TransitionStop) {
-          assert.deepStrictEqual(ts.TransitionStop.variants, data.variants);
-          for (const sr of ts.TransitionStop.Resources) {
-            assert.deepStrictEqual(sr.variants, data.variants);
           }
         }
       }

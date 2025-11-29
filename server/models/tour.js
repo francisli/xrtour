@@ -100,10 +100,14 @@ export default function (sequelize, DataTypes) {
       await Promise.all(
         resources.map((r) => {
           const Files = [...r.Files];
-          const files = [];
+          const promises = [];
           for (const variant of variants) {
+            if (!r.variants.find((v) => v.code === variant.code)) {
+              r.variants = [...r.variants, variant];
+              promises.push(r.save({ transaction }));
+            }
             if (!Files.find((f) => f.variant === variant.code)) {
-              files.push(
+              promises.push(
                 sequelize.models.File.findOrCreate({
                   where: { variant: variant.code, ResourceId: r.id },
                   defaults: { variant: variant.code, ResourceId: r.id },
@@ -112,7 +116,7 @@ export default function (sequelize, DataTypes) {
               );
             }
           }
-          return Promise.all(files);
+          return Promise.all(promises);
         })
       );
     }
