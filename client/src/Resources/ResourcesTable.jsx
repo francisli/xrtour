@@ -17,7 +17,6 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
   const [selectedResourceClone, setSelectedResourceClone] = useState();
   const [isEditing, setEditing] = useState(false);
   const [isAssetShowing, setAssetShowing] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState();
   const [isConfirmRemoveShowing, setConfirmRemoveShowing] = useState(false);
 
   function onClickEdit(resource) {
@@ -63,14 +62,16 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
     onRemove(resource);
   }
 
-  function onSelectAsset(event, stopResource) {
+  function onSelectAsset(event, resource) {
     event.preventDefault();
     setAssetShowing(true);
-    setSelectedAsset(stopResource.Resource);
+    setSelectedResource(resource);
   }
 
-  function onUpdateAsset() {
+  function onUpdateAsset(resource) {
     setAssetShowing(false);
+    selectedResource.Resource = resource;
+    onChange(selectedResource);
   }
 
   return (
@@ -213,8 +214,8 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
           </Modal.Header>
           <Modal.Body>
             <ResourceForm
-              ResourceId={selectedAsset.id}
-              type={selectedAsset.type}
+              ResourceId={selectedResource.Resource.id}
+              type={selectedResource.Resource.type}
               onCancel={() => setAssetShowing(false)}
               onUpdate={onUpdateAsset}
             />
