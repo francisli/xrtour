@@ -269,17 +269,18 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
               )}
               {resource.type !== 'AR_LINK' && (
                 <>
-                  {resource.type !== 'AUDIO' || variant.code === resource.variants[0].code && (
-                    <FormFileGroup
-                      id="file"
-                      label="File"
-                      accept={ACCEPTED_FILES[resource.type]}
-                      file={variantFile}
-                      onPreview={setPreview}
-                      onUploading={setUploading}
-                      onChangeFile={onChangeVariantFile}
-                    />
-                  )}
+                  {resource.type !== 'AUDIO' ||
+                    (variant.code === resource.variants[0].code && (
+                      <FormFileGroup
+                        id="file"
+                        label="File"
+                        accept={ACCEPTED_FILES[resource.type]}
+                        file={variantFile}
+                        onPreview={setPreview}
+                        onUploading={setUploading}
+                        onChangeFile={onChangeVariantFile}
+                      />
+                    ))}
                 </>
               )}
               {resource.type === 'AUDIO' && (
@@ -300,7 +301,9 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                         onClick={onGenerate}
                         type="button"
                         className="btn btn-outline-primary">
-                        <span style={{ display: 'inline-block', width: '70px' }}>{isGenerating ? <Spinner size="sm" /> : variant.code === resource.variants[0].code ? 'Generate' : 'Translate'}</span>
+                        <span style={{ display: 'inline-block', width: '70px' }}>
+                          {isGenerating ? <Spinner size="sm" /> : variant.code === resource.variants[0].code ? 'Generate' : 'Translate'}
+                        </span>
                       </button>
                     </>
                   )}

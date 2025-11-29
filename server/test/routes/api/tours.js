@@ -204,11 +204,19 @@ describe('/api/tours', () => {
     });
   });
 
-  describe('GET /:id/translate', () => {
+  describe('POST /translate', () => {
     it('translates a Tour name/description', async () => {
       const response = await testSession
-        .get('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352/translate?target=es')
+        .post('/api/tours/translate')
         .set('Accept', 'application/json')
+        .send({
+          source: 'en-us',
+          target: 'es',
+          data: {
+            name: 'Tour 2',
+            description: 'Tour 2 description',
+          },
+        })
         .expect(StatusCodes.OK);
 
       assert.deepStrictEqual(response.body, {

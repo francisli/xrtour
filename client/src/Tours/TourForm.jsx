@@ -110,7 +110,12 @@ function TourForm() {
 
   async function onTranslateVariant(variant) {
     try {
-      const response = await Api.tours.translate(TourId, variant.code);
+      const source = tour.variants[0].code;
+      const target = variant.code;
+      const response = await Api.tours.translate(source, target, {
+        name: tour.names[source],
+        description: tour.descriptions[source],
+      });
       const newTour = { ...tour };
       if (!newTour.names[variant.code]) {
         newTour.names[variant.code] = response.data.name;
