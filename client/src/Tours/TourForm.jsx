@@ -117,11 +117,11 @@ function TourForm() {
         description: tour.descriptions[source],
       });
       const newTour = { ...tour };
-      if (!newTour.names[variant.code]) {
-        newTour.names[variant.code] = response.data.name;
+      if (!newTour.names[target]) {
+        newTour.names[target] = response.data.name;
       }
-      if (!newTour.descriptions[variant.code]) {
-        newTour.descriptions[variant.code] = response.data.description;
+      if (!newTour.descriptions[target]) {
+        newTour.descriptions[target] = response.data.description;
       }
       setTour(newTour);
     } catch {

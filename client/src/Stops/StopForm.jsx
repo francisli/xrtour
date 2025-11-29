@@ -99,13 +99,19 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
 
   async function onTranslateVariant(variant) {
     try {
-      const response = await Api.stops.translate(Stop.id, variant.code);
+      const source = Stop.variants[0].code;
+      const target = variant.code;
+      const data = {
+        name: Stop.names[source],
+        description: Stop.descriptions[source],
+      };
+      const response = await Api.stops.translate(source, target, data);
       const newStop = { ...Stop };
-      if (!newStop.names[variant.code]) {
-        newStop.names[variant.code] = response.data.name;
+      if (!newStop.names[target]) {
+        newStop.names[target] = response.data.name;
       }
-      if (!newStop.descriptions[variant.code]) {
-        newStop.descriptions[variant.code] = response.data.description;
+      if (!newStop.descriptions[target]) {
+        newStop.descriptions[target] = response.data.description;
       }
       setStop(newStop);
     } catch {

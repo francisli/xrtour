@@ -83,31 +83,21 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
 
 router.use('/:StopId/resources', stopResourcesRouter);
 
-router.get('/:id/translate', interceptors.requireLogin, async (req, res) => {
-  const record = await models.Stop.findByPk(req.params.id, {
-    include: ['Team'],
-  });
-  if (record) {
-    const membership = await record.Team.getMembership(req.user);
-    if (!membership) {
-      res.status(StatusCodes.UNAUTHORIZED).end();
-    } else {
-      const source = record.variants[0].code;
-      const { target } = req.query;
-      if (!target) {
-        res.status(StatusCodes.BAD_REQUEST).end();
-        return;
-      }
-      const name = await translateText(record.names[source], source, target);
-      const description = await translateText(record.descriptions[source], source, target);
-      res.json({
-        name,
-        description,
-      });
-    }
-  } else {
-    res.status(StatusCodes.NOT_FOUND).end();
+router.post('/translate', interceptors.requireLogin, async (req, res) => {
+  const { source, target, data } = req.body;
+  if (!source || !target || !data) {
+    res.status(StatusCodes.BAD_REQUEST).end();
+    return;
   }
+  let name = '';
+  if (data.name) {
+    name = await translateText(data.name, source, target);
+  }
+  let description = '';
+  if (data.description) {
+    description = await translateText(data.description, source, target);
+  }
+  res.json({ name, description });
 });
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {

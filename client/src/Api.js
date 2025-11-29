@@ -161,8 +161,8 @@ const Api = {
     get(id) {
       return instance.get(`/api/stops/${id}`);
     },
-    translate(id, target) {
-      return instance.get(`/api/stops/${id}/translate`, { params: { target } });
+    translate(source, target, data) {
+      return instance.post(`/api/stops/translate`, { source, target, data });
     },
     update(id, data) {
       return instance.patch(`/api/stops/${id}`, data);
