@@ -104,6 +104,10 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     }
   }
 
+  let primaryVariant = resource?.variants?.[0];
+  let primaryVariantFile = resource?.Files?.find((f) => f.variant === primaryVariant?.code);
+  let primaryVariantFileSubtitles = resource?.Files?.find((f) => f.variant === `${primaryVariant?.code}-vtt`);
+
   let variantFile = resource?.Files?.find((f) => f.variant === variant?.code);
   if (!variantFile) {
     variantFile = { variant: variant?.code, externalURL: '', key: '' };
@@ -192,19 +196,36 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
   async function onGenerate(event) {
     event.preventDefault();
     setGenerating(true);
-    const params = {};
-    if (variantFile.id) {
-      params.id = variantFile.id;
-    } else if (variantFile.key) {
-      params.key = variantFile.key;
-    }
-    const response = await Api.files.transcribe(params);
-    const { data } = response;
-    if (data['$metadata']?.httpStatusCode === StatusCodes.OK) {
-      const jobName = data.TranscriptionJob?.TranscriptionJobName;
-      pollGenerate(jobName);
+    if (variant.code === primaryVariant.code) {
+      const params = {};
+      if (variantFile.id) {
+        params.id = variantFile.id;
+      } else if (variantFile.key) {
+        params.key = variantFile.key;
+      }
+      const response = await Api.files.transcribe(params);
+      const { data } = response;
+      if (data['$metadata']?.httpStatusCode === StatusCodes.OK) {
+        const jobName = data.TranscriptionJob?.TranscriptionJobName;
+        pollGenerate(jobName);
+      } else {
+        setGenerating(false);
+      }
     } else {
+      const response = await Api.files.translate({
+        id: primaryVariantFileSubtitles.id,
+        key: primaryVariantFileSubtitles.key,
+        source: primaryVariantFile.variant,
+        target: variant.code,
+      });
+      const { data } = response;
+      const { key, previewURL } = data;
+      const newResource = { ...resource };
+      variantFileSubtitles.key = key;
+      variantFileSubtitles.originalName = key.substring(key.lastIndexOf('/') + 1);
+      setResource(newResource);
       setGenerating(false);
+      setPreviewSubtitles(previewURL);
     }
   }
 
@@ -217,7 +238,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
         const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/') + 8, TranscriptVttFileUri.indexOf('?'));
         const newResource = { ...resource };
         variantFileSubtitles.key = key;
-        variantFileSubtitles.keyURL = TranscriptVttFileUri;
         variantFileSubtitles.originalName = key.substring(key.lastIndexOf('/') + 1);
         setResource(newResource);
         setGenerating(false);
@@ -248,15 +268,19 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                 />
               )}
               {resource.type !== 'AR_LINK' && (
-                <FormFileGroup
-                  id="file"
-                  label="File"
-                  accept={ACCEPTED_FILES[resource.type]}
-                  file={variantFile}
-                  onPreview={setPreview}
-                  onUploading={setUploading}
-                  onChangeFile={onChangeVariantFile}
-                />
+                <>
+                  {resource.type !== 'AUDIO' || variant.code === resource.variants[0].code && (
+                    <FormFileGroup
+                      id="file"
+                      label="File"
+                      accept={ACCEPTED_FILES[resource.type]}
+                      file={variantFile}
+                      onPreview={setPreview}
+                      onUploading={setUploading}
+                      onChangeFile={onChangeVariantFile}
+                    />
+                  )}
+                </>
               )}
               {resource.type === 'AUDIO' && (
                 <FormFileGroup
@@ -272,11 +296,11 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                     <>
                       <span>&nbsp;or&nbsp;</span>
                       <button
-                        disabled={!variantFile?.key || isGenerating}
+                        disabled={!primaryVariantFile?.key || isGenerating}
                         onClick={onGenerate}
                         type="button"
                         className="btn btn-outline-primary">
-                        <span style={{ display: 'inline-block', width: '70px' }}>{isGenerating ? <Spinner size="sm" /> : 'Generate'}</span>
+                        <span style={{ display: 'inline-block', width: '70px' }}>{isGenerating ? <Spinner size="sm" /> : variant.code === resource.variants[0].code ? 'Generate' : 'Translate'}</span>
                       </button>
                     </>
                   )}
@@ -311,18 +335,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
           {variantFile?.keyURL && (
             <>
               {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={variantFile.keyURL} />}
-              {type === 'AUDIO' && (
-                <>
-                  <AudioPlayer className="flex-grow-1" src={variantFile.keyURL} />
-                  {variantFileSubtitles?.keyURL && (
-                    <>
-                      <label className="mt-3">Subtitles</label>
-                      <br />
-                      <URLText url={variantFileSubtitles.keyURL} />
-                    </>
-                  )}
-                </>
-              )}
+              {type === 'AUDIO' && <AudioPlayer className="flex-grow-1" src={variantFile.keyURL} />}
               {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
                 <img className="img-fluid" alt={variantFile.originalName} src={variantFile.keyURL} />
               )}
@@ -334,22 +347,25 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
           {preview && (
             <>
               {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={preview} />}
-              {type === 'AUDIO' && (
-                <>
-                  <AudioPlayer className="flex-grow-1" src={preview} onDurationChange={onPreviewAudioDurationChange} />
-                  {previewSubtitles && (
-                    <>
-                      <label className="mt-3">Subtitles</label>
-                      <br />
-                      <URLText url={previewSubtitles} />
-                    </>
-                  )}
-                </>
-              )}
+              {type === 'AUDIO' && <AudioPlayer className="flex-grow-1" src={preview} onDurationChange={onPreviewAudioDurationChange} />}
               {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
                 <img className="img-fluid" alt={variantFile?.originalName} src={preview} onLoad={onPreviewImageLoad} />
               )}
               {type === 'IMAGE_SPHERE' && ReactPhotoSphereViewer && <ReactPhotoSphereViewer src={preview} height="100%" width="100%" />}
+            </>
+          )}
+          {variantFileSubtitles?.keyURL && (
+            <>
+              <label className="mt-3">Subtitles</label>
+              <br />
+              <URLText url={variantFileSubtitles.keyURL} />
+            </>
+          )}
+          {previewSubtitles && (
+            <>
+              <label className="mt-3">Subtitles</label>
+              <br />
+              <URLText url={previewSubtitles} />
             </>
           )}
         </div>

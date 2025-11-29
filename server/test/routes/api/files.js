@@ -15,6 +15,7 @@ describe('/api/files', () => {
       ['512x512.png', 'b45136f4-54e4-45cd-8851-efc9d733a573.png'],
       ['512x512.png', 'cdd8007d-dcaf-4163-b497-92d378679668.png'],
       ['testing123.m4a', 'd2e150be-b277-4f68-96c7-22a477e0022f.m4a'],
+      ['testing123.vtt', '41eca218-23a8-4b15-9a3f-bbf5be74dc6c.vtt'],
     ]);
     await helper.loadFixtures(['users', 'invites', 'teams', 'memberships', 'resources', 'files']);
     testSession = session(app);
@@ -59,6 +60,25 @@ describe('/api/files', () => {
           path.join('files', 'ed2f158a-e44e-432d-971e-e5da1a2e33b4', 'key', 'b45136f4-54e4-45cd-8851-efc9d733a573.png')
         )
       );
+    });
+  });
+
+  describe('GET /translate', () => {
+    it('translates a vtt file into another language', async function () {
+      this.timeout(24000);
+      if (process.env.CI) {
+        return this.skip();
+      }
+
+      let response = await testSession
+        .get('/api/files/translate?key=41eca218-23a8-4b15-9a3f-bbf5be74dc6c.vtt&source=en-us&target=es')
+        .set('Accept', 'application/json')
+        .expect(StatusCodes.OK);
+
+      let data = { ...response.body };
+      assert.ok(data.key);
+      assert.ok(await s3.objectExists(data.key));
+      assert.ok(new TextDecoder('utf-8').decode(await s3.getObjectData(data.key)).includes('Probando 123.'));
     });
   });
 

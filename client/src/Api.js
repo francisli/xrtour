@@ -65,6 +65,9 @@ const Api = {
     poll(jobName) {
       return instance.get(`/api/files/transcribe?jobName=${jobName}`);
     },
+    translate({ id, key, source, target }) {
+      return instance.get(`/api/files/translate`, { params: { id, key, source, target } });
+    },
   },
   google: {
     webfonts(key) {

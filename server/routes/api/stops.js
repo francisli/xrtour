@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 
 import helpers from '../helpers.js';
 import interceptors from '../interceptors.js';
-import { translate } from '../../lib/translate.js';
+import { translateText } from '../../lib/translate.js';
 import models from '../../models/index.js';
 
 import stopResourcesRouter from './stopResources.js';
@@ -98,8 +98,8 @@ router.get('/:id/translate', interceptors.requireLogin, async (req, res) => {
         res.status(StatusCodes.BAD_REQUEST).end();
         return;
       }
-      const name = await translate(record.names[source], source, target);
-      const description = await translate(record.descriptions[source], source, target);
+      const name = await translateText(record.names[source], source, target);
+      const description = await translateText(record.descriptions[source], source, target);
       res.json({
         name,
         description,

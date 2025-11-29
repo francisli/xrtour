@@ -100,6 +100,20 @@ async function getObject(Key) {
   return filePath;
 }
 
+async function getObjectData(Key) {
+  const response = await client.send(
+    new GetObjectCommand({
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key,
+    })
+  );
+  try {
+    return response.Body.transformToByteArray();
+  } finally {
+    response?.Body?.destroy();
+  }
+}
+
 function getSignedAssetUrl(Key, expiresIn = 60) {
   if (process.env.AWS_CLOUDFRONT_DOMAIN) {
     const url = `https://${process.env.AWS_CLOUDFRONT_DOMAIN}/${Key}`;
@@ -153,14 +167,26 @@ function putObject(Key, filePath) {
   );
 }
 
+function putObjectData(Key, Body) {
+  return client.send(
+    new PutObjectCommand({
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key,
+      Body,
+    })
+  );
+}
+
 export default {
   copyObject,
   createBucket,
   deleteObject,
   deleteObjects,
   getObject,
+  getObjectData,
   getSignedAssetUrl,
   getSignedUploadUrl,
   objectExists,
   putObject,
+  putObjectData,
 };

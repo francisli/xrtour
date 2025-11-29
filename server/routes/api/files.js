@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 import interceptors from '../interceptors.js';
 import models from '../../models/index.js';
 import s3 from '../../lib/s3.js';
+import { translateDocument } from '../../lib/translate.js';
 import transcribe from '../../lib/transcribe.js';
 
 const router = express.Router();
@@ -35,6 +36,42 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
   } else {
     res.status(StatusCodes.NOT_FOUND).end();
   }
+});
+
+router.get('/translate', interceptors.requireLogin, async (req, res) => {
+  const { id, key, source, target } = req.query;
+  console.log('!!', id, key, source, target);
+  let vttKey;
+  if (id) {
+    const record = await models.File.findByPk(id, { include: { model: models.Resource, include: 'Team' } });
+    if (record) {
+      const membership = await record.Resource.Team.getMembership(req.user);
+      if (!membership) {
+        res.status(StatusCodes.UNAUTHORIZED).end();
+        return;
+      }
+      vttKey = record.getAssetPath('key');
+    }
+  } else if (key) {
+    vttKey = path.join('uploads', key);
+  } else {
+    res.status(StatusCodes.UNPROCESSABLE_ENTITY).end();
+    return;
+  }
+  if (!vttKey) {
+    res.status(StatusCodes.NOT_FOUND).end();
+    return;
+  }
+  // download file
+  const vttFileData = await s3.getObjectData(vttKey);
+  const translatedFileData = await translateDocument(vttFileData, source, target);
+  const outputKey = `${uuid()}/${uuid()}.vtt`;
+  const outputPath = `uploads/${outputKey}`;
+  await s3.putObjectData(outputPath, translatedFileData);
+  res.json({
+    key: outputKey,
+    previewURL: await s3.getSignedAssetUrl(outputPath),
+  });
 });
 
 router.post('/transcribe', interceptors.requireLogin, async (req, res) => {

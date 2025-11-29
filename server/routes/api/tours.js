@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import helpers from '../helpers.js';
 import interceptors from '../interceptors.js';
-import { translate } from '../../lib/translate.js';
+import { translateText } from '../../lib/translate.js';
 import models from '../../models/index.js';
 
 import tourStopsRouter from './tourStops.js';
@@ -74,11 +74,11 @@ router.get('/:id/translate', interceptors.requireLogin, async (req, res) => {
       const source = record.variants[0].code;
       let name = '';
       if (record.names[source]) {
-        name = await translate(record.names[source], source, target);
+        name = await translateText(record.names[source], source, target);
       }
       let description = '';
       if (record.descriptions[source]) {
-        description = await translate(record.descriptions[source], source, target);
+        description = await translateText(record.descriptions[source], source, target);
       }
       res.json({ name, description });
     }
