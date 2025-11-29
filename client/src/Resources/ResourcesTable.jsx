@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faPen, faTrashCan, faXmark } from '@fortawesome/free-solid-svg-icons';
 import classNames from 'classnames';
@@ -7,6 +8,7 @@ import PropTypes from 'prop-types';
 import TimeCode from 'shared/Components/TimeCode';
 
 import ConfirmModal from '../Components/ConfirmModal';
+import ResourceForm from './ResourceForm';
 
 import './ResourcesTable.scss';
 
@@ -14,6 +16,8 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
   const [selectedResource, setSelectedResource] = useState();
   const [selectedResourceClone, setSelectedResourceClone] = useState();
   const [isEditing, setEditing] = useState(false);
+  const [isAssetShowing, setAssetShowing] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState();
   const [isConfirmRemoveShowing, setConfirmRemoveShowing] = useState(false);
 
   function onClickEdit(resource) {
@@ -59,6 +63,16 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
     onRemove(resource);
   }
 
+  function onSelectAsset(event, stopResource) {
+    event.preventDefault();
+    setAssetShowing(true);
+    setSelectedAsset(stopResource.Resource);
+  }
+
+  function onUpdateAsset() {
+    setAssetShowing(false);
+  }
+
   return (
     <>
       <table className={classNames('resources-table table table-striped', { 'table-hover': !!onClick })}>
@@ -93,7 +107,11 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
             <tr key={r.id} onClick={() => onClick?.(r)} className={classNames({ clickable: !!onClick })}>
               <td>{i + 1}</td>
               <td>{r.Resource.type}</td>
-              <td>{r.Resource.name}</td>
+              <td>
+                <a href="#" onClick={(event) => onSelectAsset(event, r)}>
+                  {r.Resource.name}
+                </a>
+              </td>
               <td>
                 <div className="d-flex justify-content-between">
                   <span>
@@ -188,6 +206,21 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
         onOK={() => onConfirmRemove(selectedResource)}>
         Are you sure you wish to remove <b>{selectedResource?.Resource?.name}</b>?
       </ConfirmModal>
+      {isAssetShowing && (
+        <Modal show={true} onHide={() => setAssetShowing(false)} size="xl" dialogClassName="resources-modal">
+          <Modal.Header closeButton>
+            <Modal.Title>Assets</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <ResourceForm
+              ResourceId={selectedAsset.id}
+              type={selectedAsset.type}
+              onCancel={() => setAssetShowing(false)}
+              onUpdate={onUpdateAsset}
+            />
+          </Modal.Body>
+        </Modal>
+      )}
     </>
   );
 }
