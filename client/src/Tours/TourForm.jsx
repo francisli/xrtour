@@ -108,6 +108,22 @@ function TourForm() {
     setVariant(tour.variants[0]);
   }
 
+  async function onTranslateVariant(variant) {
+    try {
+      const response = await Api.tours.translate(TourId, variant.code);
+      const newTour = { ...tour };
+      if (!newTour.names[variant.code]) {
+        newTour.names[variant.code] = response.data.name;
+      }
+      if (!newTour.descriptions[variant.code]) {
+        newTour.descriptions[variant.code] = response.data.description;
+      }
+      setTour(newTour);
+    } catch {
+      setError(new UnexpectedError());
+    }
+  }
+
   return (
     <>
       <Helmet>
@@ -185,9 +201,14 @@ function TourForm() {
                       )}
                     </div>
                     {variant.code !== tour.variants[0].code && (
-                      <button className="btn btn-outline-danger" type="button" onClick={() => onRemoveVariant(variant)}>
-                        Remove
-                      </button>
+                      <div className="d-flex gap-2">
+                        <button className="btn btn-outline-primary" type="button" onClick={() => onTranslateVariant(variant)}>
+                          Translate
+                        </button>
+                        <button className="btn btn-outline-danger" type="button" onClick={() => onRemoveVariant(variant)}>
+                          Remove
+                        </button>
+                      </div>
                     )}
                   </div>
                 </fieldset>

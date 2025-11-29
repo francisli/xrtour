@@ -208,6 +208,9 @@ const Api = {
     get(id) {
       return instance.get(`/api/tours/${id}`);
     },
+    translate(id, target) {
+      return instance.get(`/api/tours/${id}/translate`, { params: { target } });
+    },
     update(id, data) {
       return instance.patch(`/api/tours/${id}`, data);
     },

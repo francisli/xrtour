@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 import helpers from '../helpers.js';
 import interceptors from '../interceptors.js';
+import { translate } from '../../lib/translate.js';
 import models from '../../models/index.js';
 
 import tourStopsRouter from './tourStops.js';
@@ -59,6 +60,32 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
 });
 
 router.use('/:TourId/stops', tourStopsRouter);
+
+router.get('/:id/translate', interceptors.requireLogin, async (req, res) => {
+  const record = await models.Tour.findByPk(req.params.id, {
+    include: ['Team'],
+  });
+  if (record) {
+    const membership = await record.Team.getMembership(req.user);
+    if (!membership) {
+      res.status(StatusCodes.UNAUTHORIZED).end();
+    } else {
+      const { target } = req.query;
+      const source = record.variants[0].code;
+      let name = '';
+      if (record.names[source]) {
+        name = await translate(record.names[source], source, target);
+      }
+      let description = '';
+      if (record.descriptions[source]) {
+        description = await translate(record.descriptions[source], source, target);
+      }
+      res.json({ name, description });
+    }
+  } else {
+    res.status(StatusCodes.NOT_FOUND).end();
+  }
+});
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {
   const record = await models.Tour.findByPk(req.params.id, {
@@ -116,9 +143,13 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
             return;
           }
         }
-        await record.update(
-          _.pick(req.body, ['name', 'link', 'names', 'descriptions', 'variants', 'visibility', 'CoverResourceId', 'IntroStopId'])
-        );
+        record.set(_.pick(req.body, ['name', 'link', 'names', 'descriptions', 'variants', 'visibility', 'CoverResourceId', 'IntroStopId']));
+        await models.sequelize.transaction(async (transaction) => {
+          if (record.changed('variants')) {
+            await record.updateVariants({ transaction });
+          }
+          await record.save({ transaction });
+        });
         res.json(record.toJSON());
       } catch (error) {
         if (error.name === 'SequelizeValidationError') {
@@ -127,6 +158,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
             errors: error.errors.map((e) => _.pick(e, ['path', 'message', 'value'])),
           });
         } else {
+          console.log(error);
           res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
         }
       }
