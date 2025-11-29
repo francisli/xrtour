@@ -97,6 +97,22 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
     }
   }
 
+  async function onTranslateVariant(variant) {
+    try {
+      const response = await Api.stops.translate(Stop.id, variant.code);
+      const newStop = { ...Stop };
+      if (!newStop.names[variant.code]) {
+        newStop.names[variant.code] = response.data.name;
+      }
+      if (!newStop.descriptions[variant.code]) {
+        newStop.descriptions[variant.code] = response.data.description;
+      }
+      setStop(newStop);
+    } catch {
+      setError(new UnexpectedError());
+    }
+  }
+
   const form = (
     <div className="row">
       <div className="col-md-6">
@@ -149,14 +165,20 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
                 value={Stop.descriptions[variant?.code]}
                 error={error}
               />
-              <div className="mb-3">
-                <button className="btn btn-primary" type="submit">
-                  Submit
-                </button>
-                &nbsp;
-                <button onClick={onCancelInternal} className="btn btn-secondary" type="button">
-                  Cancel
-                </button>
+              <div className="mb-3 d-flex justify-content-between">
+                <div className="d-flex gap-2">
+                  <button className="btn btn-primary" type="submit">
+                    Submit
+                  </button>
+                  <button onClick={onCancelInternal} className="btn btn-secondary" type="button">
+                    Cancel
+                  </button>
+                </div>
+                {variant.code !== Stop.variants[0].code && (
+                  <button className="btn btn-outline-primary" type="button" onClick={() => onTranslateVariant(variant)}>
+                    Translate
+                  </button>
+                )}
               </div>
             </fieldset>
           </form>

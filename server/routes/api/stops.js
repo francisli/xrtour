@@ -5,6 +5,7 @@ import { Op } from 'sequelize';
 
 import helpers from '../helpers.js';
 import interceptors from '../interceptors.js';
+import { translate } from '../../lib/translate.js';
 import models from '../../models/index.js';
 
 import stopResourcesRouter from './stopResources.js';
@@ -81,6 +82,33 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
 });
 
 router.use('/:StopId/resources', stopResourcesRouter);
+
+router.get('/:id/translate', interceptors.requireLogin, async (req, res) => {
+  const record = await models.Stop.findByPk(req.params.id, {
+    include: ['Team'],
+  });
+  if (record) {
+    const membership = await record.Team.getMembership(req.user);
+    if (!membership) {
+      res.status(StatusCodes.UNAUTHORIZED).end();
+    } else {
+      const source = record.variants[0].code;
+      const { target } = req.query;
+      if (!target) {
+        res.status(StatusCodes.BAD_REQUEST).end();
+        return;
+      }
+      const name = await translate(record.names[source], source, target);
+      const description = await translate(record.descriptions[source], source, target);
+      res.json({
+        name,
+        description,
+      });
+    }
+  } else {
+    res.status(StatusCodes.NOT_FOUND).end();
+  }
+});
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {
   const record = await models.Stop.findByPk(req.params.id, {
