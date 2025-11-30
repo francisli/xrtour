@@ -293,7 +293,14 @@ function Tour() {
           <ResourcesModal isShowing={true} onHide={onHideResourcesModal} onSelect={onSelectResource} types={['IMAGE']} />
         )}
         {isShowingStopsModal && (
-          <StopsModal type={stopType} types={[stopType]} isShowing={true} onHide={onHideStopsModal} onSelect={onSelectStop} />
+          <StopsModal
+            type={stopType}
+            types={[stopType]}
+            variants={tour?.variants}
+            isShowing={true}
+            onHide={onHideStopsModal}
+            onSelect={onSelectStop}
+          />
         )}
         {isConfirmArchiveShowing && (
           <ConfirmModal isShowing={true} title="Archive Tour" onCancel={() => setConfirmArchiveShowing(false)} onOK={() => archiveTour()}>

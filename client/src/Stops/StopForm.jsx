@@ -12,7 +12,7 @@ import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
 
-function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type }) {
+function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type, variants }) {
   const { membership } = useAuthContext();
   const { StopId: StopIdParam } = useParams();
   const navigate = useNavigate();
@@ -26,17 +26,22 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
     let isCancelled = false;
     let id = StopId ?? StopIdParam;
     if (membership && !id) {
-      setStop({
+      const newStop = {
         TeamId: membership.TeamId,
         type,
         link: type !== 'STOP' ? uuid() : '',
         address: startingAddress ?? '',
         destAddress: null,
-        names: { [membership.Team.variants[0].code]: '' },
-        descriptions: { [membership.Team.variants[0].code]: '' },
-        variants: [membership.Team.variants[0]],
-      });
-      setVariant(membership.Team.variants[0]);
+        names: {},
+        descriptions: {},
+        variants,
+      };
+      for (const v of variants) {
+        newStop.names[v.code] = '';
+        newStop.descriptions[v.code] = '';
+      }
+      setStop(newStop);
+      setVariant(variants[0]);
     }
     if (id) {
       Api.stops.get(id).then((response) => {
@@ -46,7 +51,7 @@ function StopForm({ StopId, onCancel, onCreate, onUpdate, startingAddress, type 
       });
     }
     return () => (isCancelled = true);
-  }, [membership, StopId, StopIdParam, type, startingAddress]);
+  }, [membership, StopId, StopIdParam, type, startingAddress, variants]);
 
   function onChange(event) {
     const newStop = { ...Stop };
@@ -213,6 +218,7 @@ StopForm.propTypes = {
   onUpdate: PropTypes.func,
   startingAddress: PropTypes.string,
   type: PropTypes.oneOf(['INTRO', 'STOP', 'TRANSITION']),
+  variants: PropTypes.array,
 };
 
 export default StopForm;
