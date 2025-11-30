@@ -77,8 +77,8 @@ describe('/api/files', () => {
 
       let data = { ...response.body };
       assert.ok(data.key);
-      assert.ok(await s3.objectExists(data.key));
-      assert.ok(new TextDecoder('utf-8').decode(await s3.getObjectData(data.key)).includes('Probando 123.'));
+      assert.ok(await s3.objectExists(`uploads/${data.key}`));
+      assert.ok(new TextDecoder('utf-8').decode(await s3.getObjectData(`uploads/${data.key}`)).includes('Pruebas 123.'));
     });
   });
 

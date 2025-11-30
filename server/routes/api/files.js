@@ -40,7 +40,6 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
 
 router.get('/translate', interceptors.requireLogin, async (req, res) => {
   const { id, key, source, target } = req.query;
-  console.log('!!', id, key, source, target);
   let vttKey;
   if (id) {
     const record = await models.File.findByPk(id, { include: { model: models.Resource, include: 'Team' } });
