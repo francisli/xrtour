@@ -34,6 +34,8 @@ function StopViewer({
   transition,
   variant,
   fallbackVariant,
+  variants,
+  onSelectVariant,
   onEnded,
   onPause,
   onSelect,
@@ -64,6 +66,7 @@ function StopViewer({
   const [isTocOpen, setTocOpen] = useState(false);
   const [isMapOpen, setMapOpen] = useState(false);
   const [isCC, setCC] = useState(false);
+  const [isShowingVariants, setShowingVariants] = useState(false);
 
   useEffect(() => {
     if (stop?.Resources) {
@@ -295,6 +298,18 @@ function StopViewer({
     }
   }
 
+  function onToggleCC() {
+    if (!isCC && variants?.length > 1) {
+      setShowingVariants(true);
+    }
+    setCC(!isCC);
+  }
+
+  function onSelectVariantInternal(v) {
+    onSelectVariant?.(v);
+    setShowingVariants(false);
+  }
+
   let hasCC = false;
   const audio = tracks?.map((sr, i) => (
     <audio
@@ -308,7 +323,7 @@ function StopViewer({
       onTimeUpdate={onTimeUpdateInternal}
       onEnded={onEndedInternal}>
       {(() => {
-        const subtitles = getVariantFile(sr.Resource.Files, variant, fallbackVariant, '-vtt');
+        const subtitles = getVariantFile(sr.Resource.Files, variant, undefined, '-vtt');
         if (subtitles?.URL) {
           hasCC = true;
           return (
@@ -383,7 +398,7 @@ function StopViewer({
               {isPlaying && <FontAwesomeIcon icon={faPause} />}
             </button>
             <button
-              onClick={() => setCC(!isCC)}
+              onClick={onToggleCC}
               type="button"
               className={classNames('btn btn-lg btn-transparent btn-round', { invisible: !hasCC })}>
               {!isCC && <FontAwesomeIcon icon={faCC} />}
@@ -407,6 +422,15 @@ function StopViewer({
         </>
       )}
       {isCC && subtitleText && <div className="stop-viewer__subtitles">{subtitleText}</div>}
+      {isShowingVariants && (
+        <ul className="stop-viewer__variants list-group">
+          {variants?.map((v) => (
+            <li key={v.code} onClick={() => onSelectVariantInternal(v)} className="list-group-item">
+              {v.displayName}
+            </li>
+          ))}
+        </ul>
+      )}
       <>
         <Toc
           isOpen={isTocOpen}
