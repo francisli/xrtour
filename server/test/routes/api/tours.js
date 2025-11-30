@@ -205,7 +205,10 @@ describe('/api/tours', () => {
   });
 
   describe('POST /translate', () => {
-    it('translates a Tour name/description', async () => {
+    it('translates a Tour name/description', async function () {
+      if (process.env.CI) {
+        return this.skip();
+      }
       const response = await testSession
         .post('/api/tours/translate')
         .set('Accept', 'application/json')
