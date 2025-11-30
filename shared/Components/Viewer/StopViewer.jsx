@@ -436,6 +436,7 @@ function StopViewer({
           isOpen={isTocOpen}
           onClose={() => setTocOpen(false)}
           onSelect={onSelectInternal}
+          onSelectVariant={onSelectVariant}
           tour={tour}
           tourStops={tourStops}
           variant={variant}
