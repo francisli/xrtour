@@ -7,7 +7,7 @@ import './ResourcesModal.scss';
 import ResourcesList from './ResourcesList';
 import ResourceForm from './ResourceForm';
 
-function ResourcesModal({ isShowing, onHide, onSelect, types }) {
+function ResourcesModal({ isShowing, onHide, onSelect, types, variants }) {
   const [isEditing, setEditing] = useState(false);
   const [ResourceId, setResourceId] = useState();
   const [type, setType] = useState();
@@ -45,7 +45,14 @@ function ResourcesModal({ isShowing, onHide, onSelect, types }) {
           <ResourcesList type={type} types={types} onNew={onNew} onSelect={onSelect} onEdit={onEdit} refreshToken={refreshToken} />
         )}
         {isEditing && (
-          <ResourceForm ResourceId={ResourceId} type={type} onCancel={() => setEditing(false)} onCreate={onCreate} onUpdate={onUpdate} />
+          <ResourceForm
+            ResourceId={ResourceId}
+            type={type}
+            onCancel={() => setEditing(false)}
+            onCreate={onCreate}
+            onUpdate={onUpdate}
+            variants={variants}
+          />
         )}
       </Modal.Body>
     </Modal>
@@ -57,6 +64,7 @@ ResourcesModal.propTypes = {
   onHide: PropTypes.func,
   onSelect: PropTypes.func,
   types: PropTypes.array,
+  variants: PropTypes.array,
 };
 
 export default ResourcesModal;

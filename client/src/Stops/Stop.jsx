@@ -320,7 +320,14 @@ function Stop({ StopId, transition, children }) {
             </div>
           </>
         )}
-        {isShowingResourcesModal && <ResourcesModal isShowing={true} onHide={onHideResourcesModal} onSelect={onSelectResource} />}
+        {isShowingResourcesModal && (
+          <ResourcesModal
+            isShowing={true}
+            onHide={onHideResourcesModal}
+            onSelect={onSelectResource}
+            variants={tour?.variants ?? stop?.variants}
+          />
+        )}
         {isConfirmArchiveShowing && (
           <ConfirmModal
             isShowing={true}

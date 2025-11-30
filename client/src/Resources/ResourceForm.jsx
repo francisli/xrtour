@@ -36,18 +36,18 @@ const ACCEPTED_FILES = {
 };
 Object.freeze(ACCEPTED_FILES);
 
-function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
+function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants }) {
   const { membership } = useAuthContext();
 
   const [resource, setResource] = useState();
   const [variant, setVariant] = useState();
-  const [preview, setPreview] = useState();
+  const [previews, setPreviews] = useState({});
   const [isUploading, setUploading] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState();
 
   const [isGenerating, setGenerating] = useState(false);
-  const [previewSubtitles, setPreviewSubtitles] = useState();
+  const [previewSubtitles, setPreviewSubtitles] = useState({});
 
   const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
   const [deleteError, setDeleteError] = useState();
@@ -64,11 +64,11 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
         TeamId: membership.TeamId,
         name: '',
         type,
-        variants: [...membership.Team.variants],
+        variants,
         data: {},
         Files: [],
       });
-      setVariant(membership.Team.variants[0]);
+      setVariant(variants[0]);
     }
     if (ResourceId) {
       Api.resources.get(ResourceId).then((response) => {
@@ -78,7 +78,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
       });
     }
     return () => (isCancelled = true);
-  }, [membership, ResourceId, type]);
+  }, [membership, ResourceId, type, variants]);
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -147,6 +147,18 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
     }
     setResource(newResource);
     setUploading();
+  }
+
+  function onPreviewChange(newPreview) {
+    const newPreviews = { ...previews };
+    newPreviews[variant.code] = newPreview;
+    setPreviews(newPreviews);
+  }
+
+  function onPreviewSubtitlesChange(newSubtitles) {
+    const newPreviewSubtitles = { ...previewSubtitles };
+    newPreviewSubtitles[variant.code] = newSubtitles;
+    setPreviewSubtitles(newPreviewSubtitles);
   }
 
   function onPreviewAudioDurationChange(newDuration) {
@@ -225,7 +237,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
       variantFileSubtitles.originalName = key.substring(key.lastIndexOf('/') + 1);
       setResource(newResource);
       setGenerating(false);
-      setPreviewSubtitles(previewURL);
+      onPreviewSubtitlesChange(previewURL);
     }
   }
 
@@ -241,7 +253,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
         variantFileSubtitles.originalName = key.substring(key.lastIndexOf('/') + 1);
         setResource(newResource);
         setGenerating(false);
-        setPreviewSubtitles(TranscriptVttFileUri);
+        onPreviewSubtitlesChange(TranscriptVttFileUri);
       } else {
         pollGenerate(jobName);
       }
@@ -269,18 +281,17 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
               )}
               {resource.type !== 'AR_LINK' && (
                 <>
-                  {resource.type !== 'AUDIO' ||
-                    (variant.code === resource.variants[0].code && (
-                      <FormFileGroup
-                        id="file"
-                        label="File"
-                        accept={ACCEPTED_FILES[resource.type]}
-                        file={variantFile}
-                        onPreview={setPreview}
-                        onUploading={setUploading}
-                        onChangeFile={onChangeVariantFile}
-                      />
-                    ))}
+                  {(resource.type !== 'AUDIO' || variant.code === resource.variants[0].code) && (
+                    <FormFileGroup
+                      id="file"
+                      label="File"
+                      accept={ACCEPTED_FILES[resource.type]}
+                      file={variantFile}
+                      onPreview={onPreviewChange}
+                      onUploading={setUploading}
+                      onChangeFile={onChangeVariantFile}
+                    />
+                  )}
                 </>
               )}
               {resource.type === 'AUDIO' && (
@@ -290,7 +301,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
                   accept={ACCEPTED_FILES['AUDIO_SUBTITLES']}
                   disabled={isGenerating}
                   file={variantFileSubtitles}
-                  onPreview={setPreviewSubtitles}
+                  onPreview={onPreviewSubtitlesChange}
                   onUploading={setUploading}
                   onChangeFile={onChangeVariantFileSubtitles}>
                   {!variantFileSubtitles.key && (
@@ -347,14 +358,18 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
               )}
             </>
           )}
-          {preview && (
+          {variant && previews[variant.code] && (
             <>
-              {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={preview} />}
-              {type === 'AUDIO' && <AudioPlayer className="flex-grow-1" src={preview} onDurationChange={onPreviewAudioDurationChange} />}
-              {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
-                <img className="img-fluid" alt={variantFile?.originalName} src={preview} onLoad={onPreviewImageLoad} />
+              {type === '3D_MODEL' && <model-viewer autoplay camera-controls class="w-100 h-100" src={previews[variant.code]} />}
+              {type === 'AUDIO' && (
+                <AudioPlayer className="flex-grow-1" src={previews[variant.code]} onDurationChange={onPreviewAudioDurationChange} />
               )}
-              {type === 'IMAGE_SPHERE' && ReactPhotoSphereViewer && <ReactPhotoSphereViewer src={preview} height="100%" width="100%" />}
+              {(type === 'IMAGE' || type === 'IMAGE_OVERLAY') && (
+                <img className="img-fluid" alt={variantFile?.originalName} src={previews[variant.code]} onLoad={onPreviewImageLoad} />
+              )}
+              {type === 'IMAGE_SPHERE' && ReactPhotoSphereViewer && (
+                <ReactPhotoSphereViewer src={previews[variant.code]} height="100%" width="100%" />
+              )}
             </>
           )}
           {variantFileSubtitles?.keyURL && (
@@ -364,11 +379,11 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate }) {
               <URLText url={variantFileSubtitles.keyURL} />
             </>
           )}
-          {previewSubtitles && (
+          {variant && previewSubtitles[variant.code] && (
             <>
               <label className="mt-3">Subtitles</label>
               <br />
-              <URLText url={previewSubtitles} />
+              <URLText url={previewSubtitles[variant.code]} />
             </>
           )}
         </div>
@@ -389,6 +404,7 @@ ResourceForm.propTypes = {
   onCancel: PropTypes.func,
   onCreate: PropTypes.func,
   onUpdate: PropTypes.func,
+  variants: PropTypes.array,
 };
 
 export default ResourceForm;
