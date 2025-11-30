@@ -108,7 +108,8 @@ async function getObjectData(Key) {
     })
   );
   try {
-    return response.Body.transformToByteArray();
+    const data = await response.Body.transformToByteArray();
+    return data;
   } finally {
     response?.Body?.destroy();
   }
