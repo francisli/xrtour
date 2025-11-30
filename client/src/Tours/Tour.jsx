@@ -15,6 +15,14 @@ import StopsModal from '../Stops/StopsModal';
 import StopsTable from '../Stops/StopsTable';
 import SharePreview from '../Components/SharePreview';
 
+function getVariantFile(files, variant, fallbackVariant, variantSuffix = '') {
+  let file = files.find((f) => f.variant === `${variant?.code}${variantSuffix}`);
+  if (!file?.key) {
+    file = files.find((f) => f.variant === `${fallbackVariant?.code}${variantSuffix}`);
+  }
+  return file;
+}
+
 function Tour() {
   const { membership } = useAuthContext();
   const staticContext = useStaticContext();
@@ -142,6 +150,7 @@ function Tour() {
   const isEditor = membership?.role !== 'VIEWER';
   const isArchived = !!tour?.archivedAt;
   const isEditable = isEditor && !isArchived;
+  const fallbackVariant = tour?.variants[0];
 
   return (
     <>
@@ -219,7 +228,7 @@ function Tour() {
                       <div className="col-6">
                         <img
                           className="img-thumbnail mb-3"
-                          src={tour.CoverResource.Files.find((f) => f.variant === variant.code)?.URL}
+                          src={getVariantFile(tour.CoverResource.Files, variant, fallbackVariant).URL}
                           alt="Cover"
                         />
                       </div>
