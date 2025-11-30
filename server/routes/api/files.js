@@ -3,11 +3,13 @@ import { StatusCodes } from 'http-status-codes';
 import _ from 'lodash';
 import path from 'path';
 import { v4 as uuid } from 'uuid';
+import vttToJson from 'vtt-to-json';
+import Vtt from 'vtt-creator';
 
 import interceptors from '../interceptors.js';
 import models from '../../models/index.js';
 import s3 from '../../lib/s3.js';
-import { translateDocument } from '../../lib/translate.js';
+import { translateText } from '../../lib/translate.js';
 import transcribe from '../../lib/transcribe.js';
 
 const router = express.Router();
@@ -63,10 +65,22 @@ router.get('/translate', interceptors.requireLogin, async (req, res) => {
   }
   // download file
   const vttFileData = await s3.getObjectData(vttKey);
-  const translatedFileData = await translateDocument(vttFileData, source, target);
+  const vttFile = new TextDecoder('utf-8').decode(vttFileData);
+  const vttJson = await vttToJson(vttFile);
+  const translatedVttJson = await Promise.all(
+    vttJson.map(async (cue) => {
+      cue.part = await translateText(cue.part, source, target);
+      return cue;
+    })
+  );
+  const translatedVttFile = new Vtt();
+  translatedVttJson.forEach((cue) => {
+    translatedVttFile.add(cue.start / 1000, cue.end / 1000, cue.part);
+  });
+  const translatedVttFileData = translatedVttFile.toString();
   const outputKey = `${uuid()}.vtt`;
   const outputPath = `uploads/${outputKey}`;
-  await s3.putObjectData(outputPath, translatedFileData);
+  await s3.putObjectData(outputPath, translatedVttFileData);
   res.json({
     key: outputKey,
     previewURL: await s3.getSignedAssetUrl(outputPath),
