@@ -6,6 +6,7 @@ import { StatusCodes } from 'http-status-codes';
 import Api from '../Api';
 import { useAuthContext } from '../AuthContext';
 import FormGroup from '../Components/FormGroup';
+import LanguageModal from '../Components/LanguageModal';
 import UnexpectedError from '../UnexpectedError';
 import ValidationError from '../ValidationError';
 import VariantTabs from '../Components/VariantTabs';
@@ -56,6 +57,8 @@ function TourForm() {
     const { name, value } = event.target;
     if (name === 'names' || name === 'descriptions') {
       newTour[name][variant?.code] = value;
+    } else if (name === 'variant.displayName') {
+      newTour.variants.find((v) => v.code === variant?.code).displayName = value;
     } else {
       newTour[name] = value;
     }
@@ -82,6 +85,47 @@ function TourForm() {
       }
     } finally {
       setLoading(false);
+    }
+  }
+
+  const [isShowingLanguageModal, setShowingLanguageModal] = useState(false);
+  function onAddVariant(variant) {
+    const newTour = { ...tour };
+    newTour.variants.push(variant);
+    newTour.names[variant.code] = '';
+    newTour.descriptions[variant.code] = '';
+    setTour(newTour);
+    setShowingLanguageModal(false);
+    setVariant(variant);
+  }
+
+  function onRemoveVariant(variant) {
+    const newTour = { ...tour };
+    newTour.variants = tour.variants.filter((v) => v.code !== variant.code);
+    delete newTour.names[variant.code];
+    delete newTour.descriptions[variant.code];
+    setTour(newTour);
+    setVariant(tour.variants[0]);
+  }
+
+  async function onTranslateVariant(variant) {
+    try {
+      const source = tour.variants[0].code;
+      const target = variant.code;
+      const response = await Api.tours.translate(source, target, {
+        name: tour.names[source],
+        description: tour.descriptions[source],
+      });
+      const newTour = { ...tour };
+      if (!newTour.names[target]) {
+        newTour.names[target] = response.data.name;
+      }
+      if (!newTour.descriptions[target]) {
+        newTour.descriptions[target] = response.data.description;
+      }
+      setTour(newTour);
+    } catch {
+      setError(new UnexpectedError());
     }
   }
 
@@ -117,7 +161,20 @@ function TourForm() {
                     record={tour}
                     error={error}
                   />
-                  <VariantTabs variants={tour.variants} current={variant} setVariant={setVariant} />
+                  <VariantTabs
+                    variants={tour.variants}
+                    current={variant}
+                    setVariant={setVariant}
+                    onAdd={() => setShowingLanguageModal(true)}
+                  />
+                  <FormGroup
+                    name="variant.displayName"
+                    label="Language Name"
+                    helpText="The name of the Language as it appears to the public"
+                    onChange={onChange}
+                    value={variant.displayName}
+                    error={error}
+                  />
                   <FormGroup
                     name="names"
                     label="Display Name"
@@ -134,16 +191,39 @@ function TourForm() {
                     value={tour.descriptions[variant?.code]}
                     error={error}
                   />
-                  <div className="mb-3">
-                    <button className="btn btn-primary" type="submit">
-                      Submit
-                    </button>
+                  <div className="mb-3 d-flex justify-content-between">
+                    <div className="d-flex gap-2">
+                      <button className="btn btn-primary" type="submit">
+                        Submit
+                      </button>
+                      {tour.id && (
+                        <button
+                          className="btn btn-outline-secondary"
+                          type="button"
+                          onClick={() => navigate(`/teams/${membership.TeamId}/tours/${tour.id}`)}>
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                    {variant.code !== tour.variants[0].code && (
+                      <div className="d-flex gap-2">
+                        <button className="btn btn-outline-primary" type="button" onClick={() => onTranslateVariant(variant)}>
+                          Translate
+                        </button>
+                        <button className="btn btn-outline-danger" type="button" onClick={() => onRemoveVariant(variant)}>
+                          Remove
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </fieldset>
               </form>
             )}
           </div>
         </div>
+        {isShowingLanguageModal && (
+          <LanguageModal onCancel={() => setShowingLanguageModal(false)} onOK={onAddVariant} variants={tour.variants} />
+        )}
       </main>
     </>
   );

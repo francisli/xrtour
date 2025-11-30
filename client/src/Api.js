@@ -65,6 +65,9 @@ const Api = {
     poll(jobName) {
       return instance.get(`/api/files/transcribe?jobName=${jobName}`);
     },
+    translate({ id, key, source, target }) {
+      return instance.get(`/api/files/translate`, { params: { id, key, source, target } });
+    },
   },
   google: {
     webfonts(key) {
@@ -158,6 +161,9 @@ const Api = {
     get(id) {
       return instance.get(`/api/stops/${id}`);
     },
+    translate(source, target, data) {
+      return instance.post(`/api/stops/translate`, { source, target, data });
+    },
     update(id, data) {
       return instance.patch(`/api/stops/${id}`, data);
     },
@@ -207,6 +213,9 @@ const Api = {
     },
     get(id) {
       return instance.get(`/api/tours/${id}`);
+    },
+    translate(source, target, data) {
+      return instance.post(`/api/tours/translate`, { source, target, data });
     },
     update(id, data) {
       return instance.patch(`/api/tours/${id}`, data);

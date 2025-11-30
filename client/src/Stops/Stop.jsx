@@ -252,7 +252,10 @@ function Stop({ StopId, transition, children }) {
                               {tour && (
                                 <>
                                   &nbsp;
-                                  <PreviewButton href={`/teams/${tour.TeamId}/tours/${tour.id}/preview/stops/${TourStopId}`} />
+                                  <PreviewButton
+                                    href={`/teams/${tour.TeamId}/tours/${tour.id}/preview${TourStopId ? `/stops/${TourStopId}` : ''}`}
+                                    variant={variant}
+                                  />
                                 </>
                               )}
                             </>
@@ -308,6 +311,7 @@ function Stop({ StopId, transition, children }) {
                       stop={stop}
                       transition={transition}
                       variant={variant}
+                      fallbackVariant={tour?.variants[0] ?? stop?.variants[0]}
                       onTimeUpdate={(newPosition) => setPosition(newPosition)}
                     />
                   </PhoneScreen>
@@ -316,7 +320,14 @@ function Stop({ StopId, transition, children }) {
             </div>
           </>
         )}
-        {isShowingResourcesModal && <ResourcesModal isShowing={true} onHide={onHideResourcesModal} onSelect={onSelectResource} />}
+        {isShowingResourcesModal && (
+          <ResourcesModal
+            isShowing={true}
+            onHide={onHideResourcesModal}
+            onSelect={onSelectResource}
+            variants={tour?.variants ?? stop?.variants}
+          />
+        )}
         {isConfirmArchiveShowing && (
           <ConfirmModal
             isShowing={true}

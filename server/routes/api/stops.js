@@ -5,6 +5,7 @@ import { Op } from 'sequelize';
 
 import helpers from '../helpers.js';
 import interceptors from '../interceptors.js';
+import { translateText } from '../../lib/translate.js';
 import models from '../../models/index.js';
 
 import stopResourcesRouter from './stopResources.js';
@@ -81,6 +82,23 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
 });
 
 router.use('/:StopId/resources', stopResourcesRouter);
+
+router.post('/translate', interceptors.requireLogin, async (req, res) => {
+  const { source, target, data } = req.body;
+  if (!source || !target || !data) {
+    res.status(StatusCodes.BAD_REQUEST).end();
+    return;
+  }
+  let name = '';
+  if (data.name) {
+    name = await translateText(data.name, source, target);
+  }
+  let description = '';
+  if (data.description) {
+    description = await translateText(data.description, source, target);
+  }
+  res.json({ name, description });
+});
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {
   const record = await models.Stop.findByPk(req.params.id, {

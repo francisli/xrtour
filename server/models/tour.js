@@ -42,6 +42,85 @@ export default function (sequelize, DataTypes) {
       return json;
     }
 
+    async updateVariants(options) {
+      const { transaction } = options ?? {};
+      const tour = await sequelize.models.Tour.findByPk(this.id, {
+        include: [
+          'Team',
+          { model: sequelize.models.Resource, as: 'CoverResource', include: 'Files' },
+          {
+            model: sequelize.models.Stop,
+            as: 'IntroStop',
+            include: {
+              model: sequelize.models.StopResource,
+              as: 'Resources',
+              include: { model: sequelize.models.Resource, include: 'Files' },
+            },
+          },
+          {
+            model: sequelize.models.TourStop,
+            include: [
+              {
+                model: sequelize.models.Stop,
+                include: {
+                  model: sequelize.models.StopResource,
+                  as: 'Resources',
+                  include: { model: sequelize.models.Resource, include: 'Files' },
+                },
+              },
+              {
+                model: sequelize.models.Stop,
+                as: 'TransitionStop',
+                include: {
+                  model: sequelize.models.StopResource,
+                  as: 'Resources',
+                  include: { model: sequelize.models.Resource, include: 'Files' },
+                },
+              },
+            ],
+          },
+        ],
+        transaction,
+      });
+      const { variants } = this;
+      const stops = [tour.IntroStop, ...tour.TourStops.flatMap((ts) => [ts.Stop, ts.TransitionStop])].filter(Boolean);
+      await Promise.all(
+        stops.map((s) => {
+          for (const variant of variants) {
+            if (!s.variants.find((v) => v.code === variant.code)) {
+              s.variants = [...s.variants, variant];
+              s.names = { ...s.names, [variant.code]: '' };
+              s.descriptions = { ...s.descriptions, [variant.code]: '' };
+            }
+          }
+          return s.save({ transaction });
+        })
+      );
+      const resources = [tour.CoverResource, ...stops.flatMap((s) => s.Resources.map((sr) => sr.Resource))].filter(Boolean);
+      await Promise.all(
+        resources.map((r) => {
+          const Files = [...r.Files];
+          const promises = [];
+          for (const variant of variants) {
+            if (!r.variants.find((v) => v.code === variant.code)) {
+              r.variants = [...r.variants, variant];
+              promises.push(r.save({ transaction }));
+            }
+            if (!Files.find((f) => f.variant === variant.code)) {
+              promises.push(
+                sequelize.models.File.findOrCreate({
+                  where: { variant: variant.code, ResourceId: r.id },
+                  defaults: { variant: variant.code, ResourceId: r.id },
+                  transaction,
+                })
+              );
+            }
+          }
+          return Promise.all(promises);
+        })
+      );
+    }
+
     async delete(options) {
       const { isPermanent = false, transaction } = options ?? {};
       const resourceIds = new Set();

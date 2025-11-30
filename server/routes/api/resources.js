@@ -133,6 +133,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
             errors: error.errors.map((e) => _.pick(e, ['path', 'message', 'value'])),
           });
         } else {
+          console.log(error);
           res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
         }
       }

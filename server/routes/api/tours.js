@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 import helpers from '../helpers.js';
 import interceptors from '../interceptors.js';
+import { translateText } from '../../lib/translate.js';
 import models from '../../models/index.js';
 
 import tourStopsRouter from './tourStops.js';
@@ -59,6 +60,23 @@ router.post('/', interceptors.requireLogin, async (req, res) => {
 });
 
 router.use('/:TourId/stops', tourStopsRouter);
+
+router.post('/translate', interceptors.requireLogin, async (req, res) => {
+  const { source, target, data } = req.body;
+  if (!source || !target || !data) {
+    res.status(StatusCodes.BAD_REQUEST).end();
+    return;
+  }
+  let name = '';
+  if (data.name) {
+    name = await translateText(data.name, source, target);
+  }
+  let description = '';
+  if (data.description) {
+    description = await translateText(data.description, source, target);
+  }
+  res.json({ name, description });
+});
 
 router.get('/:id', interceptors.requireLogin, async (req, res) => {
   const record = await models.Tour.findByPk(req.params.id, {
@@ -116,9 +134,13 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
             return;
           }
         }
-        await record.update(
-          _.pick(req.body, ['name', 'link', 'names', 'descriptions', 'variants', 'visibility', 'CoverResourceId', 'IntroStopId'])
-        );
+        record.set(_.pick(req.body, ['name', 'link', 'names', 'descriptions', 'variants', 'visibility', 'CoverResourceId', 'IntroStopId']));
+        await models.sequelize.transaction(async (transaction) => {
+          if (record.changed('variants')) {
+            await record.updateVariants({ transaction });
+          }
+          await record.save({ transaction });
+        });
         res.json(record.toJSON());
       } catch (error) {
         if (error.name === 'SequelizeValidationError') {
@@ -127,6 +149,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
             errors: error.errors.map((e) => _.pick(e, ['path', 'message', 'value'])),
           });
         } else {
+          console.log(error);
           res.status(StatusCodes.INTERNAL_SERVER_ERROR).end();
         }
       }

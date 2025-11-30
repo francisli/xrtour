@@ -42,3 +42,14 @@
     border-top: 1px solid lightgray;
   }
 }
+
+.toc__variants {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+
+  .dropdown-menu {
+    right: 0;
+    min-width: inherit;
+  }
+}

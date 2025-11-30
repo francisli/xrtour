@@ -14,6 +14,14 @@ import Toc from './Toc';
 
 import './StopViewer.scss';
 
+function getVariantFile(files, variant, fallbackVariant, variantSuffix = '') {
+  let file = files.find((f) => f.variant === `${variant?.code}${variantSuffix}`);
+  if (!file?.key) {
+    file = files.find((f) => f.variant === `${fallbackVariant?.code}${variantSuffix}`);
+  }
+  return file;
+}
+
 function StopViewer({
   autoPlay,
   controls,
@@ -25,6 +33,9 @@ function StopViewer({
   stop,
   transition,
   variant,
+  fallbackVariant,
+  variants,
+  onSelectVariant,
   onEnded,
   onPause,
   onSelect,
@@ -55,6 +66,7 @@ function StopViewer({
   const [isTocOpen, setTocOpen] = useState(false);
   const [isMapOpen, setMapOpen] = useState(false);
   const [isCC, setCC] = useState(false);
+  const [isShowingVariants, setShowingVariants] = useState(false);
 
   useEffect(() => {
     if (stop?.Resources) {
@@ -69,13 +81,13 @@ function StopViewer({
           newDuration = Math.max(newDuration, sr.start);
         }
         if (sr.Resource.type === 'AUDIO') {
-          newDuration = Math.max(newDuration, sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0);
+          newDuration = Math.max(newDuration, sr.start + getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.duration ?? 0);
           newTracks.push(sr);
         } else if (sr.Resource.type === 'IMAGE') {
           newImages.push({ ...sr });
           // preload image
           const img = new Image();
-          img.src = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
+          img.src = getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.URL;
         } else if (
           sr.Resource.type === '3D_MODEL' ||
           sr.Resource.type === 'AR_LINK' ||
@@ -106,14 +118,14 @@ function StopViewer({
           if (sr.Resource.type === 'AUDIO') {
             newDuration = Math.max(
               newDuration,
-              offset + sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0
+              offset + sr.start + getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.duration ?? 0
             );
             newTracks.push({ ...sr, start: offset + sr.start });
           } else if (sr.Resource.type === 'IMAGE') {
             newImages.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
             // preload image
             const img = new Image();
-            img.src = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
+            img.src = getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.URL;
           } else if (
             sr.Resource.type === '3D_MODEL' ||
             sr.Resource.type === 'AR_LINK' ||
@@ -141,7 +153,7 @@ function StopViewer({
       let newImageOptions;
       for (const sr of images) {
         if (((position === 0 && sr.start <= position) || sr.start < position) && (sr.end ?? Number.MAX_SAFE_INTEGER) >= position) {
-          newImageURL = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
+          newImageURL = getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.URL;
           newImageOptions = sr.options;
           break;
         }
@@ -164,7 +176,7 @@ function StopViewer({
         setCurrentOverlay(newOverlay);
       }
       for (const sr of tracks) {
-        const end = sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0;
+        const end = sr.start + getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.duration ?? 0;
         if (sr.start <= position && position < end) {
           const audio = ref.current[sr.id];
           if (!isPlaying && audio?.paused) {
@@ -187,6 +199,7 @@ function StopViewer({
       for (const audio of Object.values(ref.current)) {
         audio.pause();
       }
+      onPause?.();
     } else {
       if (currentTrack) {
         let audio = ref.current[currentTrack.id];
@@ -272,7 +285,7 @@ function StopViewer({
         setSelectedOverlay(currentOverlay);
         break;
       case 'AR_LINK':
-        window.open(currentOverlay.Resource.Files.find((f) => f.variant === variant.code)?.URL, '_blank');
+        window.open(getVariantFile(currentOverlay.Resource.Files, variant, fallbackVariant)?.URL, '_blank');
         break;
       case 'IMAGE_OVERLAY':
         setSelectedOverlay(currentOverlay);
@@ -285,6 +298,18 @@ function StopViewer({
     }
   }
 
+  function onToggleCC() {
+    if (!isCC && variants?.length > 1) {
+      setShowingVariants(true);
+    }
+    setCC(!isCC);
+  }
+
+  function onSelectVariantInternal(v) {
+    onSelectVariant?.(v);
+    setShowingVariants(false);
+  }
+
   let hasCC = false;
   const audio = tracks?.map((sr, i) => (
     <audio
@@ -294,11 +319,11 @@ function StopViewer({
       id={sr.id}
       key={sr.id}
       ref={(el) => el && (ref.current[el.id] = el)}
-      src={sr.Resource.Files.find((f) => f.variant === variant.code)?.URL}
+      src={getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.URL}
       onTimeUpdate={onTimeUpdateInternal}
       onEnded={onEndedInternal}>
       {(() => {
-        const subtitles = sr.Resource.Files.find((f) => f.variant === `${variant.code}-vtt`);
+        const subtitles = getVariantFile(sr.Resource.Files, variant, undefined, '-vtt');
         if (subtitles?.URL) {
           hasCC = true;
           return (
@@ -362,7 +387,7 @@ function StopViewer({
           </div>
         )}
         <div className="stop-viewer__title h5">
-          {stopIndex ?? '#'}. {stop?.names[variant?.code]}
+          {stopIndex ?? '#'}. {stop?.names[variant?.code] || stop?.names[fallbackVariant?.code]}
         </div>
         <div className="stop-viewer__controls">
           <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber mb-2" />
@@ -373,7 +398,7 @@ function StopViewer({
               {isPlaying && <FontAwesomeIcon icon={faPause} />}
             </button>
             <button
-              onClick={() => setCC(!isCC)}
+              onClick={onToggleCC}
               type="button"
               className={classNames('btn btn-lg btn-transparent btn-round', { invisible: !hasCC })}>
               {!isCC && <FontAwesomeIcon icon={faCC} />}
@@ -397,11 +422,21 @@ function StopViewer({
         </>
       )}
       {isCC && subtitleText && <div className="stop-viewer__subtitles">{subtitleText}</div>}
+      {isShowingVariants && (
+        <ul className="stop-viewer__variants list-group">
+          {variants?.map((v) => (
+            <li key={v.code} onClick={() => onSelectVariantInternal(v)} className="list-group-item">
+              {v.displayName}
+            </li>
+          ))}
+        </ul>
+      )}
       <>
         <Toc
           isOpen={isTocOpen}
           onClose={() => setTocOpen(false)}
           onSelect={onSelectInternal}
+          onSelectVariant={onSelectVariant}
           tour={tour}
           tourStops={tourStops}
           variant={variant}

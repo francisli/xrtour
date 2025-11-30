@@ -204,6 +204,132 @@ describe('/api/tours', () => {
     });
   });
 
+  describe('POST /translate', () => {
+    it('translates a Tour name/description', async function () {
+      if (process.env.CI) {
+        return this.skip();
+      }
+      const response = await testSession
+        .post('/api/tours/translate')
+        .set('Accept', 'application/json')
+        .send({
+          source: 'en-us',
+          target: 'es',
+          data: {
+            name: 'Tour 2',
+            description: 'Tour 2 description',
+          },
+        })
+        .expect(StatusCodes.OK);
+
+      assert.deepStrictEqual(response.body, {
+        name: 'Vuelta 2',
+        description: 'Descripción del Tour 2',
+      });
+    });
+  });
+
+  describe('PATCH /:id', () => {
+    it('updates a Tour by id', async () => {
+      const data = {
+        name: 'Updated Internal Tour Name',
+        link: 'updatedtour',
+        names: { 'en-us': 'Updated Tour' },
+        descriptions: { 'en-us': 'Updated Tour description' },
+        variants: [{ name: 'English (US)', displayName: 'English', code: 'en-us' }],
+        visibility: 'UNLISTED',
+      };
+      const response = await testSession
+        .patch('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352')
+        .set('Accept', 'application/json')
+        .send(data)
+        .expect(StatusCodes.OK);
+
+      assert.deepStrictEqual(response.body, {
+        ...data,
+        id: '495b18a8-ae05-4f44-a06d-c1809add0352',
+        CoverResourceId: null,
+        IntroStopId: null,
+        TeamId: '1a93d46d-89bf-463b-ab23-8f22f5777907',
+        Team: response.body.Team,
+        createdAt: response.body.createdAt,
+        updatedAt: response.body.updatedAt,
+        archivedAt: null,
+      });
+
+      const record = await models.Tour.findByPk('495b18a8-ae05-4f44-a06d-c1809add0352');
+      assert(record);
+      assert.deepStrictEqual(record.name, 'Updated Internal Tour Name');
+      assert.deepStrictEqual(record.link, 'updatedtour');
+      assert.deepStrictEqual(record.names, { 'en-us': 'Updated Tour' });
+      assert.deepStrictEqual(record.descriptions, { 'en-us': 'Updated Tour description' });
+      assert.deepStrictEqual(record.variants, [{ name: 'English (US)', displayName: 'English', code: 'en-us' }]);
+      assert.deepStrictEqual(record.visibility, 'UNLISTED');
+    });
+
+    it('updates all Tour Stops and Resources with new variants', async () => {
+      const data = {
+        variants: [
+          { name: 'English (US)', displayName: 'English', code: 'en-us' },
+          { name: 'Spanish', displayName: 'Español', code: 'es' },
+        ],
+      };
+      await testSession
+        .patch('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352')
+        .set('Accept', 'application/json')
+        .send(data)
+        .expect(StatusCodes.OK);
+
+      const record = await models.Tour.findByPk('495b18a8-ae05-4f44-a06d-c1809add0352', {
+        include: [
+          { model: models.Resource, as: 'CoverResource', include: 'Files' },
+          {
+            model: models.Stop,
+            as: 'IntroStop',
+            include: {
+              model: models.StopResource,
+              as: 'Resources',
+              include: { model: models.Resource, include: 'Files' },
+            },
+          },
+          {
+            model: models.TourStop,
+            include: [
+              {
+                model: models.Stop,
+                include: {
+                  model: models.StopResource,
+                  as: 'Resources',
+                  include: { model: models.Resource, include: 'Files' },
+                },
+              },
+              {
+                model: models.Stop,
+                as: 'TransitionStop',
+                include: {
+                  model: models.StopResource,
+                  as: 'Resources',
+                  include: { model: models.Resource, include: 'Files' },
+                },
+              },
+            ],
+          },
+        ],
+      });
+      assert.deepStrictEqual(record.variants, data.variants);
+      for (const ts of record.TourStops) {
+        assert.deepStrictEqual(ts.Stop.variants, data.variants);
+        for (const sr of ts.Stop.Resources) {
+          assert.deepStrictEqual(sr.Resource.variants, data.variants);
+          const Files = [...sr.Resource.Files];
+          for (const variant of data.variants) {
+            assert.ok(Files.find((file) => file.variant === variant.code));
+          }
+        }
+      }
+    });
+  });
+
   describe('DELETE /:id', () => {
     it('archives a Tour and orphaned Stops and Resources', async () => {
       await testSession.delete('/api/tours/495b18a8-ae05-4f44-a06d-c1809add0352').expect(StatusCodes.NO_CONTENT);
