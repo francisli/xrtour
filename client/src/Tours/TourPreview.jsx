@@ -16,7 +16,9 @@ function TourPreview() {
   const navigate = useNavigate();
   const { TourId, TourStopId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [position, setPosition] = useState(0);
+  const initialVariant = searchParams.get('variant');
+  const initialPosition = searchParams.get('position');
+  const [position, setPosition] = useState(parseInt(initialPosition ?? '0', 10));
   const [Tour, setTour] = useState();
   const [TourStops, setTourStops] = useState();
   const [TourStop, setTourStop] = useState();
@@ -38,12 +40,12 @@ function TourPreview() {
         .then((response) => {
           if (isCancelled) return;
           setTour(newTour);
-          setVariant(newTour.variants[0]);
+          setVariant(newTour.variants.find((v) => v.code === initialVariant) ?? newTour.variants[0]);
           setTourStops(response.data);
         });
     }
     return () => (isCancelled = true);
-  }, [TourId]);
+  }, [TourId, initialVariant]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -110,7 +112,7 @@ function TourPreview() {
   }
 
   function onPause() {
-    setSearchParams(`position=${position}`);
+    setSearchParams(`position=${position}&variant=${variant?.code}`);
   }
 
   return (

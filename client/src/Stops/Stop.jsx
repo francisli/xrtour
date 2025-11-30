@@ -252,7 +252,10 @@ function Stop({ StopId, transition, children }) {
                               {tour && (
                                 <>
                                   &nbsp;
-                                  <PreviewButton href={`/teams/${tour.TeamId}/tours/${tour.id}/preview/stops/${TourStopId}`} />
+                                  <PreviewButton
+                                    href={`/teams/${tour.TeamId}/tours/${tour.id}/preview${TourStopId ? `/stops/${TourStopId}` : ''}`}
+                                    variant={variant}
+                                  />
                                 </>
                               )}
                             </>

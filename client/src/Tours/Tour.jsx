@@ -186,7 +186,7 @@ function Tour() {
                           Edit
                         </Link>
                       )}
-                      <PreviewButton href={`/teams/${membership?.TeamId}/tours/${TourId}/preview`} />
+                      <PreviewButton href={`/teams/${membership?.TeamId}/tours/${TourId}/preview`} variant={variant} />
                       {isEditor && (
                         <Link className="btn btn-outline-primary" to="publish">
                           Publish

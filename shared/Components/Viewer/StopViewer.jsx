@@ -196,6 +196,7 @@ function StopViewer({
       for (const audio of Object.values(ref.current)) {
         audio.pause();
       }
+      onPause?.();
     } else {
       if (currentTrack) {
         let audio = ref.current[currentTrack.id];
