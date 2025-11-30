@@ -65,7 +65,7 @@ router.get('/translate', interceptors.requireLogin, async (req, res) => {
   // download file
   const vttFileData = await s3.getObjectData(vttKey);
   const translatedFileData = await translateDocument(vttFileData, source, target);
-  const outputKey = `${uuid()}/${uuid()}.vtt`;
+  const outputKey = `${uuid()}.vtt`;
   const outputPath = `uploads/${outputKey}`;
   await s3.putObjectData(outputPath, translatedFileData);
   res.json({

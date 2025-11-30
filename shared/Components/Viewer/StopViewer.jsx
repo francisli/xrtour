@@ -14,6 +14,14 @@ import Toc from './Toc';
 
 import './StopViewer.scss';
 
+function getVariantFile(files, variant, fallbackVariant, variantSuffix = '') {
+  let file = files.find((f) => f.variant === `${variant?.code}${variantSuffix}`);
+  if (!file?.key) {
+    file = files.find((f) => f.variant === `${fallbackVariant?.code}${variantSuffix}`);
+  }
+  return file;
+}
+
 function StopViewer({
   autoPlay,
   controls,
@@ -25,6 +33,7 @@ function StopViewer({
   stop,
   transition,
   variant,
+  fallbackVariant,
   onEnded,
   onPause,
   onSelect,
@@ -69,13 +78,13 @@ function StopViewer({
           newDuration = Math.max(newDuration, sr.start);
         }
         if (sr.Resource.type === 'AUDIO') {
-          newDuration = Math.max(newDuration, sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0);
+          newDuration = Math.max(newDuration, sr.start + getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.duration ?? 0);
           newTracks.push(sr);
         } else if (sr.Resource.type === 'IMAGE') {
           newImages.push({ ...sr });
           // preload image
           const img = new Image();
-          img.src = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
+          img.src = getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.URL;
         } else if (
           sr.Resource.type === '3D_MODEL' ||
           sr.Resource.type === 'AR_LINK' ||
@@ -106,14 +115,14 @@ function StopViewer({
           if (sr.Resource.type === 'AUDIO') {
             newDuration = Math.max(
               newDuration,
-              offset + sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0
+              offset + sr.start + getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.duration ?? 0
             );
             newTracks.push({ ...sr, start: offset + sr.start });
           } else if (sr.Resource.type === 'IMAGE') {
             newImages.push({ ...sr, start: offset + sr.start, end: Number.isInteger(sr.end) ? offset + sr.end : null });
             // preload image
             const img = new Image();
-            img.src = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
+            img.src = getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.URL;
           } else if (
             sr.Resource.type === '3D_MODEL' ||
             sr.Resource.type === 'AR_LINK' ||
@@ -141,7 +150,7 @@ function StopViewer({
       let newImageOptions;
       for (const sr of images) {
         if (((position === 0 && sr.start <= position) || sr.start < position) && (sr.end ?? Number.MAX_SAFE_INTEGER) >= position) {
-          newImageURL = sr.Resource.Files.find((f) => f.variant === variant.code)?.URL;
+          newImageURL = getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.URL;
           newImageOptions = sr.options;
           break;
         }
@@ -164,7 +173,7 @@ function StopViewer({
         setCurrentOverlay(newOverlay);
       }
       for (const sr of tracks) {
-        const end = sr.start + sr.Resource.Files.find((f) => f.variant === variant.code)?.duration ?? 0;
+        const end = sr.start + getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.duration ?? 0;
         if (sr.start <= position && position < end) {
           const audio = ref.current[sr.id];
           if (!isPlaying && audio?.paused) {
@@ -272,7 +281,7 @@ function StopViewer({
         setSelectedOverlay(currentOverlay);
         break;
       case 'AR_LINK':
-        window.open(currentOverlay.Resource.Files.find((f) => f.variant === variant.code)?.URL, '_blank');
+        window.open(getVariantFile(currentOverlay.Resource.Files, variant, fallbackVariant)?.URL, '_blank');
         break;
       case 'IMAGE_OVERLAY':
         setSelectedOverlay(currentOverlay);
@@ -294,11 +303,11 @@ function StopViewer({
       id={sr.id}
       key={sr.id}
       ref={(el) => el && (ref.current[el.id] = el)}
-      src={sr.Resource.Files.find((f) => f.variant === variant.code)?.URL}
+      src={getVariantFile(sr.Resource.Files, variant, fallbackVariant)?.URL}
       onTimeUpdate={onTimeUpdateInternal}
       onEnded={onEndedInternal}>
       {(() => {
-        const subtitles = sr.Resource.Files.find((f) => f.variant === `${variant.code}-vtt`);
+        const subtitles = getVariantFile(sr.Resource.Files, variant, fallbackVariant, '-vtt');
         if (subtitles?.URL) {
           hasCC = true;
           return (
@@ -362,7 +371,7 @@ function StopViewer({
           </div>
         )}
         <div className="stop-viewer__title h5">
-          {stopIndex ?? '#'}. {stop?.names[variant?.code]}
+          {stopIndex ?? '#'}. {stop?.names[variant?.code] || stop?.names[fallbackVariant?.code]}
         </div>
         <div className="stop-viewer__controls">
           <Scrubber onSeek={onSeek} position={position} duration={duration} className="stop-viewer__scrubber mb-2" />

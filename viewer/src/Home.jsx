@@ -141,6 +141,7 @@ function Home() {
               stop={TourStop ? TourStop.Stop : Tour.IntroStop}
               transition={TourStop?.TransitionStop}
               variant={variant}
+              fallbackVariant={Tour?.variants?.[0]}
               onEnded={onEnded}
               onSelect={onSelect}
               position={position}

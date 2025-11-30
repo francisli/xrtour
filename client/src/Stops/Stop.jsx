@@ -308,6 +308,7 @@ function Stop({ StopId, transition, children }) {
                       stop={stop}
                       transition={transition}
                       variant={variant}
+                      fallbackVariant={tour?.variants[0] ?? stop?.variants[0]}
                       onTimeUpdate={(newPosition) => setPosition(newPosition)}
                     />
                   </PhoneScreen>
