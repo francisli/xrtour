@@ -55,7 +55,14 @@ function TeamAssetsList() {
             <Modal.Title>Assets</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <ResourceForm ResourceId={ResourceId} type={type} onCancel={() => setEditing(false)} onCreate={onCreate} onUpdate={onUpdate} />
+            <ResourceForm
+              ResourceId={ResourceId}
+              type={type}
+              onCancel={() => setEditing(false)}
+              onCreate={onCreate}
+              onUpdate={onUpdate}
+              variants={membership?.Team?.variants}
+            />
           </Modal.Body>
         </Modal>
       )}
