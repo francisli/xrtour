@@ -42,7 +42,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
 
 router.get('/translate', interceptors.requireLogin, async (req, res) => {
   const { id, key, source, target } = req.query;
-  let vttKey;
+  let vttKey, name;
   if (id) {
     const record = await models.File.findByPk(id, { include: { model: models.Resource, include: 'Team' } });
     if (record) {
@@ -52,9 +52,11 @@ router.get('/translate', interceptors.requireLogin, async (req, res) => {
         return;
       }
       vttKey = record.getAssetPath('key');
+      ({ name } = path.parse(record.originalName || record.key));
     }
   } else if (key) {
     vttKey = path.join('uploads', key);
+    ({ name } = path.parse(key));
   } else {
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).end();
     return;
@@ -78,7 +80,7 @@ router.get('/translate', interceptors.requireLogin, async (req, res) => {
     translatedVttFile.add(cue.start / 1000, cue.end / 1000, cue.part);
   });
   const translatedVttFileData = translatedVttFile.toString();
-  const outputKey = `${uuid()}.vtt`;
+  const outputKey = `${name}_${target}.vtt`;
   const outputPath = `uploads/${outputKey}`;
   await s3.putObjectData(outputPath, translatedVttFileData);
   res.json({
@@ -129,7 +131,7 @@ router.post('/transcribe', interceptors.requireLogin, async (req, res) => {
 });
 
 router.get('/transcribe', interceptors.requireLogin, async (req, res) => {
-  const { jobName } = req.query;
+  const { jobName, originalName } = req.query;
   if (!jobName) {
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).end();
     return;
@@ -139,10 +141,13 @@ router.get('/transcribe', interceptors.requireLogin, async (req, res) => {
     if (response.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
       // if transcription bucket is not the same as assets bucket, copy
       const jobName = response.TranscriptionJob?.TranscriptionJobName;
-      const vttFileKey = `uploads/${jobName}/${jobName}.vtt`;
-      const vttFilePath = await transcribe.getObject(vttFileKey);
-      await s3.putObject(vttFileKey, vttFilePath);
-      response.TranscriptionJob.Transcript.TranscriptVttFileUri = await s3.getSignedAssetUrl(vttFileKey);
+      const srcVttFileKey = `uploads/${jobName}/${jobName}.vtt`;
+      const vttFilePath = await transcribe.getObject(srcVttFileKey);
+      // rename to match originalName of source
+      const { name } = path.parse(originalName || srcVttFileKey);
+      const destVttFileKey = `uploads/${jobName}/${name}.vtt`;
+      await s3.putObject(destVttFileKey, vttFilePath);
+      response.TranscriptionJob.Transcript.TranscriptVttFileUri = await s3.getSignedAssetUrl(destVttFileKey);
     }
     res.json(response);
   } catch (error) {
