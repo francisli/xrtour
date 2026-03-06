@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import _ from 'lodash';
 import path from 'path';
 import { v4 as uuid } from 'uuid';
-import vttToJson from 'vtt-to-json';
+import { parse } from '@plussub/srt-vtt-parser';
 import Vtt from 'vtt-creator';
 
 import interceptors from '../interceptors.js';
@@ -68,16 +68,16 @@ router.get('/translate', interceptors.requireLogin, async (req, res) => {
   // download file
   const vttFileData = await s3.getObjectData(vttKey);
   const vttFile = new TextDecoder('utf-8').decode(vttFileData);
-  const vttJson = await vttToJson(vttFile);
+  const { entries: vttJson } = await parse(vttFile);
   const translatedVttJson = await Promise.all(
-    vttJson.map(async (cue) => {
-      cue.part = await translateText(cue.part, source, target);
-      return cue;
-    })
+    vttJson.map(async (cue) => ({
+      ...cue,
+      text: await translateText(cue.text, source, target),
+    }))
   );
   const translatedVttFile = new Vtt();
   translatedVttJson.forEach((cue) => {
-    translatedVttFile.add(cue.start / 1000, cue.end / 1000, cue.part);
+    translatedVttFile.add(cue.from / 1000, cue.to / 1000, cue.text);
   });
   const translatedVttFileData = translatedVttFile.toString();
   const outputKey = `${name}_${target}.vtt`;
