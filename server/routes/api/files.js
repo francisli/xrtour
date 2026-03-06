@@ -68,11 +68,11 @@ router.get('/translate', interceptors.requireLogin, async (req, res) => {
   // download file
   const vttFileData = await s3.getObjectData(vttKey);
   const vttFile = new TextDecoder('utf-8').decode(vttFileData);
-  const { entries: vttJson} = await parse(vttFile);
+  const { entries: vttJson } = await parse(vttFile);
   const translatedVttJson = await Promise.all(
     vttJson.map(async (cue) => ({
       ...cue,
-      text: await translateText(cue.text, source, target)
+      text: await translateText(cue.text, source, target),
     }))
   );
   const translatedVttFile = new Vtt();
