@@ -219,7 +219,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
       const { data } = response;
       if (data['$metadata']?.httpStatusCode === StatusCodes.OK) {
         const jobName = data.TranscriptionJob?.TranscriptionJobName;
-        pollGenerate(jobName);
+        pollGenerate(jobName, variantFile.originalName || variantFile.key);
       } else {
         setGenerating(false);
       }
@@ -241,9 +241,9 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
     }
   }
 
-  function pollGenerate(jobName) {
+  function pollGenerate(jobName, originalName) {
     setTimeout(async () => {
-      const response = await Api.files.poll(jobName);
+      const response = await Api.files.poll(jobName, originalName);
       const { data } = response;
       if (data.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
         const { TranscriptVttFileUri } = data.TranscriptionJob.Transcript;
@@ -255,7 +255,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
         setGenerating(false);
         onPreviewSubtitlesChange(TranscriptVttFileUri);
       } else {
-        pollGenerate(jobName);
+        pollGenerate(jobName, originalName);
       }
     }, 1000);
   }
