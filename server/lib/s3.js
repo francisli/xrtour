@@ -115,7 +115,7 @@ async function getObjectData(Key) {
   }
 }
 
-function getSignedAssetUrl({ Key, expiresIn = 60, originalName }) {
+function getSignedAssetUrl({ Key, expiresIn = 300, originalName }) {
   if (process.env.AWS_CLOUDFRONT_DOMAIN && !originalName) {
     const url = `https://${process.env.AWS_CLOUDFRONT_DOMAIN}/${Key}`;
     const keyPairId = process.env.AWS_CLOUDFRONT_KEYPAIR_ID;
