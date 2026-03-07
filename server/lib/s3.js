@@ -115,22 +115,22 @@ async function getObjectData(Key) {
   }
 }
 
-function getSignedAssetUrl(Key, expiresIn = 60) {
-  if (process.env.AWS_CLOUDFRONT_DOMAIN) {
+function getSignedAssetUrl(Key, expiresIn = 60, originalName) {
+  if (process.env.AWS_CLOUDFRONT_DOMAIN && !originalName) {
     const url = `https://${process.env.AWS_CLOUDFRONT_DOMAIN}/${Key}`;
     const keyPairId = process.env.AWS_CLOUDFRONT_KEYPAIR_ID;
     const privateKey = process.env.AWS_CLOUDFRONT_PRIVATE_KEY.replace(/\\n/g, '\n');
     const dateLessThan = DateTime.now().plus({ seconds: expiresIn }).toISO();
     return getSignedCloudFrontUrl({ url, keyPairId, privateKey, dateLessThan });
   }
-  return getSignedS3Url(
-    signerClient ?? client,
-    new GetObjectCommand({
-      Bucket: process.env.AWS_S3_BUCKET,
-      Key,
-    }),
-    { expiresIn }
-  );
+  const options = {
+    Bucket: process.env.AWS_S3_BUCKET,
+    Key,
+  };
+  if (originalName) {
+    options.ResponseContentDisposition = `attachment; filename="${originalName}"`;
+  }
+  return getSignedS3Url(signerClient ?? client, new GetObjectCommand(options), { expiresIn });
 }
 
 function getSignedUploadUrl(ContentType, Key) {

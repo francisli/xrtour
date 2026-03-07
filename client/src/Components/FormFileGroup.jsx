@@ -66,7 +66,10 @@ function FormFileGroup({ accept, children, className, disabled, file, id, label,
                       <button type="button" className="btn btn-sm btn-outline-danger" onClick={onRemoved}>
                         <FontAwesomeIcon icon={faTrashCan} />
                       </button>
-                      <a className="btn btn-sm btn-outline-secondary ms-2" download={file.originalName} href={file.keyURL}>
+                      <a
+                        className="btn btn-sm btn-outline-secondary ms-2"
+                        href={`${file.keyURL}?originalName=${file.originalName}`}
+                        target="_blank">
                         <FontAwesomeIcon icon={faDownload} />
                       </a>
                     </div>

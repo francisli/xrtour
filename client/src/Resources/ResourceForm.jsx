@@ -234,7 +234,12 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
       const { key, previewURL } = data;
       const newResource = { ...resource };
       variantFileSubtitles.key = key;
-      variantFileSubtitles.originalName = key.substring(key.lastIndexOf('/') + 1);
+      let baseName = primaryVariantFileSubtitles.originalName;
+      const index = baseName.lastIndexOf('.');
+      if (index > 0) {
+        baseName = baseName.substring(0, index);
+      }
+      variantFileSubtitles.originalName = `${baseName}_${variant.code}.vtt`;
       setResource(newResource);
       setGenerating(false);
       onPreviewSubtitlesChange(previewURL);
@@ -243,14 +248,19 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
 
   function pollGenerate(jobName, originalName) {
     setTimeout(async () => {
-      const response = await Api.files.poll(jobName, originalName);
+      const response = await Api.files.poll(jobName);
       const { data } = response;
       if (data.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
         const { TranscriptVttFileUri } = data.TranscriptionJob.Transcript;
         const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/') + 8, TranscriptVttFileUri.indexOf('?'));
         const newResource = { ...resource };
         variantFileSubtitles.key = key;
-        variantFileSubtitles.originalName = key.substring(key.lastIndexOf('/') + 1);
+        let baseName = originalName;
+        const index = baseName.lastIndexOf('.');
+        if (index > 0) {
+          baseName = baseName.substring(0, index);
+        }
+        variantFileSubtitles.originalName = `${baseName}.vtt`;
         setResource(newResource);
         setGenerating(false);
         onPreviewSubtitlesChange(TranscriptVttFileUri);
