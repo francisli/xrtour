@@ -48,10 +48,11 @@ router.put('/:path([^?]+)', interceptors.requireLogin, (req, res) => {
 
 router.get('/:path([^?]+)', async (req, res) => {
   let { path: assetPath } = req.params;
+  const { originalName } = req.query;
   if (process.env.ASSET_PATH_PREFIX) {
     assetPath = path.join(process.env.ASSET_PATH_PREFIX, assetPath);
   }
-  const url = await s3.getSignedAssetUrl(assetPath, 900);
+  const url = await s3.getSignedAssetUrl(assetPath, 900, originalName);
   res.set('Cache-Control', 'public, max-age=845');
   res.redirect(url);
 });
