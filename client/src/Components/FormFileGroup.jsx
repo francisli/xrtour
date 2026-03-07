@@ -68,7 +68,7 @@ function FormFileGroup({ accept, children, className, disabled, file, id, label,
                       </button>
                       <a
                         className="btn btn-sm btn-outline-secondary ms-2"
-                        href={`${file.keyURL}?originalName=${file.originalName}`}
+                        href={`${file.keyURL}${file.keyURL?.startsWith('/api/assets') ? `?originalName=${file.originalName}` : ''}`}
                         target="_blank">
                         <FontAwesomeIcon icon={faDownload} />
                       </a>

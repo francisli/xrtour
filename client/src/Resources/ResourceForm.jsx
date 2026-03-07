@@ -219,27 +219,35 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
       const { data } = response;
       if (data['$metadata']?.httpStatusCode === StatusCodes.OK) {
         const jobName = data.TranscriptionJob?.TranscriptionJobName;
-        pollGenerate(jobName, variantFile.originalName || variantFile.key);
+        let baseName = variantFile.originalName;
+        const index = baseName.lastIndexOf('.');
+        if (index > 0) {
+          baseName = baseName.substring(0, index);
+        }
+        pollGenerate(jobName, `${baseName}.vtt`);
       } else {
         setGenerating(false);
       }
     } else {
-      const response = await Api.files.translate({
-        id: primaryVariantFileSubtitles.id,
-        key: primaryVariantFileSubtitles.key,
-        source: primaryVariantFile.variant,
-        target: variant.code,
-      });
-      const { data } = response;
-      const { key, previewURL } = data;
-      const newResource = { ...resource };
-      variantFileSubtitles.key = key;
       let baseName = primaryVariantFileSubtitles.originalName;
       const index = baseName.lastIndexOf('.');
       if (index > 0) {
         baseName = baseName.substring(0, index);
       }
-      variantFileSubtitles.originalName = `${baseName}_${variant.code}.vtt`;
+      const originalName = `${baseName}_${variant.code}.vtt`;
+      const response = await Api.files.translate({
+        id: primaryVariantFileSubtitles.id,
+        key: primaryVariantFileSubtitles.key,
+        source: primaryVariantFile.variant,
+        target: variant.code,
+        originalName,
+      });
+      const { data } = response;
+      const { key, previewURL } = data;
+      const newResource = { ...resource };
+      variantFileSubtitles.key = key;
+      variantFileSubtitles.keyURL = previewURL;
+      variantFileSubtitles.originalName = originalName;
       setResource(newResource);
       setGenerating(false);
       onPreviewSubtitlesChange(previewURL);
@@ -248,19 +256,15 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
 
   function pollGenerate(jobName, originalName) {
     setTimeout(async () => {
-      const response = await Api.files.poll(jobName);
+      const response = await Api.files.poll(jobName, originalName);
       const { data } = response;
       if (data.TranscriptionJob?.TranscriptionJobStatus == 'COMPLETED') {
         const { TranscriptVttFileUri } = data.TranscriptionJob.Transcript;
         const key = TranscriptVttFileUri.substring(TranscriptVttFileUri.indexOf('uploads/') + 8, TranscriptVttFileUri.indexOf('?'));
         const newResource = { ...resource };
         variantFileSubtitles.key = key;
-        let baseName = originalName;
-        const index = baseName.lastIndexOf('.');
-        if (index > 0) {
-          baseName = baseName.substring(0, index);
-        }
-        variantFileSubtitles.originalName = `${baseName}.vtt`;
+        variantFileSubtitles.keyURL = TranscriptVttFileUri;
+        variantFileSubtitles.originalName = originalName;
         setResource(newResource);
         setGenerating(false);
         onPreviewSubtitlesChange(TranscriptVttFileUri);
@@ -387,13 +391,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
               <label className="mt-3">Subtitles</label>
               <br />
               <URLText url={variantFileSubtitles.keyURL} />
-            </>
-          )}
-          {variant && previewSubtitles[variant.code] && (
-            <>
-              <label className="mt-3">Subtitles</label>
-              <br />
-              <URLText url={previewSubtitles[variant.code]} />
             </>
           )}
         </div>
