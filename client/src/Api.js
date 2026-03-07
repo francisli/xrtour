@@ -62,11 +62,11 @@ const Api = {
       }
       throw new Error();
     },
-    poll(jobName) {
-      return instance.get(`/api/files/transcribe`, { params: { jobName } });
+    poll(jobName, originalName) {
+      return instance.get(`/api/files/transcribe`, { params: { jobName, originalName } });
     },
-    translate({ id, key, source, target }) {
-      return instance.get(`/api/files/translate`, { params: { id, key, source, target } });
+    translate({ id, key, source, target, originalName }) {
+      return instance.get(`/api/files/translate`, { params: { id, key, source, target, originalName } });
     },
   },
   google: {

@@ -41,7 +41,7 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
 });
 
 router.get('/translate', interceptors.requireLogin, async (req, res) => {
-  const { id, key, source, target } = req.query;
+  const { id, key, source, target, originalName } = req.query;
   let vttKey;
   if (id) {
     const record = await models.File.findByPk(id, { include: { model: models.Resource, include: 'Team' } });
@@ -83,7 +83,7 @@ router.get('/translate', interceptors.requireLogin, async (req, res) => {
   await s3.putObjectData(outputPath, translatedVttFileData);
   res.json({
     key: outputKey,
-    previewURL: await s3.getSignedAssetUrl(outputPath),
+    previewURL: await s3.getSignedAssetUrl({ Key: outputPath, originalName }),
   });
 });
 
@@ -129,7 +129,7 @@ router.post('/transcribe', interceptors.requireLogin, async (req, res) => {
 });
 
 router.get('/transcribe', interceptors.requireLogin, async (req, res) => {
-  const { jobName } = req.query;
+  const { jobName, originalName } = req.query;
   if (!jobName) {
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).end();
     return;
@@ -143,7 +143,7 @@ router.get('/transcribe', interceptors.requireLogin, async (req, res) => {
       const vttFilePath = await transcribe.getObject(srcVttFileKey);
       const destVttFileKey = `uploads/${jobName}/${jobName}.vtt`;
       await s3.putObject(destVttFileKey, vttFilePath);
-      response.TranscriptionJob.Transcript.TranscriptVttFileUri = await s3.getSignedAssetUrl(destVttFileKey);
+      response.TranscriptionJob.Transcript.TranscriptVttFileUri = await s3.getSignedAssetUrl({ Key: destVttFileKey, originalName });
     }
     res.json(response);
   } catch (error) {
