@@ -47,7 +47,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
   const [error, setError] = useState();
 
   const [isGenerating, setGenerating] = useState(false);
-  const [previewSubtitles, setPreviewSubtitles] = useState({});
+  const [previewFallback, setPreviewFallback] = useState({});
 
   const [isConfirmDeleteShowing, setConfirmDeleteShowing] = useState(false);
   const [deleteError, setDeleteError] = useState();
@@ -124,6 +124,14 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
       setResource({ ...resource });
     }
   }
+  let variantFileFallback = resource?.Files?.find((f) => f.variant === `${variant?.code}-fallback`);
+  if (!variantFileFallback && resource?.type === 'IMAGE_OVERLAY') {
+    variantFileFallback = { variant: `${variant?.code}-fallback`, externalURL: '', key: '' };
+    resource?.Files?.push(variantFileFallback);
+    if (resource) {
+      setResource({ ...resource });
+    }
+  }
 
   function onChange(event) {
     const newResource = { ...resource };
@@ -155,10 +163,10 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
     setPreviews(newPreviews);
   }
 
-  function onPreviewSubtitlesChange(newSubtitles) {
-    const newPreviewSubtitles = { ...previewSubtitles };
-    newPreviewSubtitles[variant.code] = newSubtitles;
-    setPreviewSubtitles(newPreviewSubtitles);
+  function onPreviewFallbackChange(newPreview) {
+    const newPreviewFallback = { ...previewFallback };
+    newPreviewFallback[variant.code] = newPreview;
+    setPreviewFallback(newPreviewFallback);
   }
 
   function onPreviewAudioDurationChange(newDuration) {
@@ -185,9 +193,32 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
     setResource(newResource);
   }
 
+  function onPreviewFallbackImageLoad(event) {
+    const { target: img } = event;
+    const newVariantFile = { ...variantFileFallback };
+    newVariantFile.width = img.naturalWidth;
+    newVariantFile.height = img.naturalHeight;
+    const newResource = { ...resource };
+    const index = newResource.Files.indexOf(variantFileFallback);
+    if (index >= 0) {
+      newResource.Files[index] = newVariantFile;
+    }
+    setResource(newResource);
+  }
+
   function onChangeVariantFileSubtitles(newFile) {
     const newResource = { ...resource };
     const index = newResource.Files.indexOf(variantFileSubtitles);
+    if (index >= 0) {
+      newResource.Files[index] = newFile;
+    }
+    setResource(newResource);
+    setUploading();
+  }
+
+  function onChangeVariantFileFallback(newFile) {
+    const newResource = { ...resource };
+    const index = newResource.Files.indexOf(variantFileFallback);
     if (index >= 0) {
       newResource.Files[index] = newFile;
     }
@@ -250,7 +281,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
       variantFileSubtitles.originalName = originalName;
       setResource(newResource);
       setGenerating(false);
-      onPreviewSubtitlesChange(previewURL);
     }
   }
 
@@ -267,7 +297,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
         variantFileSubtitles.originalName = originalName;
         setResource(newResource);
         setGenerating(false);
-        onPreviewSubtitlesChange(TranscriptVttFileUri);
       } else {
         pollGenerate(jobName, originalName);
       }
@@ -315,7 +344,6 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
                   accept={ACCEPTED_FILES['AUDIO_SUBTITLES']}
                   disabled={isGenerating}
                   file={variantFileSubtitles}
-                  onPreview={onPreviewSubtitlesChange}
                   onUploading={setUploading}
                   onChangeFile={onChangeVariantFileSubtitles}>
                   {!variantFileSubtitles.key && (
@@ -333,6 +361,16 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
                     </>
                   )}
                 </FormFileGroup>
+              )}
+              {resource.type === 'IMAGE_OVERLAY' && (
+                <FormFileGroup
+                  id="fallbackfile"
+                  label="Fallback Image"
+                  accept={ACCEPTED_FILES['IMAGE']}
+                  file={variantFileFallback}
+                  onPreview={onPreviewFallbackChange}
+                  onUploading={setUploading}
+                  onChangeFile={onChangeVariantFileFallback}></FormFileGroup>
               )}
               <div className="d-flex justify-content-between mb-3">
                 <div>
@@ -391,6 +429,30 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
               <label className="mt-3">Subtitles</label>
               <br />
               <URLText url={variantFileSubtitles.keyURL} />
+            </>
+          )}
+          {variantFileFallback?.keyURL && (
+            <>
+              <label className="mt-3">Fallback Image</label>
+              <br />
+              <img
+                className="img-fluid"
+                alt={variantFileFallback?.originalName}
+                src={variantFileFallback.keyURL}
+                onLoad={onPreviewFallbackImageLoad}
+              />
+            </>
+          )}
+          {variant && previewFallback[variant.code] && (
+            <>
+              <label className="mt-3">Fallback Image</label>
+              <br />
+              <img
+                className="img-fluid"
+                alt={variantFileFallback?.originalName}
+                src={previewFallback[variant.code]}
+                onLoad={onPreviewFallbackImageLoad}
+              />
             </>
           )}
         </div>
