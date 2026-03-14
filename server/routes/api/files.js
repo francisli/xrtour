@@ -42,6 +42,10 @@ router.patch('/:id', interceptors.requireLogin, async (req, res) => {
 
 router.get('/translate', interceptors.requireLogin, async (req, res) => {
   const { id, key, source, target, originalName } = req.query;
+  if (!id || !key || !source || !target || !originalName) {
+    res.status(StatusCodes.UNPROCESSABLE_ENTITY).end();
+    return;
+  }
   let vttKey;
   if (id) {
     const record = await models.File.findByPk(id, { include: { model: models.Resource, include: 'Team' } });
@@ -53,11 +57,9 @@ router.get('/translate', interceptors.requireLogin, async (req, res) => {
       }
       vttKey = record.getAssetPath('key');
     }
-  } else if (key) {
+  }
+  if (!vttKey && key) {
     vttKey = path.join('uploads', key);
-  } else {
-    res.status(StatusCodes.UNPROCESSABLE_ENTITY).end();
-    return;
   }
   if (!vttKey) {
     res.status(StatusCodes.NOT_FOUND).end();
