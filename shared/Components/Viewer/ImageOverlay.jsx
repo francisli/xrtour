@@ -18,7 +18,7 @@ function ImageOverlay({ onClose, resource, variant }) {
   return (
     <div className="image-overlay">
       <div className="image-overlay__container" style={{ backgroundImage: isShowingFallback ? `url(${fallbackImageURL})` : 'none' }}>
-        <Camera ref={camera} facingMode="environment" />
+        {!isShowingFallback && <Camera ref={camera} facingMode="environment" />}
       </div>
       <div className="image-overlay__image" style={{ backgroundImage: `url(${imageURL})`, opacity }}></div>
       <Scrubber
