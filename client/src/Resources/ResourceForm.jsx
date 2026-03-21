@@ -327,7 +327,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
                   {(resource.type !== 'AUDIO' || variant.code === resource.variants[0].code) && (
                     <FormFileGroup
                       id="file"
-                      label="File"
+                      label={resource.type === 'IMAGE_OVERLAY' ? 'Overlay' : 'File'}
                       accept={ACCEPTED_FILES[resource.type]}
                       file={variantFile}
                       onPreview={onPreviewChange}
@@ -365,7 +365,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
               {resource.type === 'IMAGE_OVERLAY' && (
                 <FormFileGroup
                   id="fallbackfile"
-                  label="Fallback Image"
+                  label="Optional Underlay"
                   accept={ACCEPTED_FILES['IMAGE']}
                   file={variantFileFallback}
                   onPreview={onPreviewFallbackChange}
