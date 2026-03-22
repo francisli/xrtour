@@ -433,7 +433,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
           )}
           {variantFileFallback?.keyURL && (
             <>
-              <label className="mt-3">Fallback Image</label>
+              <label className="mt-3">Optional Underlay</label>
               <br />
               <img
                 className="img-fluid"
@@ -445,7 +445,7 @@ function ResourceForm({ ResourceId, type, onCancel, onCreate, onUpdate, variants
           )}
           {variant && previewFallback[variant.code] && (
             <>
-              <label className="mt-3">Fallback Image</label>
+              <label className="mt-3">Optional Underlay</label>
               <br />
               <img
                 className="img-fluid"
