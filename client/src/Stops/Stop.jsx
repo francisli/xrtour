@@ -169,7 +169,7 @@ function Stop({ StopId, transition, children }) {
         {
           variant: variant.code,
           key: blob.signed_id,
-          originalName: blob.filename,
+          originalName: `${stop.name}.${variant.code}.mp3`,
           duration: blob.duration,
         },
       ],
