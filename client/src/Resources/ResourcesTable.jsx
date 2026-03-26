@@ -12,7 +12,15 @@ import ResourceForm from './ResourceForm';
 
 import './ResourcesTable.scss';
 
-function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEditable }) {
+function getVariantFile(files, variant, fallbackVariant, variantSuffix = '') {
+  let file = files.find((f) => f.variant === `${variant?.code}${variantSuffix}`);
+  if (!file?.key) {
+    file = files.find((f) => f.variant === `${fallbackVariant?.code}${variantSuffix}`);
+  }
+  return file;
+}
+
+function ResourcesTable({ variant, fallbackVariant, resources, onClick, onChange, onRemove, isEditable }) {
   const [selectedResource, setSelectedResource] = useState();
   const [selectedResourceClone, setSelectedResourceClone] = useState();
   const [isEditing, setEditing] = useState(false);
@@ -123,7 +131,7 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
                     />{' '}
                     -{' '}
                     {r.Resource.type === 'AUDIO' && (
-                      <TimeCode seconds={r.start + r.Resource.Files.find((f) => f.variant === variant.code).duration} />
+                      <TimeCode seconds={r.start + getVariantFile(r.Resource.Files, variant, fallbackVariant)?.duration} />
                     )}
                     {r.Resource.type !== 'AUDIO' &&
                       (r.end || (isEditing && selectedResource === r) ? (
@@ -228,6 +236,9 @@ function ResourcesTable({ variant, resources, onClick, onChange, onRemove, isEdi
 
 ResourcesTable.propTypes = {
   variant: PropTypes.shape({
+    code: PropTypes.string.isRequired,
+  }).isRequired,
+  fallbackVariant: PropTypes.shape({
     code: PropTypes.string.isRequired,
   }).isRequired,
   resources: PropTypes.arrayOf(

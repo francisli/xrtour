@@ -184,6 +184,7 @@ function Stop({ StopId, transition, children }) {
   const isEditable = isEditor && !isArchived;
 
   const title = stop?.name ?? '';
+  const primaryVariant = tour?.variants[0] ?? stop?.variants[0];
 
   return (
     <>
@@ -287,6 +288,7 @@ function Stop({ StopId, transition, children }) {
                 <h2>Assets</h2>
                 <ResourcesTable
                   variant={variant}
+                  fallbackVariant={primaryVariant}
                   resources={resources}
                   onClick={onClickResource}
                   onChange={onChangeResource}
@@ -311,7 +313,7 @@ function Stop({ StopId, transition, children }) {
                       stop={stop}
                       transition={transition}
                       variant={variant}
-                      fallbackVariant={tour?.variants[0] ?? stop?.variants[0]}
+                      fallbackVariant={primaryVariant}
                       onTimeUpdate={(newPosition) => setPosition(newPosition)}
                     />
                   </PhoneScreen>
